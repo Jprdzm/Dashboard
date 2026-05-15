@@ -1,20 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export function usePomodoro(initialWorkMinutes = 25) {
-  const workSeconds = initialWorkMinutes * 60;
+  const WORK = initialWorkMinutes * 60;
 
   const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(workSeconds);
+  const [timeLeft, setTimeLeft] = useState(WORK);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
 
   const intervalRef = useRef(null);
   const isBreakRef = useRef(false);
-  const breakDurationRef = useRef(5);
-  const workSecondsRef = useRef(workSeconds);
 
   useEffect(() => { isBreakRef.current = isBreak; }, [isBreak]);
-  useEffect(() => { breakDurationRef.current = breakDuration; }, [breakDuration]);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -23,27 +20,32 @@ export function usePomodoro(initialWorkMinutes = 25) {
     }
   }, []);
 
-  const play = useCallback(() => {
-    if (timeLeft <= 0) return;
-    setIsRunning(true);
-  }, [timeLeft]);
-
   const pause = useCallback(() => {
     setIsRunning(false);
     clearTimer();
   }, [clearTimer]);
+
+  const play = useCallback(() => {
+    if (timeLeft <= 0) return;
+    setIsRunning(true);
+  }, [timeLeft]);
 
   const reset = useCallback(() => {
     setIsRunning(false);
     clearTimer();
     setIsBreak(false);
     isBreakRef.current = false;
-    setTimeLeft(workSecondsRef.current);
-  }, [clearTimer]);
+    setTimeLeft(WORK);
+  }, [clearTimer, WORK]);
 
-  const handleSetBreakDuration = useCallback((mins) => {
+  const changeBreakDuration = useCallback((mins) => {
     setBreakDuration(mins);
-  }, []);
+    setIsRunning(false);
+    clearTimer();
+    if (isBreakRef.current) {
+      setTimeLeft(mins * 60);
+    }
+  }, [clearTimer]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -52,30 +54,35 @@ export function usePomodoro(initialWorkMinutes = 25) {
     }
 
     intervalRef.current = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (!isBreakRef.current) {
-            setIsBreak(true);
-            isBreakRef.current = true;
-            return breakDurationRef.current * 60;
-          }
-          setIsBreak(false);
-          isBreakRef.current = false;
-          return workSecondsRef.current;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => prev - 1);
     }, 1000);
 
     return () => clearTimer();
   }, [isRunning, clearTimer]);
+
+  useEffect(() => {
+    if (timeLeft > 0 || !isRunning) return;
+
+    clearTimer();
+    setIsRunning(false);
+
+    if (isBreak) {
+      setIsBreak(false);
+      isBreakRef.current = false;
+      setTimeLeft(WORK);
+    } else {
+      setIsBreak(true);
+      isBreakRef.current = true;
+      setTimeLeft(breakDuration * 60);
+    }
+  }, [timeLeft, isBreak, breakDuration, WORK, isRunning, clearTimer]);
 
   return {
     timeLeft,
     isRunning,
     isBreak,
     breakDuration,
-    setBreakDuration: handleSetBreakDuration,
+    setBreakDuration: changeBreakDuration,
     play,
     pause,
     reset,

@@ -4,7 +4,7 @@ import { ExternalLink } from 'lucide-react';
 export default function NotionLink() {
   return (
     <a
-      href="https://www.notion.so"
+      href="https://www.notion.so/Segundo-Cerebro-5d019a1a076345989474c3741930bd89"
       target="_blank"
       rel="noopener noreferrer"
       className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark group transition-all duration-300 hover:shadow-md hover:border-blue-400 dark:hover:border-blue-500 flex flex-col items-center justify-center text-center space-y-3 cursor-pointer"

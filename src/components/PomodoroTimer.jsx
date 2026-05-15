@@ -77,7 +77,7 @@ export default function PomodoroTimer() {
               : 'border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-surface-light dark:hover:bg-surface-dark'
           }`}
         >
-          5 min
+          Corto (5m)
         </button>
         <button
           onClick={() => setBreakDuration(15)}
@@ -87,7 +87,7 @@ export default function PomodoroTimer() {
               : 'border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-surface-light dark:hover:bg-surface-dark'
           }`}
         >
-          15 min
+          Largo (15m)
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useIndexedDB } from '../hooks/useIndexedDB';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -14,7 +14,7 @@ function formatDate(dateStr) {
 }
 
 export default function FinanceTracker() {
-  const [transactions, setTransactions] = useLocalStorage('transactions', []);
+  const [transactions, setTransactions] = useIndexedDB('transactions', []);
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
   const [description, setDescription] = useState('');
