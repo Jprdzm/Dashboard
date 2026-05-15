@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export function usePomodoro(initialWorkMinutes = 25) {
-  const WORK_MS = initialWorkMinutes * 60 * 1000;
+  const WORK_SECONDS = initialWorkMinutes * 60;
 
   const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(initialWorkMinutes * 60);
+  const [timeLeft, setTimeLeft] = useState(WORK_SECONDS);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
 
   const intervalRef = useRef(null);
   const endTimeRef = useRef(0);
-  const pauseRemainingRef = useRef(WORK_MS);
+  const remainingRef = useRef(WORK_SECONDS);
   const isBreakRef = useRef(false);
   const breakDurationRef = useRef(5);
 
@@ -34,14 +34,14 @@ export function usePomodoro(initialWorkMinutes = 25) {
     if (isBreakRef.current) {
       setIsBreak(false);
       isBreakRef.current = false;
-      pauseRemainingRef.current = WORK_MS;
-      setTimeLeft(WORK_MS / 1000);
+      remainingRef.current = WORK_SECONDS;
+      setTimeLeft(WORK_SECONDS);
     } else {
       setIsBreak(true);
       isBreakRef.current = true;
-      const ms = breakDurationRef.current * 60 * 1000;
-      pauseRemainingRef.current = ms;
-      setTimeLeft(ms / 1000);
+      const secs = breakDurationRef.current * 60;
+      remainingRef.current = secs;
+      setTimeLeft(secs);
     }
     endTimeRef.current = 0;
     setIsRunning(false);
@@ -61,16 +61,15 @@ export function usePomodoro(initialWorkMinutes = 25) {
   }, [isRunning, clearTimer]);
 
   const play = useCallback(() => {
-    if (pauseRemainingRef.current <= 0) return;
+    if (remainingRef.current <= 0) return;
 
-    endTimeRef.current = Date.now() + pauseRemainingRef.current;
-    pauseRemainingRef.current = 0;
+    endTimeRef.current = Date.now() + remainingRef.current * 1000;
     setIsRunning(true);
   }, []);
 
   const pause = useCallback(() => {
     if (endTimeRef.current > 0) {
-      pauseRemainingRef.current = Math.max(500, endTimeRef.current - Date.now());
+      remainingRef.current = Math.max(0.5, Math.ceil((endTimeRef.current - Date.now()) / 1000));
     }
     endTimeRef.current = 0;
     setIsRunning(false);
@@ -78,31 +77,36 @@ export function usePomodoro(initialWorkMinutes = 25) {
 
   const reset = useCallback(() => {
     endTimeRef.current = 0;
-    pauseRemainingRef.current = WORK_MS;
+    remainingRef.current = WORK_SECONDS;
     setIsBreak(false);
     isBreakRef.current = false;
-    setTimeLeft(WORK_MS / 1000);
+    setTimeLeft(WORK_SECONDS);
     setIsRunning(false);
-  }, [WORK_MS]);
+  }, [WORK_SECONDS]);
 
-  const changeBreakDuration = useCallback((mins) => {
-    setBreakDuration(mins);
-    if (isBreakRef.current) {
-      setIsRunning(false);
-      clearTimer();
-      const ms = mins * 60 * 1000;
-      pauseRemainingRef.current = ms;
-      endTimeRef.current = 0;
-      setTimeLeft(mins * 60);
+  const changeMode = useCallback((minutes) => {
+    clearTimer();
+    setIsRunning(false);
+    endTimeRef.current = 0;
+    const seconds = minutes * 60;
+    remainingRef.current = seconds;
+    setTimeLeft(seconds);
+    if (minutes === initialWorkMinutes) {
+      setIsBreak(false);
+      isBreakRef.current = false;
+    } else {
+      setBreakDuration(minutes);
+      setIsBreak(true);
+      isBreakRef.current = true;
     }
-  }, [clearTimer]);
+  }, [clearTimer, initialWorkMinutes]);
 
   return {
     timeLeft,
     isRunning,
     isBreak,
     breakDuration,
-    setBreakDuration: changeBreakDuration,
+    changeMode,
     play,
     pause,
     reset,

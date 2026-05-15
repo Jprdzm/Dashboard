@@ -7,8 +7,7 @@ export default function PomodoroTimer() {
     timeLeft,
     isRunning,
     isBreak,
-    breakDuration,
-    setBreakDuration,
+    changeMode,
     play,
     pause,
     reset,
@@ -65,14 +64,21 @@ export default function PomodoroTimer() {
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark">
-          Descanso:
-        </span>
+      <div className="flex items-center gap-2 flex-wrap justify-center">
         <button
-          onClick={() => setBreakDuration(5)}
+          onClick={() => changeMode(25)}
           className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors duration-200 ${
-            breakDuration === 5
+            !isBreak
+              ? 'bg-blue-500 text-white border-blue-500'
+              : 'border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-surface-light dark:hover:bg-surface-dark'
+          }`}
+        >
+          Trabajo (25m)
+        </button>
+        <button
+          onClick={() => changeMode(5)}
+          className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors duration-200 ${
+            isBreak
               ? 'bg-blue-500 text-white border-blue-500'
               : 'border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-surface-light dark:hover:bg-surface-dark'
           }`}
@@ -80,9 +86,9 @@ export default function PomodoroTimer() {
           Corto (5m)
         </button>
         <button
-          onClick={() => setBreakDuration(15)}
+          onClick={() => changeMode(15)}
           className={`px-3 py-1 text-xs font-medium rounded-md border transition-colors duration-200 ${
-            breakDuration === 15
+            isBreak
               ? 'bg-blue-500 text-white border-blue-500'
               : 'border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-surface-light dark:hover:bg-surface-dark'
           }`}

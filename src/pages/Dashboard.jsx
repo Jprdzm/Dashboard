@@ -1,7 +1,7 @@
 import React from 'react';
 import WelcomeBanner from '../components/WelcomeBanner';
 import NotionLink from '../components/NotionLink';
-import CalendarIframe from '../components/CalendarIframe';
+import CalendarEmbed from '../components/CalendarEmbed';
 import PomodoroTimer from '../components/PomodoroTimer';
 import FinanceCard from '../components/FinanceCard';
 import ProjectTracker from '../components/ProjectTracker';
@@ -25,7 +25,7 @@ export default function Dashboard() {
         </div>
 
         <div className="md:col-span-2 lg:col-span-3">
-          <CalendarIframe />
+          <CalendarEmbed />
         </div>
       </main>
     </div>
