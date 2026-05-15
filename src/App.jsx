@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import ThemeToggle from './components/ThemeToggle';
 import Dashboard from './pages/Dashboard';
 import FinanzasPage from './pages/FinanzasPage';
+import DeudasPage from './pages/DeudasPage';
+import MetasPage from './pages/MetasPage';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/finanzas" element={<FinanzasPage />} />
+        <Route path="/deudas" element={<DeudasPage />} />
+        <Route path="/metas" element={<MetasPage />} />
       </Routes>
     </div>
   );

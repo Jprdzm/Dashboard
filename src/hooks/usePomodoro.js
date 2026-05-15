@@ -1,17 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 export function usePomodoro(initialWorkMinutes = 25) {
-  const WORK = initialWorkMinutes * 60;
+  const WORK_MS = initialWorkMinutes * 60 * 1000;
 
   const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(WORK);
+  const [timeLeft, setTimeLeft] = useState(initialWorkMinutes * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
 
   const intervalRef = useRef(null);
+  const endTimeRef = useRef(0);
+  const pauseRemainingRef = useRef(WORK_MS);
   const isBreakRef = useRef(false);
+  const breakDurationRef = useRef(5);
 
   useEffect(() => { isBreakRef.current = isBreak; }, [isBreak]);
+  useEffect(() => { breakDurationRef.current = breakDuration; }, [breakDuration]);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current) {
@@ -20,32 +24,29 @@ export function usePomodoro(initialWorkMinutes = 25) {
     }
   }, []);
 
-  const pause = useCallback(() => {
-    setIsRunning(false);
-    clearTimer();
-  }, [clearTimer]);
+  const tickRef = useRef(null);
 
-  const play = useCallback(() => {
-    if (timeLeft <= 0) return;
-    setIsRunning(true);
-  }, [timeLeft]);
+  tickRef.current = () => {
+    const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+    setTimeLeft(remaining);
+    if (remaining > 0) return;
 
-  const reset = useCallback(() => {
-    setIsRunning(false);
-    clearTimer();
-    setIsBreak(false);
-    isBreakRef.current = false;
-    setTimeLeft(WORK);
-  }, [clearTimer, WORK]);
-
-  const changeBreakDuration = useCallback((mins) => {
-    setBreakDuration(mins);
-    setIsRunning(false);
-    clearTimer();
     if (isBreakRef.current) {
-      setTimeLeft(mins * 60);
+      setIsBreak(false);
+      isBreakRef.current = false;
+      pauseRemainingRef.current = WORK_MS;
+      setTimeLeft(WORK_MS / 1000);
+    } else {
+      setIsBreak(true);
+      isBreakRef.current = true;
+      const ms = breakDurationRef.current * 60 * 1000;
+      pauseRemainingRef.current = ms;
+      setTimeLeft(ms / 1000);
     }
-  }, [clearTimer]);
+    endTimeRef.current = 0;
+    setIsRunning(false);
+    clearTimer();
+  };
 
   useEffect(() => {
     if (!isRunning) {
@@ -53,29 +54,48 @@ export function usePomodoro(initialWorkMinutes = 25) {
       return;
     }
 
-    intervalRef.current = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
+    const id = setInterval(() => tickRef.current(), 100);
+    intervalRef.current = id;
 
-    return () => clearTimer();
+    return () => clearInterval(id);
   }, [isRunning, clearTimer]);
 
-  useEffect(() => {
-    if (timeLeft > 0 || !isRunning) return;
+  const play = useCallback(() => {
+    if (pauseRemainingRef.current <= 0) return;
 
-    clearTimer();
-    setIsRunning(false);
+    endTimeRef.current = Date.now() + pauseRemainingRef.current;
+    pauseRemainingRef.current = 0;
+    setIsRunning(true);
+  }, []);
 
-    if (isBreak) {
-      setIsBreak(false);
-      isBreakRef.current = false;
-      setTimeLeft(WORK);
-    } else {
-      setIsBreak(true);
-      isBreakRef.current = true;
-      setTimeLeft(breakDuration * 60);
+  const pause = useCallback(() => {
+    if (endTimeRef.current > 0) {
+      pauseRemainingRef.current = Math.max(500, endTimeRef.current - Date.now());
     }
-  }, [timeLeft, isBreak, breakDuration, WORK, isRunning, clearTimer]);
+    endTimeRef.current = 0;
+    setIsRunning(false);
+  }, []);
+
+  const reset = useCallback(() => {
+    endTimeRef.current = 0;
+    pauseRemainingRef.current = WORK_MS;
+    setIsBreak(false);
+    isBreakRef.current = false;
+    setTimeLeft(WORK_MS / 1000);
+    setIsRunning(false);
+  }, [WORK_MS]);
+
+  const changeBreakDuration = useCallback((mins) => {
+    setBreakDuration(mins);
+    if (isBreakRef.current) {
+      setIsRunning(false);
+      clearTimer();
+      const ms = mins * 60 * 1000;
+      pauseRemainingRef.current = ms;
+      endTimeRef.current = 0;
+      setTimeLeft(mins * 60);
+    }
+  }, [clearTimer]);
 
   return {
     timeLeft,
