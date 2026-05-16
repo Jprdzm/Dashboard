@@ -1,37 +1,21 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft,
-  Plus,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  Filter,
+  ArrowLeft, Plus, Trash2, Filter, Loader2,
 } from 'lucide-react';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell,
 } from 'recharts';
-import { useIndexedDB } from '../hooks/useIndexedDB';
+import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
+import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
 
 const CATEGORIES = [
-  'Estudios',
-  'Gimnasio',
-  'Comida',
-  'Transporte',
-  'Entretenimiento',
-  'Vivienda',
-  'Salud',
-  'Otros',
+  'Estudios', 'Gimnasio', 'Comida', 'Transporte',
+  'Entretenimiento', 'Vivienda', 'Salud', 'Otros',
 ];
 
 function formatCurrency(value) {
@@ -40,9 +24,7 @@ function formatCurrency(value) {
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString(LOCALE, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    year: 'numeric', month: '2-digit', day: '2-digit',
   });
 }
 
@@ -71,7 +53,11 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export default function FinanzasPage() {
-  const [transactions, setTransactions] = useIndexedDB('transactions', []);
+  const { user } = useAuth();
+  const supabaseReady = isSupabaseConfigured;
+
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(() => isSupabaseConfigured);
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
   const [description, setDescription] = useState('');
@@ -79,13 +65,34 @@ export default function FinanzasPage() {
   const [filterCategory, setFilterCategory] = useState('Todos');
   const [sortOrder, setSortOrder] = useState('newest');
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [refreshCount, setRefreshCount] = useState(0);
+
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('finanzas')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false });
+        if (cancelled) return;
+        if (error) {
+          console.error('[FinanzasPage] Error al obtener transacciones:', error);
+        } else if (data) {
+          setTransactions(data);
+        }
+      } catch (err) {
+        if (!cancelled) console.error('[FinanzasPage] Error inesperado al obtener transacciones:', err);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, refreshCount]);
 
   const balance = useMemo(
-    () =>
-      transactions.reduce(
-        (acc, t) => (t.type === 'income' ? acc + t.amount : acc - t.amount),
-        0,
-      ),
+    () => transactions.reduce((acc, t) => (t.type === 'income' ? acc + t.amount : acc - t.amount), 0),
     [transactions],
   );
 
@@ -115,7 +122,7 @@ export default function FinanzasPage() {
       .sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [transactions, selectedMonth]);
 
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const [sevenDaysAgo] = useState(() => Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const recentFiltered = useMemo(() => {
     let list = transactions.filter((t) => new Date(t.date).getTime() >= sevenDaysAgo);
@@ -142,36 +149,6 @@ export default function FinanzasPage() {
     return { totals, max };
   }, [transactions]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!amount || !description) return;
-
-    setTransactions((prev) => [
-      {
-        id: Date.now(),
-        amount: parseFloat(amount),
-        type,
-        description,
-        category,
-        date: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
-    setAmount('');
-    setDescription('');
-    setCategory('Otros');
-  };
-
-  const handleDelete = (id) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const handleBarClick = (entry) => {
-    if (entry?.month) {
-      setSelectedMonth((prev) => (prev === entry.month ? null : entry.month));
-    }
-  };
-
   const totalIncome = useMemo(
     () => transactions.reduce((acc, t) => (t.type === 'income' ? acc + t.amount : acc), 0),
     [transactions],
@@ -180,6 +157,76 @@ export default function FinanzasPage() {
     () => transactions.reduce((acc, t) => (t.type === 'expense' ? acc + t.amount : acc), 0),
     [transactions],
   );
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!amount || !description) return;
+    if (!supabaseReady) return;
+
+    const { error } = await supabase
+      .from('finanzas')
+      .insert([enrichWithUser({
+        amount: parseFloat(amount),
+        type,
+        description,
+        category,
+        date: new Date().toISOString(),
+      }, user)]);
+
+    if (error) {
+      console.error('[FinanzasPage] Error de Supabase al insertar movimiento:', error);
+      return;
+    }
+
+    setAmount('');
+    setDescription('');
+    setCategory('Otros');
+    setRefreshCount((c) => c + 1);
+  };
+
+  const handleDelete = async (id) => {
+    if (!supabaseReady) return;
+
+    const { error } = await supabase
+      .from('finanzas')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('[FinanzasPage] Error de Supabase al eliminar movimiento:', error);
+      return;
+    }
+
+    setRefreshCount((c) => c + 1);
+  };
+
+  const handleBarClick = (entry) => {
+    if (entry?.month) {
+      setSelectedMonth((prev) => (prev === entry.month ? null : entry.month));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-textMuted-light dark:text-textMuted-dark" />
+      </div>
+    );
+  }
+
+  if (!supabaseReady) {
+    return (
+      <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark flex items-center justify-center px-4">
+        <div className="text-center max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+          <p className="text-sm text-textMuted-light dark:text-textMuted-dark mb-2">
+            Configura <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
+            <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">.env</code> para usar Finanzas.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300">
@@ -217,13 +264,7 @@ export default function FinanzasPage() {
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Balance General
             </span>
-            <p
-              className={`text-2xl font-bold mt-1 ${
-                balance >= 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400'
-              }`}
-            >
+            <p className={`text-2xl font-bold mt-1 ${balance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {formatCurrency(balance)}
             </p>
           </div>
@@ -283,12 +324,8 @@ export default function FinanzasPage() {
                       key={idx}
                       fill={
                         selectedMonth === entry.month
-                          ? entry.netBalance >= 0
-                            ? '#16a34a'
-                            : '#dc2626'
-                          : entry.netBalance >= 0
-                            ? '#86efac'
-                            : '#fca5a5'
+                          ? entry.netBalance >= 0 ? '#16a34a' : '#dc2626'
+                          : entry.netBalance >= 0 ? '#86efac' : '#fca5a5'
                       }
                     />
                   ))}
@@ -408,9 +445,7 @@ export default function FinanzasPage() {
                 className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
@@ -452,9 +487,7 @@ export default function FinanzasPage() {
               >
                 <option value="Todos">Todas las categorías</option>
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
               <select
@@ -497,15 +530,8 @@ export default function FinanzasPage() {
                       <td className="py-2.5 px-2 text-textMuted-light dark:text-textMuted-dark hidden sm:table-cell">
                         {t.category || 'Otros'}
                       </td>
-                      <td
-                        className={`py-2.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap ${
-                          t.type === 'income'
-                            ? 'text-green-600 dark:text-green-400'
-                            : 'text-red-600 dark:text-red-400'
-                        }`}
-                      >
-                        {t.type === 'income' ? '+' : '-'}
-                        {formatCurrency(t.amount)}
+                      <td className={`py-2.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap ${t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
                       </td>
                       <td className="py-2.5 pl-2 text-right">
                         <button

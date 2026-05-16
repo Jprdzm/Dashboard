@@ -5,8 +5,9 @@ import {
   ChevronDown, ChevronRight, CalendarDays, FileText, Loader2,
 } from 'lucide-react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
-import supabase from '../services/supabaseClient';
+import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -130,7 +131,7 @@ export default function DeudasPage() {
   const [savingAbono, setSavingAbono] = useState(false);
 
   const { user } = useAuth();
-  const supabaseReady = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
+  const supabaseReady = isSupabaseConfigured;
 
   const totalDebt = useMemo(
     () => debts.reduce((s, d) => s + (d.totalAmount - (d.paidAmount || 0)), 0),
@@ -195,15 +196,21 @@ export default function DeudasPage() {
   const fetchAbonos = useCallback(async (debtId) => {
     if (!supabaseReady) return;
     setLoadingAbonos((prev) => ({ ...prev, [debtId]: true }));
-    const { data, error } = await supabase
-      .from('deudas_abonos')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('deuda_id', debtId)
-      .order('fecha', { ascending: false })
-      .order('created_at', { ascending: false });
-    if (!error && data) {
-      setAbonosMap((prev) => ({ ...prev, [debtId]: data }));
+    try {
+      const { data, error } = await supabase
+        .from('deudas_abonos')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('deuda_id', debtId)
+        .order('fecha', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('[DeudasPage] Error al obtener abonos:', error);
+      } else if (data) {
+        setAbonosMap((prev) => ({ ...prev, [debtId]: data }));
+      }
+    } catch (err) {
+      console.error('[DeudasPage] Error inesperado al obtener abonos:', err);
     }
     setLoadingAbonos((prev) => ({ ...prev, [debtId]: false }));
   }, [supabaseReady, user]);
@@ -223,44 +230,56 @@ export default function DeudasPage() {
   };
 
   const handleAddAbono = async (debtId) => {
-    const cantidad = parseFloat(abonoCantidad);
-    if (!cantidad || cantidad <= 0) return;
+    const cantidadAbonada = parseFloat(abonoCantidad);
+    if (!cantidadAbonada || cantidadAbonada <= 0) return;
     if (!supabaseReady) return;
 
     setSavingAbono(true);
-    const { data, error } = await supabase
-      .from('deudas_abonos')
-      .insert({
-        user_id: user.id,
-        deuda_id: debtId,
-        fecha: abonoFecha || todayISO(),
-        cantidad,
-        nota: abonoNota.trim(),
-      })
-      .select()
-      .single();
+    try {
+      const { error } = await supabase
+        .from('deudas_abonos')
+        .insert([enrichWithUser({
+          deuda_id: debtId,
+          fecha: abonoFecha || todayISO(),
+          cantidad_abonada: cantidadAbonada,
+          nota: abonoNota.trim(),
+        }, user)]);
 
-    if (error) {
-      setSavingAbono(false);
-      return;
+      if (error) {
+        console.error('[DeudasPage] Error de Supabase al insertar abono:', error);
+        setSavingAbono(false);
+        return;
+      }
+
+      const { data: abonos, error: fetchError } = await supabase
+        .from('deudas_abonos')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('deuda_id', debtId);
+
+      if (fetchError) {
+        console.error('[DeudasPage] Error de Supabase al refrescar abonos:', fetchError);
+        setSavingAbono(false);
+        return;
+      }
+
+      const totalAbonado = abonos.reduce((sum, a) => sum + (a.cantidad_abonada || 0), 0);
+      const debt = debts.find((d) => d.id === debtId);
+      const capped = Math.min(totalAbonado, debt?.totalAmount ?? 0);
+
+      setDebts((prev) =>
+        prev.map((d) => (d.id === debtId ? { ...d, paidAmount: capped } : d)),
+      );
+
+      abonos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha) || new Date(b.created_at) - new Date(a.created_at));
+      setAbonosMap((prev) => ({ ...prev, [debtId]: abonos }));
+
+      setAbonoFecha(todayISO());
+      setAbonoCantidad('');
+      setAbonoNota('');
+    } catch (err) {
+      console.error('[DeudasPage] Error inesperado al guardar abono:', err);
     }
-
-    const debt = debts.find((d) => d.id === debtId);
-    const newPaid = Math.min((debt?.paidAmount || 0) + cantidad, debt?.totalAmount || Infinity);
-    setDebts((prev) =>
-      prev.map((d) => (d.id === debtId ? { ...d, paidAmount: newPaid } : d)),
-    );
-
-    if (data) {
-      setAbonosMap((prev) => ({
-        ...prev,
-        [debtId]: [data, ...(prev[debtId] || [])],
-      }));
-    }
-
-    setAbonoFecha(todayISO());
-    setAbonoCantidad('');
-    setAbonoNota('');
     setSavingAbono(false);
   };
 
@@ -697,7 +716,7 @@ export default function DeudasPage() {
                                                     {formatDate(a.fecha)}
                                                   </td>
                                                   <td className="py-1.5 px-2 text-right font-medium tabular-nums text-green-600 dark:text-green-400">
-                                                    {formatCurrency(a.cantidad)}
+                                                    {formatCurrency(a.cantidad_abonada)}
                                                   </td>
                                                   <td className="py-1.5 pl-2 text-textMuted-light dark:text-textMuted-dark">
                                                     {a.nota || '—'}
