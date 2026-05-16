@@ -1,7 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Target, Clock, TrendingUp, Wallet } from 'lucide-react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
+import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
+import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -18,10 +21,6 @@ function formatRelativeTime(dateStr) {
   return `Hace ${days} días`;
 }
 
-function formatDateShort(dateStr) {
-  return new Date(dateStr).toLocaleDateString(LOCALE, { day: '2-digit', month: '2-digit' });
-}
-
 function daysBetween(from, to) {
   return Math.ceil((new Date(to) - new Date(from)) / (1000 * 60 * 60 * 24));
 }
@@ -34,6 +33,9 @@ function progressColor(pct) {
 }
 
 export default function MetasPage() {
+  const { user } = useAuth();
+  const supabaseReady = isSupabaseConfigured;
+
   const [goals, setGoals] = useIndexedDB('goals', []);
 
   const [name, setName] = useState('');
@@ -41,28 +43,56 @@ export default function MetasPage() {
   const [deadline, setDeadline] = useState('');
   const [quickAddAmount, setQuickAddAmount] = useState({});
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
 
-    setGoals((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        name,
-        targetAmount: parseFloat(targetAmount),
-        currentAmount: 0,
-        deadline,
-        contributions: [],
-      },
-    ]);
+    const newGoal = {
+      id: Date.now(),
+      name,
+      targetAmount: parseFloat(targetAmount),
+      currentAmount: 0,
+      deadline,
+      contributions: [],
+    };
+
+    setGoals((prev) => [...prev, newGoal]);
+
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('metas')
+          .insert([enrichWithUser({
+            name: newGoal.name,
+            target_amount: parseFloat(targetAmount),
+            deadline,
+          }, user)]);
+        if (error) console.error('[MetasPage] Error de Supabase al crear meta:', error);
+      } catch (err) {
+        console.error('[MetasPage] Error inesperado al crear meta:', err);
+      }
+    }
+
     setName('');
     setTargetAmount('');
     setDeadline('');
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     setGoals((prev) => prev.filter((g) => g.id !== id));
+
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('metas')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id);
+        if (error) console.error('[MetasPage] Error de Supabase al eliminar meta:', error);
+      } catch (err) {
+        console.error('[MetasPage] Error inesperado al eliminar meta:', err);
+      }
+    }
   };
 
   const handleQuickAdd = (id) => {

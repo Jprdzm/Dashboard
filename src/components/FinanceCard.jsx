@@ -1,7 +1,8 @@
-import React from 'react';
-import { Coins, TrendingUp, AlertCircle, Target } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Coins, TrendingUp, AlertCircle, Target, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useIndexedDB } from '../hooks/useIndexedDB';
+import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
+import { useAuth } from '../services/AuthContext';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -17,12 +18,36 @@ const NAV_ITEMS = [
 ];
 
 export default function FinanceCard() {
-  const [transactions] = useIndexedDB('transactions', []);
+  const { user } = useAuth();
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(() => isSupabaseConfigured);
 
-  const balance = transactions.reduce(
-    (acc, t) => (t.type === 'income' ? acc + t.amount : acc - t.amount),
-    0,
-  );
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('finanzas')
+          .select('monto, tipo')
+          .eq('user_id', user.id);
+        if (cancelled) return;
+        if (error) {
+          console.error('[FinanceCard] Error al obtener balance:', error);
+        } else {
+          const bal = (data || []).reduce(
+            (acc, t) => (t.tipo === 'ingreso' ? acc + t.monto : acc - t.monto),
+            0,
+          );
+          setBalance(bal);
+        }
+      } catch (err) {
+        if (!cancelled) console.error('[FinanceCard] Error inesperado:', err);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   return (
     <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-colors duration-300 hover:shadow-sm flex flex-col space-y-4">
@@ -37,15 +62,22 @@ export default function FinanceCard() {
           <h2 className="font-semibold text-text-light dark:text-text-dark">
             Finanzas
           </h2>
-          <p
-            className={`text-lg font-bold mt-1 ${
-              balance >= 0
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-            }`}
-          >
-            {formatCurrency(balance)}
-          </p>
+          {loading ? (
+            <div className="flex items-center justify-center gap-1.5 mt-1">
+              <Loader2 size={14} className="animate-spin text-textMuted-light dark:text-textMuted-dark" />
+              <span className="text-xs text-textMuted-light dark:text-textMuted-dark">Cargando…</span>
+            </div>
+          ) : (
+            <p
+              className={`text-lg font-bold mt-1 ${
+                balance >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+              }`}
+            >
+              {balance !== null ? formatCurrency(balance) : formatCurrency(0)}
+            </p>
+          )}
         </div>
       </Link>
 

@@ -155,22 +155,39 @@ export default function DeudasPage() {
     [debts, extraPerMonth],
   );
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!name || !totalAmount || !minimumPayment) return;
 
-    setDebts((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        name,
-        totalAmount: parseFloat(totalAmount),
-        interestRate: parseFloat(interestRate) || 0,
-        minimumPayment: parseFloat(minimumPayment),
-        creditor: creditor || name,
-        paidAmount: 0,
-      },
-    ]);
+    const newDebt = {
+      id: Date.now(),
+      name,
+      totalAmount: parseFloat(totalAmount),
+      interestRate: parseFloat(interestRate) || 0,
+      minimumPayment: parseFloat(minimumPayment),
+      creditor: creditor || name,
+      paidAmount: 0,
+    };
+
+    setDebts((prev) => [...prev, newDebt]);
+
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('deudas')
+          .insert([enrichWithUser({
+            name: newDebt.name,
+            total_amount: parseFloat(totalAmount),
+            interest_rate: parseFloat(interestRate) || 0,
+            minimum_payment: parseFloat(minimumPayment),
+            creditor: newDebt.creditor,
+          }, user)]);
+        if (error) console.error('[DeudasPage] Error de Supabase al insertar deuda:', error);
+      } catch (err) {
+        console.error('[DeudasPage] Error inesperado al insertar deuda:', err);
+      }
+    }
+
     setName('');
     setTotalAmount('');
     setInterestRate('');
@@ -178,9 +195,22 @@ export default function DeudasPage() {
     setCreditor('');
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     setDebts((prev) => prev.filter((d) => d.id !== id));
     if (expandedDebtId === id) setExpandedDebtId(null);
+
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('deudas')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id);
+        if (error) console.error('[DeudasPage] Error de Supabase al eliminar deuda:', error);
+      } catch (err) {
+        console.error('[DeudasPage] Error inesperado al eliminar deuda:', err);
+      }
+    }
   };
 
   const handlePaidChange = (id, value) => {
