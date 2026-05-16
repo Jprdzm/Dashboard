@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2, Target, Clock, TrendingUp, Wallet } from 'luci
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
+import { useEffect } from 'react';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -42,6 +43,28 @@ export default function MetasPage() {
   const [deadline, setDeadline] = useState('');
   const [quickAddAmount, setQuickAddAmount] = useState({});
 
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('metas')
+          .select('*')
+          .eq('user_id', user.id);
+        if (cancelled) return;
+        if (error) {
+          console.error('Error al obtener metas:', error);
+        } else if (data && data.length > 0) {
+          // Sincronización básica opcional si es necesario
+        }
+      } catch (err) {
+        if (!cancelled) console.error('Error:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user]);
+
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
@@ -62,8 +85,13 @@ export default function MetasPage() {
         const { error } = await supabase
           .from('metas')
           .insert([{
+            nombre: newGoal.name,
             name: newGoal.name,
+            monto_objective: parseFloat(targetAmount),
             target_amount: parseFloat(targetAmount),
+            goal_amount: parseFloat(targetAmount),
+            monto_actual: 0,
+            current_amount: 0,
             deadline,
             user_id: session.user.id,
           }]);

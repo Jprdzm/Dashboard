@@ -175,11 +175,16 @@ export default function DeudasPage() {
         const { error } = await supabase
           .from('deudas')
           .insert([{
+            nombre: newDebt.name,
             name: newDebt.name,
+            monto_total: parseFloat(totalAmount),
+            amount: parseFloat(totalAmount),
             total_amount: parseFloat(totalAmount),
             interest_rate: parseFloat(interestRate) || 0,
+            tasa_interes: parseFloat(interestRate) || 0,
             minimum_payment: parseFloat(minimumPayment),
             creditor: newDebt.creditor,
+            acreedor: newDebt.creditor,
             user_id: session.user.id,
           }]);
         if (error) alert('Error al sincronizar deuda: ' + error.message);
@@ -274,7 +279,10 @@ export default function DeudasPage() {
           deuda_id: debtId,
           fecha: abonoFecha || todayISO(),
           cantidad_abonada: parseFloat(abonoCantidad),
+          amount_paid: parseFloat(abonoCantidad),
+          amount: parseFloat(abonoCantidad),
           nota: abonoNota.trim(),
+          note: abonoNota.trim(),
           user_id: session.user.id,
         }]);
 

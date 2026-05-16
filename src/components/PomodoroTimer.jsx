@@ -142,7 +142,7 @@ export default function PomodoroTimer() {
         ))}
       </div>
 
-      <div className="mt-5 flex items-center gap-1.5 max-w-full">
+      <div className="mt-5 w-full text-center block mx-auto">
         {editingFocus ? (
           <input
             type="text"
@@ -153,7 +153,7 @@ export default function PomodoroTimer() {
               if (e.key === 'Enter') commitFocus();
               if (e.key === 'Escape') setEditingFocus(false);
             }}
-            className="w-full max-w-[20rem] px-3 py-1 text-xs text-center rounded-lg
+            className="w-full max-w-[20rem] mx-auto px-3 py-1 text-xs text-center rounded-lg
               border border-slate-300 dark:border-slate-600
               bg-white/80 dark:bg-slate-800/80
               text-slate-700 dark:text-slate-300
@@ -165,7 +165,7 @@ export default function PomodoroTimer() {
         ) : (
           <button
             onClick={startEditFocus}
-            className="group flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500
+            className="group flex items-center justify-center w-full text-center block mx-auto gap-1.5 text-xs text-slate-400 dark:text-slate-500
               hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
           >
             <span className="leading-relaxed max-w-[18rem] truncate">{focus}</span>

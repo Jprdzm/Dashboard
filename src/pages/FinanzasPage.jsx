@@ -168,6 +168,7 @@ export default function FinanzasPage() {
         .from('finanzas')
         .insert([enrichWithUser({
           monto: parseFloat(monto),
+          amount: parseFloat(monto),
           tipo,
           descripcion,
           categoria,
