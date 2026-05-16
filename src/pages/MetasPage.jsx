@@ -36,7 +36,7 @@ export default function MetasPage() {
   const { user, session } = useAuth();
   const supabaseReady = isSupabaseConfigured;
 
-  const [goals, setGoals] = useIndexedDB('goals', []);
+  const [goals, setGoals, isLoadingGoals] = useIndexedDB('goals', []);
 
   const [name, setName] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
@@ -44,7 +44,7 @@ export default function MetasPage() {
   const [quickAddAmount, setQuickAddAmount] = useState({});
 
   useEffect(() => {
-    if (!supabaseReady || !user) return;
+    if (!supabaseReady || !user || isLoadingGoals) return;
     let cancelled = false;
     (async () => {
       try {
@@ -71,7 +71,7 @@ export default function MetasPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [supabaseReady, user]);
+  }, [supabaseReady, user, setGoals, isLoadingGoals]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

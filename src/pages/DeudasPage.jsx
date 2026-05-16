@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, AlertTriangle, PiggyBank, BadgeInfo,
@@ -111,7 +111,7 @@ function todayISO() {
 }
 
 export default function DeudasPage() {
-  const [debts, setDebts] = useIndexedDB('debts', []);
+  const [debts, setDebts, isLoadingDebts] = useIndexedDB('debts', []);
   const [monthlyIncome, setMonthlyIncome] = useIndexedDB('monthlyIncome', 0);
   const [extraPerMonth, setExtraPerMonth] = useState(0);
 
@@ -133,7 +133,7 @@ export default function DeudasPage() {
   const supabaseReady = isSupabaseConfigured;
 
   useEffect(() => {
-    if (!supabaseReady || !user) return;
+    if (!supabaseReady || !user || isLoadingDebts) return;
     let cancelled = false;
     (async () => {
       try {
@@ -161,7 +161,7 @@ export default function DeudasPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [supabaseReady, user, setDebts]);
+  }, [supabaseReady, user, setDebts, isLoadingDebts]);
 
   const totalDebt = useMemo(
     () => debts.reduce((s, d) => s + (d.totalAmount - (d.paidAmount || 0)), 0),
