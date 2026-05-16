@@ -55,8 +55,16 @@ export default function MetasPage() {
         if (cancelled) return;
         if (error) {
           console.error('Error al obtener metas:', error);
-        } else if (data && data.length > 0) {
-          // Sincronización básica opcional si es necesario
+        } else if (data) {
+          const mapped = data.map(d => ({
+            id: d.id,
+            name: d.nombre || d.name,
+            targetAmount: d.monto_objective || d.target_amount || d.goal_amount,
+            currentAmount: d.monto_actual || d.current_amount || 0,
+            deadline: d.deadline,
+            contributions: [],
+          }));
+          setGoals(mapped);
         }
       } catch (err) {
         if (!cancelled) console.error('Error:', err);
@@ -123,14 +131,15 @@ export default function MetasPage() {
     }
   };
 
-  const handleQuickAdd = (id) => {
+  const handleQuickAdd = async (id) => {
     const amt = parseFloat(quickAddAmount[id]);
     if (!amt || amt <= 0) return;
 
+    let newAmount = 0;
     setGoals((prev) =>
       prev.map((g) => {
         if (g.id !== id) return g;
-        const newAmount = Math.min(g.currentAmount + amt, g.targetAmount);
+        newAmount = Math.min(g.currentAmount + amt, g.targetAmount);
         return {
           ...g,
           currentAmount: newAmount,
@@ -142,6 +151,14 @@ export default function MetasPage() {
       }),
     );
     setQuickAddAmount((prev) => ({ ...prev, [id]: '' }));
+
+    if (supabaseReady) {
+      try {
+        await supabase.from('metas').update({ monto_actual: newAmount, current_amount: newAmount }).eq('id', id);
+      } catch (err) {
+        console.error('Error al actualizar meta:', err);
+      }
+    }
   };
 
   const stats = useMemo(() => {

@@ -44,7 +44,7 @@ export default function PomodoroTimer() {
 
   const commitFocus = () => {
     const trimmed = focusDraft.trim();
-    if (trimmed) setFocus(trimmed);
+    setFocus(trimmed || 'Enfoque de trabajo');
     setEditingFocus(false);
   };
 
@@ -153,13 +153,14 @@ export default function PomodoroTimer() {
               if (e.key === 'Enter') commitFocus();
               if (e.key === 'Escape') setEditingFocus(false);
             }}
-            className="w-full max-w-[20rem] mx-auto px-3 py-1 text-xs text-center rounded-lg
+            style={{ width: `max(100px, ${focusDraft.length + 2}ch)` }}
+            className="px-3 py-1 text-xs text-center rounded-lg
               border border-slate-300 dark:border-slate-600
               bg-white/80 dark:bg-slate-800/80
               text-slate-700 dark:text-slate-300
               placeholder-slate-400 dark:placeholder-slate-500
               focus:outline-none focus:ring-2 focus:ring-slate-400/40 dark:focus:ring-slate-500/40
-              transition-colors"
+              transition-all max-w-full"
             autoFocus
           />
         ) : (

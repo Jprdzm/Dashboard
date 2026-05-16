@@ -132,6 +132,37 @@ export default function DeudasPage() {
   const { user, session } = useAuth();
   const supabaseReady = isSupabaseConfigured;
 
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('deudas')
+          .select('*')
+          .eq('user_id', user.id);
+        if (cancelled) return;
+        if (error) {
+          console.error('[DeudasPage] Error al obtener deudas:', error);
+        } else if (data) {
+          const mapped = data.map(d => ({
+            id: d.id,
+            name: d.nombre || d.name,
+            totalAmount: d.monto_total || d.amount || d.total_amount,
+            interestRate: d.tasa_interes || d.interest_rate || 0,
+            minimumPayment: d.minimum_payment,
+            creditor: d.acreedor || d.creditor,
+            paidAmount: d.amount_paid || d.paidAmount || 0,
+          }));
+          setDebts(mapped);
+        }
+      } catch (err) {
+        if (!cancelled) console.error('[DeudasPage] Error inesperado:', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, setDebts]);
+
   const totalDebt = useMemo(
     () => debts.reduce((s, d) => s + (d.totalAmount - (d.paidAmount || 0)), 0),
     [debts],
@@ -218,14 +249,28 @@ export default function DeudasPage() {
     }
   };
 
-  const handlePaidChange = (id, value) => {
+  const handlePaidChange = async (id, value) => {
     const amt = parseFloat(value);
     if (isNaN(amt)) return;
+    
+    let newPaidAmount = 0;
     setDebts((prev) =>
-      prev.map((d) =>
-        d.id === id ? { ...d, paidAmount: Math.min(Math.max(0, amt), d.totalAmount) } : d,
-      ),
+      prev.map((d) => {
+        if (d.id === id) {
+          newPaidAmount = Math.min(Math.max(0, amt), d.totalAmount);
+          return { ...d, paidAmount: newPaidAmount };
+        }
+        return d;
+      }),
     );
+
+    if (supabaseReady) {
+      try {
+        await supabase.from('deudas').update({ amount_paid: newPaidAmount, paidAmount: newPaidAmount }).eq('id', id);
+      } catch (err) {
+        console.error('Error al actualizar paidAmount:', err);
+      }
+    }
   };
 
   const fetchAbonos = useCallback(async (debtId) => {
