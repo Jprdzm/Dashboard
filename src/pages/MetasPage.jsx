@@ -4,7 +4,6 @@ import { ArrowLeft, Plus, Trash2, Target, Clock, TrendingUp, Wallet } from 'luci
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
-import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -27,13 +26,13 @@ function daysBetween(from, to) {
 
 function progressColor(pct) {
   if (pct >= 100) return 'bg-green-500';
-  if (pct >= 66) return 'bg-blue-500';
+  if (pct >= 66) return 'bg-indigo-500';
   if (pct >= 33) return 'bg-yellow-500';
   return 'bg-red-500';
 }
 
 export default function MetasPage() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const supabaseReady = isSupabaseConfigured;
 
   const [goals, setGoals] = useIndexedDB('goals', []);
@@ -58,18 +57,19 @@ export default function MetasPage() {
 
     setGoals((prev) => [...prev, newGoal]);
 
-    if (supabaseReady) {
+    if (supabaseReady && session?.user?.id) {
       try {
         const { error } = await supabase
           .from('metas')
-          .insert([enrichWithUser({
+          .insert([{
             name: newGoal.name,
             target_amount: parseFloat(targetAmount),
             deadline,
-          }, user)]);
-        if (error) console.error('[MetasPage] Error de Supabase al crear meta:', error);
+            user_id: session.user.id,
+          }]);
+        if (error) alert('Error al sincronizar meta: ' + error.message);
       } catch (err) {
-        console.error('[MetasPage] Error inesperado al crear meta:', err);
+        alert('Error al sincronizar meta: ' + err.message);
       }
     }
 
@@ -138,7 +138,7 @@ export default function MetasPage() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Meta Total
             </span>
@@ -146,7 +146,7 @@ export default function MetasPage() {
               {formatCurrency(stats.totalTarget)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Ahorrado
             </span>
@@ -154,17 +154,17 @@ export default function MetasPage() {
               {formatCurrency(stats.totalCurrent)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Por Ahorrar
             </span>
-            <p className="text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400">
+            <p className="text-2xl font-bold mt-1 text-indigo-600 dark:text-indigo-400">
               {formatCurrency(stats.remaining)}
             </p>
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
           <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
             Crear Nueva Meta
           </h2>
@@ -175,7 +175,7 @@ export default function MetasPage() {
                 placeholder="Nombre (Ej. Fondo de Emergencia)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="number"
@@ -184,17 +184,17 @@ export default function MetasPage() {
                 placeholder="Monto Objetivo"
                 value={targetAmount}
                 onChange={(e) => setTargetAmount(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
               />
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors flex items-center justify-center gap-1.5"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center justify-center gap-1.5"
               >
                 <Plus size={16} />
                 Crear Meta
@@ -204,7 +204,7 @@ export default function MetasPage() {
         </div>
 
         {goals.length === 0 && (
-          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <Target size={32} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No hay metas registradas. Crea tu primera meta arriba.
@@ -235,7 +235,7 @@ export default function MetasPage() {
                     ? 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-950/20'
                     : daysLeft < 30
                       ? 'border-red-200 dark:border-red-800 bg-red-50/30 dark:bg-red-950/10'
-                      : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
+                      : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
@@ -277,7 +277,7 @@ export default function MetasPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg-light dark:bg-bg-dark">
-                    <Wallet size={14} className="text-blue-500 shrink-0" />
+                    <Wallet size={14} className="text-indigo-500 shrink-0" />
                     <div>
                       <span className="text-xs text-textMuted-light dark:text-textMuted-dark">Restante</span>
                       <p className="text-sm font-semibold tabular-nums text-text-light dark:text-text-dark">
@@ -310,12 +310,12 @@ export default function MetasPage() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') { e.preventDefault(); handleQuickAdd(goal.id); }
                       }}
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                     />
                     <button
                       onClick={() => handleQuickAdd(goal.id)}
                       disabled={isCompleted}
-                      className="px-3 py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 dark:disabled:bg-blue-800 text-white transition-colors"
+                      className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 text-white transition-colors"
                     >
                       <Plus size={16} />
                     </button>

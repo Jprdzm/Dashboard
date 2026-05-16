@@ -50,9 +50,9 @@ export default function PomodoroTimer() {
 
   return (
     <div
-      className="relative overflow-hidden p-8 rounded-2xl border border-white/20 dark:border-gray-700/30
-        bg-white/60 dark:bg-gray-900/60 backdrop-blur-md
-        shadow-xl shadow-gray-100/50 dark:shadow-none
+      className="relative overflow-hidden p-8 rounded-2xl border border-white/20 dark:border-white/[0.06]
+        bg-white/60 dark:bg-[#0B0F19]/60 backdrop-blur-md
+        shadow-xl shadow-slate-200/50 dark:shadow-none
         transition-all duration-500 flex flex-col items-center text-center"
     >
       <div className="flex items-center gap-2 mb-3">
@@ -74,7 +74,7 @@ export default function PomodoroTimer() {
 
       <span
         className="font-mono font-bold tracking-tight text-5xl sm:text-6xl
-          text-gray-800 dark:text-gray-100 leading-none mb-6 select-none"
+          text-text-light dark:text-text-dark leading-none mb-6 select-none"
       >
         {formattedTime}
       </span>
@@ -83,11 +83,11 @@ export default function PomodoroTimer() {
         <button
           onClick={reset}
           className="flex items-center justify-center w-9 h-9 rounded-full
-            border border-gray-200 dark:border-gray-700
-            text-gray-400 dark:text-gray-500
-            hover:text-gray-600 dark:hover:text-gray-300
-            hover:border-gray-300 dark:hover:border-gray-600
-            hover:bg-white/60 dark:hover:bg-gray-800/60
+            border border-slate-200 dark:border-slate-700
+            text-slate-400 dark:text-slate-500
+            hover:text-slate-600 dark:hover:text-slate-300
+            hover:border-slate-300 dark:hover:border-slate-600
+            hover:bg-white/60 dark:hover:bg-slate-800/60
             transition-all duration-300 hover:scale-105 active:scale-95"
           aria-label="Reiniciar"
           title="Reiniciar"
@@ -99,10 +99,10 @@ export default function PomodoroTimer() {
           <button
             onClick={pause}
             className="flex items-center justify-center w-12 h-12 rounded-full
-              bg-gray-800 dark:bg-gray-100
-              text-gray-100 dark:text-gray-800
-              hover:bg-gray-700 dark:hover:bg-gray-200
-              shadow-lg shadow-gray-800/10 dark:shadow-none
+              bg-slate-800 dark:bg-slate-100
+              text-slate-100 dark:text-slate-800
+              hover:bg-slate-700 dark:hover:bg-slate-200
+              shadow-lg shadow-slate-800/10 dark:shadow-none
               transition-all duration-300 hover:scale-105 active:scale-95"
             aria-label="Pausar"
             title="Pausar"
@@ -113,10 +113,10 @@ export default function PomodoroTimer() {
           <button
             onClick={play}
             className="flex items-center justify-center w-12 h-12 rounded-full
-              bg-gray-800 dark:bg-gray-100
-              text-gray-100 dark:text-gray-800
-              hover:bg-gray-700 dark:hover:bg-gray-200
-              shadow-lg shadow-gray-800/10 dark:shadow-none
+              bg-slate-800 dark:bg-slate-100
+              text-slate-100 dark:text-slate-800
+              hover:bg-slate-700 dark:hover:bg-slate-200
+              shadow-lg shadow-slate-800/10 dark:shadow-none
               transition-all duration-300 hover:scale-105 active:scale-95"
             aria-label="Iniciar"
             title="Iniciar"
@@ -126,15 +126,15 @@ export default function PomodoroTimer() {
         )}
       </div>
 
-      <div className="flex items-center gap-1.5 p-0.5 rounded-full bg-gray-100/60 dark:bg-gray-800/60">
+      <div className="flex items-center gap-1.5 p-0.5 rounded-full bg-slate-100/60 dark:bg-slate-800/60">
         {MODES.map((mode) => (
           <button
             key={mode.key}
             onClick={() => changeMode(mode.minutes)}
             className={`px-3.5 py-1 text-[11px] font-semibold uppercase tracking-wider rounded-full transition-all duration-300 ${
               activeMode.key === mode.key
-                ? 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
             {mode.label} ({mode.short})
@@ -154,19 +154,19 @@ export default function PomodoroTimer() {
               if (e.key === 'Escape') setEditingFocus(false);
             }}
             className="w-full max-w-[20rem] px-3 py-1 text-xs text-center rounded-lg
-              border border-gray-300 dark:border-gray-600
-              bg-white/80 dark:bg-gray-800/80
-              text-gray-700 dark:text-gray-300
-              placeholder-gray-400 dark:placeholder-gray-500
-              focus:outline-none focus:ring-2 focus:ring-gray-400/40 dark:focus:ring-gray-500/40
+              border border-slate-300 dark:border-slate-600
+              bg-white/80 dark:bg-slate-800/80
+              text-slate-700 dark:text-slate-300
+              placeholder-slate-400 dark:placeholder-slate-500
+              focus:outline-none focus:ring-2 focus:ring-slate-400/40 dark:focus:ring-slate-500/40
               transition-colors"
             autoFocus
           />
         ) : (
           <button
             onClick={startEditFocus}
-            className="group flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500
-              hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+            className="group flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500
+              hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
           >
             <span className="leading-relaxed max-w-[18rem] truncate">{focus}</span>
             <Pencil size={11} className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0" />

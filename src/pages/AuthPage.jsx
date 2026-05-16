@@ -36,7 +36,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center px-4">
-      <div className="w-full max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-sm">
+      <div className="w-full max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-sm">
         <h1 className="text-xl font-bold tracking-tight text-text-light dark:text-text-dark mb-6 text-center">
           {isSignUp ? 'Crear cuenta' : 'Iniciar sesión'}
         </h1>
@@ -53,7 +53,7 @@ export default function AuthPage() {
               placeholder="juan@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
             />
           </div>
 
@@ -69,7 +69,7 @@ export default function AuthPage() {
               placeholder="••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white transition-colors"
+            className="w-full py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white transition-colors"
           >
             {submitting
               ? 'Procesando…'
@@ -102,7 +102,7 @@ export default function AuthPage() {
           {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}{' '}
           <button
             onClick={() => { setMode(isSignUp ? 'login' : 'signup'); setError(''); setMessage(''); }}
-            className="text-blue-500 hover:text-blue-600 font-medium underline underline-offset-2"
+            className="text-indigo-500 hover:text-indigo-600 font-medium underline underline-offset-2"
           >
             {isSignUp ? 'Inicia sesión' : 'Regístrate'}
           </button>

@@ -3,6 +3,6 @@
 
 @layer base {
   body {
-    @apply bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark antialiased transition-colors duration-300;
+    @apply bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark antialiased transition-colors duration-300 selection:bg-indigo-500/20;
   }
 }

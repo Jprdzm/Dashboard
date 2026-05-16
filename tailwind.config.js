@@ -8,26 +8,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Neutral clean palette (Notion style)
+        // Glassmorphism / Linear-style palette
         bg: {
           light: '#ffffff',
-          dark: '#191919',
+          dark: '#0B0F19',
         },
         surface: {
-          light: '#f7f7f5',
-          dark: '#202020',
+          light: '#ffffff',
+          dark: 'rgba(255, 255, 255, 0.04)',
         },
         border: {
-          light: '#e6e6e6',
-          dark: '#333333',
+          light: '#e2e8f0',
+          dark: 'rgba(255, 255, 255, 0.06)',
         },
         text: {
-          light: '#37352f', // Notion default text color
-          dark: '#ffffff',
+          light: '#1e293b',
+          dark: '#e2e8f0',
         },
         textMuted: {
-          light: '#9a9a97',
-          dark: '#9b9b9b',
+          light: '#94a3b8',
+          dark: '#64748b',
         }
       },
       fontFamily: {

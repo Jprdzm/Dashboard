@@ -43,7 +43,7 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
   const val = payload[0].value;
   return (
-    <div className="px-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-xs shadow-sm">
+    <div className="px-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs shadow-sm">
       <p className="font-medium text-text-light dark:text-text-dark mb-1">{label}</p>
       <p className={val >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
         {val >= 0 ? '+' : ''}{formatCurrency(val)}
@@ -226,7 +226,7 @@ export default function FinanzasPage() {
   if (!supabaseReady) {
     return (
       <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark flex items-center justify-center px-4">
-        <div className="text-center max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+        <div className="text-center max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
           <p className="text-sm text-textMuted-light dark:text-textMuted-dark mb-2">
             Configura <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
             <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">.env</code> para usar Finanzas.
@@ -268,7 +268,7 @@ export default function FinanzasPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Balance General
             </span>
@@ -276,7 +276,7 @@ export default function FinanzasPage() {
               {formatCurrency(balance)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Ingresos
             </span>
@@ -284,7 +284,7 @@ export default function FinanzasPage() {
               {formatCurrency(totalIngresos)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Gastos
             </span>
@@ -295,7 +295,7 @@ export default function FinanzasPage() {
         </div>
 
         {datosBarraMensual.length > 0 && (
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
             <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
               Balance Neto por Mes
               <span className="ml-2 text-xs font-normal text-textMuted-light dark:text-textMuted-dark">
@@ -344,7 +344,7 @@ export default function FinanzasPage() {
         )}
 
         {mesSeleccionado && transaccionesMesSeleccionado.length > 0 && (
-          <div className="p-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 mb-8">
+          <div className="p-5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/20 mb-8">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
                 Desglose — {formatMonthLabel(mesSeleccionado)}
@@ -401,7 +401,7 @@ export default function FinanzasPage() {
         )}
 
         {Object.keys(totalesPorCategoria.totals).length > 0 && (
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
             <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
               Gastos por Categoría
             </h2>
@@ -414,7 +414,7 @@ export default function FinanzasPage() {
                   </div>
                   <div className="h-2 rounded-full bg-bg-light dark:bg-bg-dark overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-blue-500 transition-all"
+                      className="h-full rounded-full bg-indigo-500 transition-all"
                       style={{ width: `${(totalesPorCategoria.totals[cat] / totalesPorCategoria.max) * 100}%` }}
                     />
                   </div>
@@ -424,7 +424,7 @@ export default function FinanzasPage() {
           </div>
         )}
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
           <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
             Nuevo Movimiento
           </h2>
@@ -437,12 +437,12 @@ export default function FinanzasPage() {
                 placeholder="Monto"
                 value={monto}
                 onChange={(e) => setMonto(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <select
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               >
                 <option value="gasto">Gasto</option>
                 <option value="ingreso">Ingreso</option>
@@ -450,7 +450,7 @@ export default function FinanzasPage() {
               <select
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               >
                 {CATEGORIAS.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -463,11 +463,11 @@ export default function FinanzasPage() {
                 placeholder="Mensualidad del gym"
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center gap-1.5"
               >
                 <Plus size={16} />
                 Agregar
@@ -476,7 +476,7 @@ export default function FinanzasPage() {
           </form>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-2">
               <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
@@ -491,7 +491,7 @@ export default function FinanzasPage() {
               <select
                 value={filtroCategoria}
                 onChange={(e) => setFiltroCategoria(e.target.value)}
-                className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               >
                 <option value="Todos">Todas las categorías</option>
                 {CATEGORIAS.map((c) => (
@@ -501,7 +501,7 @@ export default function FinanzasPage() {
               <select
                 value={orden}
                 onChange={(e) => setOrden(e.target.value)}
-                className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               >
                 <option value="newest">Más reciente</option>
                 <option value="oldest">Más antiguo</option>

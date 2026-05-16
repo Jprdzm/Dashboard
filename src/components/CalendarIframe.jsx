@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function CalendarIframe() {
   return (
-    <div className="p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-colors duration-300">
+    <div className="p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300">
       <h2 className="font-semibold mb-3 text-text-light dark:text-text-dark">
         Calendario
       </h2>

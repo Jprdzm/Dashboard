@@ -37,7 +37,7 @@ export default function FinanceTracker() {
   };
 
   return (
-    <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-colors duration-300 hover:shadow-sm flex flex-col">
+    <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-md flex flex-col">
       <h2 className="font-semibold mb-3 text-text-light dark:text-text-dark">Finanzas</h2>
 
       <div className="text-center mb-4 pb-4 border-b border-border-light dark:border-border-dark">
@@ -64,12 +64,12 @@ export default function FinanceTracker() {
             placeholder="Monto"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-1/2 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors duration-200"
+            className="w-1/2 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200"
           />
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-1/2 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors duration-200"
+            className="w-1/2 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200"
           >
             <option value="expense">Gasto</option>
             <option value="income">Ingreso</option>
@@ -81,11 +81,11 @@ export default function FinanceTracker() {
             placeholder="Mensualidad del gym"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors duration-200"
+            className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200"
           />
           <button
             type="submit"
-            className="px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200 flex items-center gap-1"
+            className="px-3 py-1.5 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors duration-200 flex items-center gap-1"
           >
             <Plus size={16} />
           </button>

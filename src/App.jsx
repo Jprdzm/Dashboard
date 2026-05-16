@@ -13,7 +13,7 @@ function AppShell() {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+        <div className="w-5 h-5 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
       </div>
     );
   }

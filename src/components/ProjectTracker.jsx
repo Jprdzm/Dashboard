@@ -53,7 +53,7 @@ export default function ProjectTracker() {
   };
 
   return (
-    <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-colors duration-300 hover:shadow-sm">
+    <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-md">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-text-light dark:text-text-dark">
           Proyectos
@@ -77,7 +77,7 @@ export default function ProjectTracker() {
             placeholder="Nombre del proyecto"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+            className="w-full px-3 py-1.5 text-sm rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
           />
           <div className="flex items-center gap-2">
             <input
@@ -87,11 +87,11 @@ export default function ProjectTracker() {
               placeholder="Progreso inicial (%)"
               value={newProgress}
               onChange={(e) => setNewProgress(e.target.value)}
-              className="flex-1 px-3 py-1.5 text-sm rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+              className="flex-1 px-3 py-1.5 text-sm rounded-md border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
             />
             <button
               type="submit"
-              className="px-3 py-1.5 text-sm font-medium rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+              className="px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
             >
               Añadir
             </button>
@@ -130,7 +130,7 @@ export default function ProjectTracker() {
               </button>
               <div className="flex-1 h-2 rounded-full bg-bg-light dark:bg-bg-dark overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-blue-500 transition-all duration-500"
+                  className="h-full rounded-full bg-indigo-500 transition-all duration-500"
                   style={{ width: `${project.progress}%` }}
                 />
               </div>
@@ -146,13 +146,13 @@ export default function ProjectTracker() {
                     if (e.key === 'Enter') commitEdit(project.id);
                     if (e.key === 'Escape') setEditingId(null);
                   }}
-                  className="w-14 px-1 py-0.5 text-xs font-medium tabular-nums text-center rounded-md border border-blue-400 dark:border-blue-500 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  className="w-14 px-1 py-0.5 text-xs font-medium tabular-nums text-center rounded-md border border-indigo-400 dark:border-indigo-500 bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   autoFocus
                 />
               ) : (
                 <button
                   onClick={() => startEditing(project.id, project.progress)}
-                  className="text-xs font-medium tabular-nums text-textMuted-light dark:text-textMuted-dark hover:text-blue-500 dark:hover:text-blue-400 transition-colors shrink-0 min-w-[2rem] text-right cursor-pointer"
+                  className="text-xs font-medium tabular-nums text-textMuted-light dark:text-textMuted-dark hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors shrink-0 min-w-[2rem] text-right cursor-pointer"
                   aria-label={`Editar progreso de ${project.name}`}
                 >
                   {project.progress}%

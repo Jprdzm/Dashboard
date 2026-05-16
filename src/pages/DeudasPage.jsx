@@ -7,7 +7,6 @@ import {
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
-import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -130,7 +129,7 @@ export default function DeudasPage() {
   const [abonoNota, setAbonoNota] = useState('');
   const [savingAbono, setSavingAbono] = useState(false);
 
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const supabaseReady = isSupabaseConfigured;
 
   const totalDebt = useMemo(
@@ -171,20 +170,21 @@ export default function DeudasPage() {
 
     setDebts((prev) => [...prev, newDebt]);
 
-    if (supabaseReady) {
+    if (supabaseReady && session?.user?.id) {
       try {
         const { error } = await supabase
           .from('deudas')
-          .insert([enrichWithUser({
+          .insert([{
             name: newDebt.name,
             total_amount: parseFloat(totalAmount),
             interest_rate: parseFloat(interestRate) || 0,
             minimum_payment: parseFloat(minimumPayment),
             creditor: newDebt.creditor,
-          }, user)]);
-        if (error) console.error('[DeudasPage] Error de Supabase al insertar deuda:', error);
+            user_id: session.user.id,
+          }]);
+        if (error) alert('Error al sincronizar deuda: ' + error.message);
       } catch (err) {
-        console.error('[DeudasPage] Error inesperado al insertar deuda:', err);
+        alert('Error al sincronizar deuda: ' + err.message);
       }
     }
 
@@ -264,19 +264,22 @@ export default function DeudasPage() {
     if (!cantidadAbonada || cantidadAbonada <= 0) return;
     if (!supabaseReady) return;
 
+    if (!session?.user?.id) { setSavingAbono(false); return; }
+
     setSavingAbono(true);
     try {
       const { error } = await supabase
         .from('deudas_abonos')
-        .insert([enrichWithUser({
+        .insert([{
           deuda_id: debtId,
           fecha: abonoFecha || todayISO(),
-          cantidad_abonada: cantidadAbonada,
+          cantidad_abonada: parseFloat(abonoCantidad),
           nota: abonoNota.trim(),
-        }, user)]);
+          user_id: session.user.id,
+        }]);
 
       if (error) {
-        console.error('[DeudasPage] Error de Supabase al insertar abono:', error);
+        alert('Error al sincronizar abono: ' + error.message);
         setSavingAbono(false);
         return;
       }
@@ -288,7 +291,7 @@ export default function DeudasPage() {
         .eq('deuda_id', debtId);
 
       if (fetchError) {
-        console.error('[DeudasPage] Error de Supabase al refrescar abonos:', fetchError);
+        alert('Error al refrescar abonos: ' + fetchError.message);
         setSavingAbono(false);
         return;
       }
@@ -308,7 +311,7 @@ export default function DeudasPage() {
       setAbonoCantidad('');
       setAbonoNota('');
     } catch (err) {
-      console.error('[DeudasPage] Error inesperado al guardar abono:', err);
+      alert('Error al sincronizar abono: ' + err.message);
     }
     setSavingAbono(false);
   };
@@ -329,7 +332,7 @@ export default function DeudasPage() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Deuda Total
             </span>
@@ -337,7 +340,7 @@ export default function DeudasPage() {
               {formatCurrency(totalDebt)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Pagado
             </span>
@@ -345,7 +348,7 @@ export default function DeudasPage() {
               {formatCurrency(totalPaidSoFar)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Deudas Activas
             </span>
@@ -353,7 +356,7 @@ export default function DeudasPage() {
               {debts.length}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Pago Mínimo Total
             </span>
@@ -363,9 +366,9 @@ export default function DeudasPage() {
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BadgeInfo size={16} className="text-blue-500" />
+            <BadgeInfo size={16} className="text-indigo-500" />
             <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
               Indicador de Salud Financiera
             </h2>
@@ -381,7 +384,7 @@ export default function DeudasPage() {
                 placeholder="Tu ingreso mensual"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
             </div>
             <div className="text-center sm:text-left">
@@ -423,7 +426,7 @@ export default function DeudasPage() {
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
           <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
             Agregar Deuda
           </h2>
@@ -434,7 +437,7 @@ export default function DeudasPage() {
                 placeholder="Nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="number"
@@ -443,7 +446,7 @@ export default function DeudasPage() {
                 placeholder="Monto Total"
                 value={totalAmount}
                 onChange={(e) => setTotalAmount(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="number"
@@ -452,7 +455,7 @@ export default function DeudasPage() {
                 placeholder="Tasa Anual %"
                 value={interestRate}
                 onChange={(e) => setInterestRate(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="number"
@@ -461,19 +464,19 @@ export default function DeudasPage() {
                 placeholder="Pago Mínimo"
                 value={minimumPayment}
                 onChange={(e) => setMinimumPayment(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
               <input
                 type="text"
                 placeholder="Acreedor"
                 value={creditor}
                 onChange={(e) => setCreditor(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
             </div>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center gap-1.5"
             >
               <Plus size={16} />
               Agregar Deuda
@@ -483,9 +486,9 @@ export default function DeudasPage() {
 
         {debts.length > 0 && (
           <>
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
               <div className="flex items-center gap-2 mb-4">
-                <PiggyBank size={16} className="text-blue-500" />
+                <PiggyBank size={16} className="text-indigo-500" />
                 <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
                   Calculadora Bola de Nieve
                 </h2>
@@ -502,12 +505,12 @@ export default function DeudasPage() {
                     placeholder="0"
                     value={extraPerMonth}
                     onChange={(e) => setExtraPerMonth(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                 </div>
                 {snowballResult ? (
                   <div className="flex flex-wrap gap-4 text-sm">
-                    <div className="px-4 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                    <div className="px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800">
                       <span className="text-textMuted-light dark:text-textMuted-dark">Tiempo total: </span>
                       <strong className="text-blue-700 dark:text-blue-300">{formatMonths(snowballResult.totalMonths)}</strong>
                     </div>
@@ -560,7 +563,7 @@ export default function DeudasPage() {
               )}
             </div>
 
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
                 Tabla de Amortización
               </h2>
@@ -591,7 +594,7 @@ export default function DeudasPage() {
                           <tr
                             className={`border-b border-border-light dark:border-border-dark transition-colors cursor-pointer ${
                               isExpanded
-                                ? 'bg-blue-50/50 dark:bg-blue-900/10'
+                                ? 'bg-indigo-50/50 dark:bg-indigo-900/10'
                                 : 'hover:bg-bg-light dark:hover:bg-bg-dark'
                             }`}
                             onClick={() => toggleAccordion(d.id)}
@@ -623,7 +626,7 @@ export default function DeudasPage() {
                                 value={d.paidAmount || 0}
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => handlePaidChange(d.id, e.target.value)}
-                                className="w-24 px-2 py-1 text-xs text-right rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
+                                className="w-24 px-2 py-1 text-xs text-right rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
                               />
                             </td>
                             <td className="py-2.5 px-2">
@@ -662,8 +665,8 @@ export default function DeudasPage() {
                                 <div className="px-6 py-4 bg-bg-light/50 dark:bg-bg-dark/50">
                                   {!supabaseReady ? (
                                     <div className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-4">
-                                      Configura <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
-                                      <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu archivo <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark text-xs font-mono">.env</code> para activar el historial de abonos.
+                                      Configura <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
+                                      <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu archivo <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">.env</code> para activar el historial de abonos.
                                     </div>
                                   ) : loading ? (
                                     <div className="flex items-center justify-center gap-2 py-4 text-sm text-textMuted-light dark:text-textMuted-dark">
@@ -682,7 +685,7 @@ export default function DeudasPage() {
                                             type="date"
                                             value={abonoFecha}
                                             onChange={(e) => setAbonoFecha(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                                           />
                                         </div>
                                         <div>
@@ -697,7 +700,7 @@ export default function DeudasPage() {
                                             placeholder="0.00"
                                             value={abonoCantidad}
                                             onChange={(e) => setAbonoCantidad(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                                           />
                                         </div>
                                         <div>
@@ -711,12 +714,12 @@ export default function DeudasPage() {
                                               placeholder="Ej. Abono con dinero extra de consultoría"
                                               value={abonoNota}
                                               onChange={(e) => setAbonoNota(e.target.value)}
-                                              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                                             />
                                             <button
                                               onClick={() => handleAddAbono(d.id)}
                                               disabled={savingAbono || !abonoCantidad || parseFloat(abonoCantidad) <= 0}
-                                              className="px-3 py-2 text-sm font-medium rounded-lg bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed text-white transition-colors flex items-center gap-1"
+                                              className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white transition-colors flex items-center gap-1"
                                             >
                                               {savingAbono ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                               Guardar
@@ -774,7 +777,7 @@ export default function DeudasPage() {
         )}
 
         {debts.length === 0 && (
-          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No hay deudas registradas. Agrega tu primera deuda arriba.
             </p>
