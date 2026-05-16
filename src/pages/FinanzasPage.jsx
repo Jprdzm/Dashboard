@@ -13,7 +13,7 @@ import { enrichWithUser } from '../services/withUser';
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
 
-const CATEGORIES = [
+const CATEGORIAS = [
   'Estudios', 'Gimnasio', 'Comida', 'Transporte',
   'Entretenimiento', 'Vivienda', 'Salud', 'Otros',
 ];
@@ -56,16 +56,18 @@ export default function FinanzasPage() {
   const { user } = useAuth();
   const supabaseReady = isSupabaseConfigured;
 
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(() => isSupabaseConfigured);
-  const [amount, setAmount] = useState('');
-  const [type, setType] = useState('expense');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Otros');
-  const [filterCategory, setFilterCategory] = useState('Todos');
-  const [sortOrder, setSortOrder] = useState('newest');
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const [refreshCount, setRefreshCount] = useState(0);
+  const [transacciones, setTransacciones] = useState([]);
+  const [cargando, setCargando] = useState(() => isSupabaseConfigured);
+  const [monto, setMonto] = useState('');
+  const [tipo, setTipo] = useState('gasto');
+  const [descripcion, setDescripcion] = useState('');
+  const [categoria, setCategoria] = useState('Otros');
+  const [filtroCategoria, setFiltroCategoria] = useState('Todos');
+  const [orden, setOrden] = useState('newest');
+  const [mesSeleccionado, setMesSeleccionado] = useState(null);
+  const [refrescar, setRefrescar] = useState(0);
+
+  const [limiteSemanal] = useState(() => Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   useEffect(() => {
     if (!supabaseReady || !user) return;
@@ -76,138 +78,144 @@ export default function FinanzasPage() {
           .from('finanzas')
           .select('*')
           .eq('user_id', user.id)
-          .order('date', { ascending: false });
+          .order('fecha', { ascending: false });
         if (cancelled) return;
         if (error) {
           console.error('[FinanzasPage] Error al obtener transacciones:', error);
         } else if (data) {
-          setTransactions(data);
+          setTransacciones(data);
         }
       } catch (err) {
         if (!cancelled) console.error('[FinanzasPage] Error inesperado al obtener transacciones:', err);
       }
-      if (!cancelled) setLoading(false);
+      if (!cancelled) setCargando(false);
     })();
     return () => { cancelled = true; };
-  }, [supabaseReady, user, refreshCount]);
+  }, [supabaseReady, user, refrescar]);
 
   const balance = useMemo(
-    () => transactions.reduce((acc, t) => (t.type === 'income' ? acc + t.amount : acc - t.amount), 0),
-    [transactions],
+    () => transacciones.reduce((acc, t) => (t.tipo === 'ingreso' ? acc + t.monto : acc - t.monto), 0),
+    [transacciones],
   );
 
-  const monthlyBarData = useMemo(() => {
+  const datosBarraMensual = useMemo(() => {
     const groups = {};
-    transactions.forEach((t) => {
-      const key = getMonthKey(t.date);
-      if (!groups[key]) groups[key] = { income: 0, expense: 0 };
-      if (t.type === 'income') groups[key].income += t.amount;
-      else groups[key].expense += t.amount;
+    transacciones.forEach((t) => {
+      const key = getMonthKey(t.fecha);
+      if (!groups[key]) groups[key] = { ingreso: 0, gasto: 0 };
+      if (t.tipo === 'ingreso') groups[key].ingreso += t.monto;
+      else groups[key].gasto += t.monto;
     });
     return Object.entries(groups)
       .map(([month, data]) => ({
         month,
-        netBalance: data.income - data.expense,
-        income: data.income,
-        expense: data.expense,
+        netBalance: data.ingreso - data.gasto,
+        ingreso: data.ingreso,
+        gasto: data.gasto,
       }))
       .sort((a, b) => a.month.localeCompare(b.month))
       .slice(-12);
-  }, [transactions]);
+  }, [transacciones]);
 
-  const selectedMonthTransactions = useMemo(() => {
-    if (!selectedMonth) return [];
-    return transactions
-      .filter((t) => getMonthKey(t.date) === selectedMonth)
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [transactions, selectedMonth]);
+  const transaccionesMesSeleccionado = useMemo(() => {
+    if (!mesSeleccionado) return [];
+    return transacciones
+      .filter((t) => getMonthKey(t.fecha) === mesSeleccionado)
+      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  }, [transacciones, mesSeleccionado]);
 
-  const [sevenDaysAgo] = useState(() => Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-  const recentFiltered = useMemo(() => {
-    let list = transactions.filter((t) => new Date(t.date).getTime() >= sevenDaysAgo);
-    if (filterCategory !== 'Todos') {
-      list = list.filter((t) => (t.category || 'Otros') === filterCategory);
+  const recientesFiltradas = useMemo(() => {
+    let list = transacciones.filter((t) => new Date(t.fecha).getTime() >= limiteSemanal);
+    if (filtroCategoria !== 'Todos') {
+      list = list.filter((t) => (t.categoria || 'Otros') === filtroCategoria);
     }
     list.sort((a, b) =>
-      sortOrder === 'newest'
-        ? new Date(b.date) - new Date(a.date)
-        : new Date(a.date) - new Date(b.date),
+      orden === 'newest'
+        ? new Date(b.fecha) - new Date(a.fecha)
+        : new Date(a.fecha) - new Date(b.fecha),
     );
     return list;
-  }, [transactions, filterCategory, sortOrder, sevenDaysAgo]);
+  }, [transacciones, filtroCategoria, orden, limiteSemanal]);
 
-  const categoryTotals = useMemo(() => {
+  const totalesPorCategoria = useMemo(() => {
     const totals = {};
-    transactions
-      .filter((t) => t.type === 'expense')
+    transacciones
+      .filter((t) => t.tipo === 'gasto')
       .forEach((t) => {
-        const cat = t.category || 'Otros';
-        totals[cat] = (totals[cat] || 0) + t.amount;
+        const cat = t.categoria || 'Otros';
+        totals[cat] = (totals[cat] || 0) + t.monto;
       });
     const max = Math.max(...Object.values(totals), 1);
     return { totals, max };
-  }, [transactions]);
+  }, [transacciones]);
 
-  const totalIncome = useMemo(
-    () => transactions.reduce((acc, t) => (t.type === 'income' ? acc + t.amount : acc), 0),
-    [transactions],
+  const totalIngresos = useMemo(
+    () => transacciones.reduce((acc, t) => (t.tipo === 'ingreso' ? acc + t.monto : acc), 0),
+    [transacciones],
   );
-  const totalExpenses = useMemo(
-    () => transactions.reduce((acc, t) => (t.type === 'expense' ? acc + t.amount : acc), 0),
-    [transactions],
+  const totalGastos = useMemo(
+    () => transacciones.reduce((acc, t) => (t.tipo === 'gasto' ? acc + t.monto : acc), 0),
+    [transacciones],
   );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!amount || !description) return;
+    if (!monto || !descripcion) return;
     if (!supabaseReady) return;
 
-    const { error } = await supabase
-      .from('finanzas')
-      .insert([enrichWithUser({
-        amount: parseFloat(amount),
-        type,
-        description,
-        category,
-        date: new Date().toISOString(),
-      }, user)]);
+    try {
+      const { error } = await supabase
+        .from('finanzas')
+        .insert([enrichWithUser({
+          monto: parseFloat(monto),
+          tipo,
+          descripcion,
+          categoria,
+          fecha: new Date().toISOString(),
+        }, user)]);
 
-    if (error) {
-      console.error('[FinanzasPage] Error de Supabase al insertar movimiento:', error);
-      return;
+      if (error) {
+        alert('Error crítico de Supabase: ' + error.message);
+        return;
+      }
+
+      setMonto('');
+      setDescripcion('');
+      setCategoria('Otros');
+      setRefrescar((c) => c + 1);
+    } catch (err) {
+      alert('Error crítico de Supabase: ' + err.message);
     }
-
-    setAmount('');
-    setDescription('');
-    setCategory('Otros');
-    setRefreshCount((c) => c + 1);
   };
 
   const handleDelete = async (id) => {
     if (!supabaseReady) return;
 
-    const { error } = await supabase
-      .from('finanzas')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', user.id);
+    try {
+      const { error } = await supabase
+        .from('finanzas')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-    if (error) {
-      console.error('[FinanzasPage] Error de Supabase al eliminar movimiento:', error);
-      return;
+      if (error) {
+        alert('Error crítico de Supabase: ' + error.message);
+        return;
+      }
+
+      setRefrescar((c) => c + 1);
+    } catch (err) {
+      alert('Error crítico de Supabase: ' + err.message);
     }
-
-    setRefreshCount((c) => c + 1);
   };
 
   const handleBarClick = (entry) => {
     if (entry?.month) {
-      setSelectedMonth((prev) => (prev === entry.month ? null : entry.month));
+      setMesSeleccionado((prev) => (prev === entry.month ? null : entry.month));
     }
   };
 
-  if (loading) {
+  if (cargando) {
     return (
       <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
         <Loader2 size={24} className="animate-spin text-textMuted-light dark:text-textMuted-dark" />
@@ -273,7 +281,7 @@ export default function FinanzasPage() {
               Ingresos
             </span>
             <p className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">
-              {formatCurrency(totalIncome)}
+              {formatCurrency(totalIngresos)}
             </p>
           </div>
           <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
@@ -281,12 +289,12 @@ export default function FinanzasPage() {
               Gastos
             </span>
             <p className="text-2xl font-bold mt-1 text-red-600 dark:text-red-400">
-              {formatCurrency(totalExpenses)}
+              {formatCurrency(totalGastos)}
             </p>
           </div>
         </div>
 
-        {monthlyBarData.length > 0 && (
+        {datosBarraMensual.length > 0 && (
           <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
             <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
               Balance Neto por Mes
@@ -295,7 +303,7 @@ export default function FinanzasPage() {
               </span>
             </h2>
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={monthlyBarData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+              <BarChart data={datosBarraMensual} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="3 3" />
                 <XAxis
                   dataKey="month"
@@ -319,11 +327,11 @@ export default function FinanzasPage() {
                   cursor="pointer"
                   className="focus:outline-none"
                 >
-                  {monthlyBarData.map((entry, idx) => (
+                  {datosBarraMensual.map((entry, idx) => (
                     <Cell
                       key={idx}
                       fill={
-                        selectedMonth === entry.month
+                        mesSeleccionado === entry.month
                           ? entry.netBalance >= 0 ? '#16a34a' : '#dc2626'
                           : entry.netBalance >= 0 ? '#86efac' : '#fca5a5'
                       }
@@ -335,32 +343,32 @@ export default function FinanzasPage() {
           </div>
         )}
 
-        {selectedMonth && selectedMonthTransactions.length > 0 && (
+        {mesSeleccionado && transaccionesMesSeleccionado.length > 0 && (
           <div className="p-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 mb-8">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
-                Desglose — {formatMonthLabel(selectedMonth)}
+                Desglose — {formatMonthLabel(mesSeleccionado)}
               </h2>
               <button
-                onClick={() => setSelectedMonth(null)}
+                onClick={() => setMesSeleccionado(null)}
                 className="text-xs text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
               >
                 Cerrar
               </button>
             </div>
             {(() => {
-              const subIncome = selectedMonthTransactions
-                .filter((t) => t.type === 'income')
-                .reduce((s, t) => s + t.amount, 0);
-              const subExpense = selectedMonthTransactions
-                .filter((t) => t.type === 'expense')
-                .reduce((s, t) => s + t.amount, 0);
+              const subIngreso = transaccionesMesSeleccionado
+                .filter((t) => t.tipo === 'ingreso')
+                .reduce((s, t) => s + t.monto, 0);
+              const subGasto = transaccionesMesSeleccionado
+                .filter((t) => t.tipo === 'gasto')
+                .reduce((s, t) => s + t.monto, 0);
               return (
                 <>
                   <div className="flex gap-4 mb-3 text-xs text-textMuted-light dark:text-textMuted-dark">
-                    <span>Ingresos: <strong className="text-green-600 dark:text-green-400">{formatCurrency(subIncome)}</strong></span>
-                    <span>Gastos: <strong className="text-red-600 dark:text-red-400">{formatCurrency(subExpense)}</strong></span>
-                    <span>Neto: <strong className={subIncome - subExpense >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>{formatCurrency(subIncome - subExpense)}</strong></span>
+                    <span>Ingresos: <strong className="text-green-600 dark:text-green-400">{formatCurrency(subIngreso)}</strong></span>
+                    <span>Gastos: <strong className="text-red-600 dark:text-red-400">{formatCurrency(subGasto)}</strong></span>
+                    <span>Neto: <strong className={subIngreso - subGasto >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>{formatCurrency(subIngreso - subGasto)}</strong></span>
                   </div>
                   <div className="overflow-x-auto max-h-64 overflow-y-auto">
                     <table className="w-full text-sm">
@@ -373,13 +381,13 @@ export default function FinanzasPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedMonthTransactions.map((t) => (
+                        {transaccionesMesSeleccionado.map((t) => (
                           <tr key={t.id} className="border-b border-border-light dark:border-border-dark">
-                            <td className="py-1.5 pr-2 text-textMuted-light dark:text-textMuted-dark whitespace-nowrap text-xs">{formatDate(t.date)}</td>
-                            <td className="py-1.5 px-2 text-text-light dark:text-text-dark text-xs">{t.description}</td>
-                            <td className="py-1.5 px-2 text-textMuted-light dark:text-textMuted-dark hidden sm:table-cell text-xs">{t.category || 'Otros'}</td>
-                            <td className={`py-1.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap text-xs ${t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                              {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                            <td className="py-1.5 pr-2 text-textMuted-light dark:text-textMuted-dark whitespace-nowrap text-xs">{formatDate(t.fecha)}</td>
+                            <td className="py-1.5 px-2 text-text-light dark:text-text-dark text-xs">{t.descripcion}</td>
+                            <td className="py-1.5 px-2 text-textMuted-light dark:text-textMuted-dark hidden sm:table-cell text-xs">{t.categoria || 'Otros'}</td>
+                            <td className={`py-1.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap text-xs ${t.tipo === 'ingreso' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                              {t.tipo === 'ingreso' ? '+' : '-'}{formatCurrency(t.monto)}
                             </td>
                           </tr>
                         ))}
@@ -392,22 +400,22 @@ export default function FinanzasPage() {
           </div>
         )}
 
-        {Object.keys(categoryTotals.totals).length > 0 && (
+        {Object.keys(totalesPorCategoria.totals).length > 0 && (
           <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark mb-8">
             <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
               Gastos por Categoría
             </h2>
             <div className="space-y-2">
-              {CATEGORIES.filter((c) => (categoryTotals.totals[c] || 0) > 0).map((cat) => (
+              {CATEGORIAS.filter((c) => (totalesPorCategoria.totals[c] || 0) > 0).map((cat) => (
                 <div key={cat}>
                   <div className="flex justify-between text-xs text-textMuted-light dark:text-textMuted-dark mb-1">
                     <span>{cat}</span>
-                    <span>{formatCurrency(categoryTotals.totals[cat])}</span>
+                    <span>{formatCurrency(totalesPorCategoria.totals[cat])}</span>
                   </div>
                   <div className="h-2 rounded-full bg-bg-light dark:bg-bg-dark overflow-hidden">
                     <div
                       className="h-full rounded-full bg-blue-500 transition-all"
-                      style={{ width: `${(categoryTotals.totals[cat] / categoryTotals.max) * 100}%` }}
+                      style={{ width: `${(totalesPorCategoria.totals[cat] / totalesPorCategoria.max) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -427,24 +435,24 @@ export default function FinanzasPage() {
                 step="0.01"
                 min="0"
                 placeholder="Monto"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                value={monto}
+                onChange={(e) => setMonto(e.target.value)}
                 className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
               <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
                 className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
-                <option value="expense">Gasto</option>
-                <option value="income">Ingreso</option>
+                <option value="gasto">Gasto</option>
+                <option value="ingreso">Ingreso</option>
               </select>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
                 className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
-                {CATEGORIES.map((c) => (
+                {CATEGORIAS.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -453,8 +461,8 @@ export default function FinanzasPage() {
               <input
                 type="text"
                 placeholder="Mensualidad del gym"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={descripcion}
+                onChange={(e) => setDescripcion(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
               <button
@@ -475,24 +483,24 @@ export default function FinanzasPage() {
                 Últimos 7 Días
               </h2>
               <span className="text-xs text-textMuted-light dark:text-textMuted-dark">
-                ({recentFiltered.length} movimientos)
+                ({recientesFiltradas.length} movimientos)
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Filter size={14} className="text-textMuted-light dark:text-textMuted-dark" />
               <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
+                value={filtroCategoria}
+                onChange={(e) => setFiltroCategoria(e.target.value)}
                 className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
                 <option value="Todos">Todas las categorías</option>
-                {CATEGORIES.map((c) => (
+                {CATEGORIAS.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
               <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value)}
+                value={orden}
+                onChange={(e) => setOrden(e.target.value)}
                 className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
                 <option value="newest">Más reciente</option>
@@ -501,7 +509,7 @@ export default function FinanzasPage() {
             </div>
           </div>
 
-          {recentFiltered.length === 0 ? (
+          {recientesFiltradas.length === 0 ? (
             <p className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-8">
               No hay movimientos en los últimos 7 días
             </p>
@@ -518,20 +526,20 @@ export default function FinanzasPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentFiltered.map((t) => (
+                  {recientesFiltradas.map((t) => (
                     <tr
                       key={t.id}
                       className="border-b border-border-light dark:border-border-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors"
                     >
                       <td className="py-2.5 pr-2 text-textMuted-light dark:text-textMuted-dark whitespace-nowrap">
-                        {formatDate(t.date)}
+                        {formatDate(t.fecha)}
                       </td>
-                      <td className="py-2.5 px-2 text-text-light dark:text-text-dark">{t.description}</td>
+                      <td className="py-2.5 px-2 text-text-light dark:text-text-dark">{t.descripcion}</td>
                       <td className="py-2.5 px-2 text-textMuted-light dark:text-textMuted-dark hidden sm:table-cell">
-                        {t.category || 'Otros'}
+                        {t.categoria || 'Otros'}
                       </td>
-                      <td className={`py-2.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap ${t.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                      <td className={`py-2.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap ${t.tipo === 'ingreso' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {t.tipo === 'ingreso' ? '+' : '-'}{formatCurrency(t.monto)}
                       </td>
                       <td className="py-2.5 pl-2 text-right">
                         <button
