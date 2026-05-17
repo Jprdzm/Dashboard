@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, Filter, Loader2,
-  Wallet, CreditCard, TrendingUp, TrendingDown, PiggyBank, Calendar,
+  Wallet, TrendingUp, TrendingDown, PiggyBank,
   ArrowUpRight, ArrowDownLeft, CheckCircle2, CalendarDays, AlertTriangle,
 } from 'lucide-react';
 import {
@@ -73,6 +73,8 @@ export default function FinanzasPage() {
   const [limiteSemanal] = useState(() => Date.now() - 7 * 24 * 60 * 60 * 1000);
 
   const [debts, setDebts] = useIndexedDB('debts', []);
+  const [recentAbonos, setRecentAbonos] = useState([]);
+  const [loadingAbonos, setLoadingAbonos] = useState(false);
 
   const deudasActivas = useMemo(
     () => debts
@@ -86,6 +88,15 @@ export default function FinanzasPage() {
     () => debts.reduce((s, d) => s + (d.totalAmount - (d.paidAmount || 0)), 0),
     [debts],
   );
+
+  const abonosConNombre = useMemo(() => {
+    return recentAbonos.map((a) => ({
+      ...a,
+      debtName: debts.find((d) => d.id === a.deuda_id)?.name
+        || debts.find((d) => d.id === a.deuda_id)?.creditor
+        || 'Deuda eliminada',
+    }));
+  }, [recentAbonos, debts]);
 
   useEffect(() => {
     if (!supabaseReady || !user) return;
@@ -117,6 +128,29 @@ export default function FinanzasPage() {
     })();
     return () => { cancelled = true; };
   }, [supabaseReady, user, setDebts]);
+
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    setLoadingAbonos(true);
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('deudas_abonos')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('fecha', { ascending: false })
+          .limit(6);
+        if (!cancelled && !error && data) {
+          setRecentAbonos(data);
+        }
+      } catch (err) {
+        if (!cancelled) console.error('[FinanzasPage] Error al obtener abonos:', err);
+      }
+      if (!cancelled) setLoadingAbonos(false);
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, refrescar]);
 
   useEffect(() => {
     if (!supabaseReady || !user) return;
@@ -589,48 +623,10 @@ export default function FinanzasPage() {
           </div>
 
           {/* ─────── Columna Derecha (1/4) ─────── */}
-          <div className="lg:col-span-1 space-y-6">
-
-            {/* Tarjeta Premium — estilo black/dark crédito */}
-            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-950 via-slate-900 to-black text-white overflow-hidden shadow-xl">
-              <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/[0.03] blur-2xl" />
-              <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-blue-500/10 blur-xl" />
-              <div className="absolute top-1/2 right-4 w-12 h-12 rounded-full bg-white/[0.02] blur-md" />
-
-              <div className="relative z-10">
-                {/* Chip bancario simulado */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-7 rounded bg-gradient-to-br from-yellow-300/80 to-yellow-500/60 flex items-center justify-center shadow-inner">
-                      <div className="w-6 h-4 rounded border border-yellow-600/40 flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-yellow-600/60" />
-                      </div>
-                    </div>
-                  </div>
-                  <CreditCard size={20} className="text-white/40" />
-                </div>
-
-                <p className="text-lg tracking-[5px] font-mono mb-5 text-white/80 select-none">
-                  **** **** **** 4832
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] text-white/40 uppercase tracking-[1px] mb-1">Titular</p>
-                    <p className="text-sm font-medium text-white/80 truncate">
-                      {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuario'}
-                    </p>
-                  </div>
-                  <div className="text-right ml-4">
-                    <p className="text-[9px] text-white/40 uppercase tracking-[1px] mb-1">Vence</p>
-                    <p className="text-sm font-medium text-white/80">12/28</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="lg:col-span-1">
 
             {/* Schedule Payments — vinculado a deudas activas */}
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md lg:sticky lg:top-24">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
                   <CalendarDays size={14} className="text-blue-600 dark:text-blue-400" />
@@ -656,57 +652,134 @@ export default function FinanzasPage() {
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {deudasActivas.map((d, idx) => {
                     const remaining = d.totalAmount - (d.paidAmount || 0);
+                    const paid = d.paidAmount || 0;
+                    const progress = d.totalAmount > 0 ? (paid / d.totalAmount) * 100 : 0;
                     const isUrgent = idx === 0;
                     return (
-                      <div
+                      <Link
                         key={d.id}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group"
+                        to="/deudas"
+                        className="block p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
-                            isUrgent
-                              ? 'bg-rose-100 dark:bg-rose-900/30'
-                              : 'bg-blue-100 dark:bg-blue-900/30'
-                          }`}>
-                            {isUrgent
-                              ? <AlertTriangle size={13} className="text-rose-600 dark:text-rose-400" />
-                              : <CalendarDays size={13} className="text-blue-600 dark:text-blue-400" />
-                            }
-                          </div>
-                          <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                              isUrgent
+                                ? 'bg-rose-100 dark:bg-rose-900/30'
+                                : 'bg-blue-100 dark:bg-blue-900/30'
+                            }`}>
+                              {isUrgent
+                                ? <AlertTriangle size={11} className="text-rose-600 dark:text-rose-400" />
+                                : <CalendarDays size={11} className="text-blue-600 dark:text-blue-400" />
+                              }
+                            </div>
                             <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
                               {d.name || d.creditor}
                             </p>
-                            <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark mt-0.5">
-                              Pago mín. {formatCurrency(d.minimumPayment || 0)}
-                            </p>
                           </div>
+                          <span className="text-xs font-semibold tabular-nums text-text-light dark:text-text-dark ml-2 shrink-0">
+                            {formatCurrency(remaining)}
+                          </span>
                         </div>
-                        <span className="text-xs font-semibold tabular-nums text-text-light dark:text-text-dark ml-2 shrink-0">
-                          {formatCurrency(remaining)}
-                        </span>
-                      </div>
+
+                        {/* Mini barra de progreso */}
+                        <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                            style={{ width: `${Math.min(progress, 100)}%` }}
+                          />
+                        </div>
+
+                        <div className="flex justify-between mt-1">
+                          <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            Pago mín. {formatCurrency(d.minimumPayment || 0)}
+                          </span>
+                          <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            {Math.round(progress)}% pagado
+                          </span>
+                        </div>
+                      </Link>
                     );
                   })}
                 </div>
               )}
 
-              <Link
-                to="/deudas"
-                className="mt-3 block text-center text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-              >
-                Gestionar deudas →
-              </Link>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                  {deudasActivas.filter(d => (d.paidAmount || 0) >= d.totalAmount).length}/{deudasActivas.length} pagadas
+                </span>
+                <Link
+                  to="/deudas"
+                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  Gestionar →
+                </Link>
+              </div>
+            </div>
+
+            {/* ─────── Pagos Recientes ─────── */}
+            <div className="mt-4 p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
+                  <TrendingDown size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  Pagos Recientes
+                </h2>
+                <Link
+                  to="/deudas"
+                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  Ver todo →
+                </Link>
+              </div>
+
+              {loadingAbonos ? (
+                <div className="py-4 text-center">
+                  <Loader2 size={16} className="animate-spin text-textMuted-light dark:text-textMuted-dark mx-auto" />
+                </div>
+              ) : abonosConNombre.length === 0 ? (
+                <div className="py-4 text-center">
+                  <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
+                    Sin pagos registrados
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {abonosConNombre.map((a) => (
+                    <div
+                      key={a.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-bg-light dark:bg-bg-dark"
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                          <TrendingDown size={11} className="text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                            {a.debtName}
+                          </p>
+                          <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            {new Date(a.fecha).toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' })}
+                            {a.nota ? ` · ${a.nota}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 ml-2 shrink-0">
+                        -{formatCurrency(a.cantidad_abonada || a.amount_paid || 0)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* ══════════════════════════════════════════════
             DESGLOSE DEL MES
-           ══════════════════════════════════════════════ */}
+            ══════════════════════════════════════════════ */}
         {mesSeleccionado && transaccionesMesSeleccionado.length > 0 && (
           <div className="p-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 mb-8">
             <div className="flex items-center justify-between mb-3">

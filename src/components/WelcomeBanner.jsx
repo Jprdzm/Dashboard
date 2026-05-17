@@ -10,7 +10,7 @@ export default function WelcomeBanner() {
   return (
     <div className="flex flex-col space-y-1">
       <h1 className="text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">
-        Bienvenido de vuelta, Juan Pablo
+        Bienvenido, JP
       </h1>
       <p className="text-sm font-medium text-textMuted-light dark:text-textMuted-dark">
         {displayDate}

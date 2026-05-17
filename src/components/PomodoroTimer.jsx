@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { Play, Pause, RotateCcw, Coffee, Brain, Pencil } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Play, Pause, RotateCcw, Coffee, Brain, Pencil, Loader2 } from 'lucide-react';
 import { usePomodoro } from '../hooks/usePomodoro';
 import { useIndexedDB } from '../hooks/useIndexedDB';
+import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
+import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 
 const MODES = [
   { key: 'work', label: 'Trabajo', minutes: 25, short: '25m' },
@@ -10,6 +13,9 @@ const MODES = [
 ];
 
 export default function PomodoroTimer() {
+  const { user } = useAuth();
+  const supabaseReady = isSupabaseConfigured;
+
   const {
     timeLeft,
     isRunning,
@@ -26,6 +32,49 @@ export default function PomodoroTimer() {
   );
   const [editingFocus, setEditingFocus] = useState(false);
   const [focusDraft, setFocusDraft] = useState('');
+  const [syncingFocus, setSyncingFocus] = useState(false);
+
+  /* Sync: cargar desde Supabase al montar */
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_preferences')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'pomodoro_focus')
+          .maybeSingle();
+        if (!cancelled && !error && data?.value) {
+          setFocus(data.value);
+        }
+      } catch {
+        /* Tabla no existe — silencioso, usa IndexedDB */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, setFocus]);
+
+  /* Sync: guardar en Supabase al confirmar */
+  const syncFocusToSupabase = async (text) => {
+    if (!supabaseReady || !user) return;
+    try {
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert(
+          enrichWithUser({
+            key: 'pomodoro_focus',
+            value: text,
+          }, user),
+          { onConflict: 'user_id,key' },
+        );
+      if (error) console.warn('[Pomodoro] Error al guardar en Supabase:', error.message);
+    } catch {
+      /* Tabla no existe — silencioso */
+    }
+    setSyncingFocus(false);
+  };
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -44,8 +93,11 @@ export default function PomodoroTimer() {
 
   const commitFocus = () => {
     const trimmed = focusDraft.trim();
-    setFocus(trimmed || 'Enfoque de trabajo');
+    const finalText = trimmed || 'Enfoque de trabajo';
+    setFocus(finalText);
     setEditingFocus(false);
+    setSyncingFocus(true);
+    syncFocusToSupabase(finalText);
   };
 
   return (
@@ -153,24 +205,27 @@ export default function PomodoroTimer() {
               if (e.key === 'Enter') commitFocus();
               if (e.key === 'Escape') setEditingFocus(false);
             }}
-            style={{ width: `max(100px, ${focusDraft.length + 2}ch)` }}
-            className="px-3 py-1 text-xs text-center rounded-lg
+            className="w-full px-3 py-1.5 text-xs text-center rounded-lg
               border border-slate-300 dark:border-slate-600
               bg-white/80 dark:bg-slate-800/80
               text-slate-700 dark:text-slate-300
               placeholder-slate-400 dark:placeholder-slate-500
               focus:outline-none focus:ring-2 focus:ring-slate-400/40 dark:focus:ring-slate-500/40
-              transition-all max-w-full"
+              transition-all"
             autoFocus
           />
         ) : (
           <button
             onClick={startEditFocus}
-            className="group flex items-center justify-center w-full text-center block mx-auto gap-1.5 text-xs text-slate-400 dark:text-slate-500
+            className="group flex items-center justify-center w-full text-center gap-1.5 text-xs text-slate-400 dark:text-slate-500
               hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
           >
-            <span className="leading-relaxed max-w-[18rem] truncate">{focus}</span>
-            <Pencil size={11} className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0" />
+            <span className="leading-relaxed line-clamp-2 break-words text-balance max-w-full">{focus}</span>
+            {syncingFocus ? (
+              <Loader2 size={11} className="animate-spin shrink-0" />
+            ) : (
+              <Pencil size={11} className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0" />
+            )}
           </button>
         )}
       </div>
