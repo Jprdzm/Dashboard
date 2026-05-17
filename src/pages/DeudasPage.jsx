@@ -9,6 +9,7 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
+import { sanitizeInput } from '../utils/sanitize';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -237,14 +238,16 @@ export default function DeudasPage() {
     const parsedTotal = parseFloat(totalAmount);
     const parsedRate = parseFloat(interestRate) || 0;
     const parsedMin = parseFloat(minimumPayment);
+    const safeName = sanitizeInput(name);
+    const safeCreditor = sanitizeInput(creditor) || safeName;
 
     const newDebt = {
       id: localId,
-      name,
+      name: safeName,
       totalAmount: parsedTotal,
       interestRate: parsedRate,
       minimumPayment: parsedMin,
-      creditor: creditor || name,
+      creditor: safeCreditor,
       paidAmount: 0,
     };
 
@@ -255,16 +258,16 @@ export default function DeudasPage() {
         const { data, error } = await supabase
           .from('deudas')
           .insert([enrichWithUser({
-            nombre: name,
-            name,
+            nombre: safeName,
+            name: safeName,
             monto_total: parsedTotal,
             amount: parsedTotal,
             total_amount: parsedTotal,
             interest_rate: parsedRate,
             tasa_interes: parsedRate,
             minimum_payment: parsedMin,
-            creditor: creditor || name,
-            acreedor: creditor || name,
+            creditor: safeCreditor,
+            acreedor: safeCreditor,
           }, user)])
           .select();
 
@@ -393,6 +396,7 @@ export default function DeudasPage() {
     if (!session?.user?.id) { setSavingAbono(false); return; }
 
     setSavingAbono(true);
+    const safeNota = sanitizeInput(abonoNota);
     try {
       const { error } = await supabase
         .from('deudas_abonos')
@@ -402,8 +406,8 @@ export default function DeudasPage() {
           cantidad_abonada: parseFloat(abonoCantidad),
           amount_paid: parseFloat(abonoCantidad),
           amount: parseFloat(abonoCantidad),
-          nota: abonoNota.trim(),
-          note: abonoNota.trim(),
+          nota: safeNota,
+          note: safeNota,
         }, user)]);
 
       if (error) {

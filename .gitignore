@@ -1,9 +1,12 @@
 # Dependencies
 node_modules/
+.pnp
+.pnp.js
 
 # Build output
 dist/
 dist-ssr/
+build/
 
 # Logs
 logs/
@@ -17,6 +20,9 @@ lerna-debug.log*
 # Environment
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 .env.*.local
 
 # IDE
@@ -31,8 +37,12 @@ lerna-debug.log*
 
 # OS
 .DS_Store
+.AppleDouble
+.LSOverride
 Thumbs.db
+Icon
 
 # Misc
 *.local
 *.pem
+coverage/

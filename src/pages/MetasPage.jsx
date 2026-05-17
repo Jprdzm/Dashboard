@@ -5,6 +5,7 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
+import { sanitizeInput } from '../utils/sanitize';
 import { useEffect } from 'react';
 
 const LOCALE = 'es-MX';
@@ -78,9 +79,11 @@ export default function MetasPage() {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
 
+    const safeName = sanitizeInput(name);
+
     const newGoal = {
       id: Date.now(),
-      name,
+      name: safeName,
       targetAmount: parseFloat(targetAmount),
       currentAmount: 0,
       deadline,
@@ -94,8 +97,8 @@ export default function MetasPage() {
         const { error } = await supabase
           .from('metas')
           .insert([enrichWithUser({
-            nombre: newGoal.name,
-            name: newGoal.name,
+            nombre: safeName,
+            name: safeName,
             monto_objective: parseFloat(targetAmount),
             target_amount: parseFloat(targetAmount),
             goal_amount: parseFloat(targetAmount),

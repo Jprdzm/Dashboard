@@ -12,6 +12,7 @@ import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
 import { useIndexedDB } from '../hooks/useIndexedDB';
+import { sanitizeInput } from '../utils/sanitize';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -274,7 +275,7 @@ export default function FinanzasPage() {
           monto: parseFloat(monto),
           amount: parseFloat(monto),
           tipo,
-          descripcion,
+          descripcion: sanitizeInput(descripcion),
           categoria,
           fecha: new Date().toISOString(),
         }, user)]);
