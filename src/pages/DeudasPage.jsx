@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, AlertTriangle, PiggyBank, BadgeInfo,
   ChevronDown, ChevronRight, CalendarDays, FileText, Loader2,
+  ArrowUpDown, Sparkles, Percent, Calculator, Zap, Snowflake,
 } from 'lucide-react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -110,10 +112,30 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function calculatePayoffMonths(remaining, minPayment, annualRate, extraSim = 0) {
+  if (remaining <= 0) return 0;
+  const monthlyRate = annualRate / 100 / 12;
+  let balance = remaining;
+  let months = 0;
+  const maxMonths = 600;
+  while (balance > 0 && months < maxMonths) {
+    balance *= 1 + monthlyRate;
+    const payment = minPayment + extraSim;
+    if (payment <= 0) return Infinity;
+    balance -= Math.min(payment, balance);
+    if (balance < 0.01) balance = 0;
+    months++;
+  }
+  return months;
+}
+
 export default function DeudasPage() {
   const [debts, setDebts, isLoadingDebts] = useIndexedDB('debts', []);
   const [monthlyIncome, setMonthlyIncome] = useIndexedDB('monthlyIncome', 0);
   const [extraPerMonth, setExtraPerMonth] = useState(0);
+
+  const [strategy, setStrategy] = useState('snowball');
+  const [extraSimMap, setExtraSimMap] = useState({});
 
   const [name, setName] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
@@ -185,41 +207,80 @@ export default function DeudasPage() {
     [debts, extraPerMonth],
   );
 
+  const avgInterestRate = useMemo(() => {
+    const totalRemaining = debts.reduce((s, d) => s + (d.totalAmount - (d.paidAmount || 0)), 0);
+    if (totalRemaining <= 0) return 0;
+    const weightedSum = debts.reduce((s, d) => {
+      const rem = d.totalAmount - (d.paidAmount || 0);
+      return s + rem * (d.interestRate || 0);
+    }, 0);
+    return weightedSum / totalRemaining;
+  }, [debts]);
+
+  const sortedDebts = useMemo(() => {
+    const list = [...debts];
+    if (strategy === 'snowball') {
+      list.sort((a, b) => (a.totalAmount - (a.paidAmount || 0)) - (b.totalAmount - (b.paidAmount || 0)));
+    } else {
+      list.sort((a, b) => (b.interestRate || 0) - (a.interestRate || 0));
+    }
+    return list;
+  }, [debts, strategy]);
+
+  const [showForm, setShowForm] = useState(false);
+
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!name || !totalAmount || !minimumPayment) return;
 
+    const localId = crypto.randomUUID();
+    const parsedTotal = parseFloat(totalAmount);
+    const parsedRate = parseFloat(interestRate) || 0;
+    const parsedMin = parseFloat(minimumPayment);
+
     const newDebt = {
-      id: Date.now(),
+      id: localId,
       name,
-      totalAmount: parseFloat(totalAmount),
-      interestRate: parseFloat(interestRate) || 0,
-      minimumPayment: parseFloat(minimumPayment),
+      totalAmount: parsedTotal,
+      interestRate: parsedRate,
+      minimumPayment: parsedMin,
       creditor: creditor || name,
       paidAmount: 0,
     };
 
     setDebts((prev) => [...prev, newDebt]);
 
-    if (supabaseReady && session?.user?.id) {
+    if (supabaseReady) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('deudas')
-          .insert([{
-            nombre: newDebt.name,
-            name: newDebt.name,
-            monto_total: parseFloat(totalAmount),
-            amount: parseFloat(totalAmount),
-            total_amount: parseFloat(totalAmount),
-            interest_rate: parseFloat(interestRate) || 0,
-            tasa_interes: parseFloat(interestRate) || 0,
-            minimum_payment: parseFloat(minimumPayment),
-            creditor: newDebt.creditor,
-            acreedor: newDebt.creditor,
-            user_id: session.user.id,
-          }]);
-        if (error) alert('Error al sincronizar deuda: ' + error.message);
+          .insert([enrichWithUser({
+            nombre: name,
+            name,
+            monto_total: parsedTotal,
+            amount: parsedTotal,
+            total_amount: parsedTotal,
+            interest_rate: parsedRate,
+            tasa_interes: parsedRate,
+            minimum_payment: parsedMin,
+            creditor: creditor || name,
+            acreedor: creditor || name,
+          }, user)])
+          .select();
+
+        if (error) {
+          setDebts((prev) => prev.filter((d) => d.id !== localId));
+          alert('Error al sincronizar deuda: ' + error.message);
+          return;
+        }
+
+        if (data?.[0]?.id) {
+          setDebts((prev) =>
+            prev.map((d) => (d.id === localId ? { ...d, id: data[0].id } : d)),
+          );
+        }
       } catch (err) {
+        setDebts((prev) => prev.filter((d) => d.id !== localId));
         alert('Error al sincronizar deuda: ' + err.message);
       }
     }
@@ -232,6 +293,7 @@ export default function DeudasPage() {
   };
 
   const handleDelete = async (id) => {
+    const snapshot = debts;
     setDebts((prev) => prev.filter((d) => d.id !== id));
     if (expandedDebtId === id) setExpandedDebtId(null);
 
@@ -242,8 +304,12 @@ export default function DeudasPage() {
           .delete()
           .eq('id', id)
           .eq('user_id', user.id);
-        if (error) console.error('[DeudasPage] Error de Supabase al eliminar deuda:', error);
+        if (error) {
+          setDebts(snapshot);
+          console.error('[DeudasPage] Error de Supabase al eliminar deuda:', error);
+        }
       } catch (err) {
+        setDebts(snapshot);
         console.error('[DeudasPage] Error inesperado al eliminar deuda:', err);
       }
     }
@@ -252,7 +318,8 @@ export default function DeudasPage() {
   const handlePaidChange = async (id, value) => {
     const amt = parseFloat(value);
     if (isNaN(amt)) return;
-    
+
+    const snapshot = debts;
     let newPaidAmount = 0;
     setDebts((prev) =>
       prev.map((d) => {
@@ -266,9 +333,18 @@ export default function DeudasPage() {
 
     if (supabaseReady) {
       try {
-        await supabase.from('deudas').update({ amount_paid: newPaidAmount, paidAmount: newPaidAmount }).eq('id', id);
+        const { error } = await supabase
+          .from('deudas')
+          .update({ amount_paid: newPaidAmount, paidAmount: newPaidAmount })
+          .eq('id', id)
+          .eq('user_id', user.id);
+        if (error) {
+          setDebts(snapshot);
+          console.error('[DeudasPage] Error al actualizar paidAmount en Supabase:', error);
+        }
       } catch (err) {
-        console.error('Error al actualizar paidAmount:', err);
+        setDebts(snapshot);
+        console.error('[DeudasPage] Error inesperado al actualizar paidAmount:', err);
       }
     }
   };
@@ -320,7 +396,7 @@ export default function DeudasPage() {
     try {
       const { error } = await supabase
         .from('deudas_abonos')
-        .insert([{
+        .insert([enrichWithUser({
           deuda_id: debtId,
           fecha: abonoFecha || todayISO(),
           cantidad_abonada: parseFloat(abonoCantidad),
@@ -328,8 +404,7 @@ export default function DeudasPage() {
           amount: parseFloat(abonoCantidad),
           nota: abonoNota.trim(),
           note: abonoNota.trim(),
-          user_id: session.user.id,
-        }]);
+        }, user)]);
 
       if (error) {
         alert('Error al sincronizar abono: ' + error.message);
@@ -371,7 +446,9 @@ export default function DeudasPage() {
 
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300">
-      <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+
+        {/* ── Header ── */}
         <Link
           to="/finanzas"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors duration-200 mb-6"
@@ -380,48 +457,103 @@ export default function DeudasPage() {
           Volver a Finanzas
         </Link>
 
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-8 text-text-light dark:text-text-dark">
-          Control de Deudas
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">
+            Control de Deudas
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
-            <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-              Deuda Total
-            </span>
-            <p className="text-2xl font-bold mt-1 text-red-600 dark:text-red-400">
-              {formatCurrency(totalDebt)}
-            </p>
+        {/* ══════════════════════════════════════════════
+            FILA SUPERIOR — 3 TARJETAS DE MÉTRICA
+           ══════════════════════════════════════════════ */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+
+          {/* Card 1: Deuda Total Acumulada */}
+          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-rose-500/5 rounded-bl-full" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-textMuted-light dark:text-textMuted-dark">
+                  Deuda Total Acumulada
+                </span>
+                <PiggyBank size={18} className="text-rose-500" />
+              </div>
+              <p className="text-3xl font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+                {formatCurrency(totalDebt)}
+              </p>
+              <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
+                Pagado: {formatCurrency(totalPaidSoFar)} ·{' '}
+                {totalPaidSoFar + totalDebt > 0
+                  ? `${((totalPaidSoFar / (totalPaidSoFar + totalDebt)) * 100).toFixed(1)}% cancelado`
+                  : 'Sin deudas'}
+              </p>
+            </div>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
-            <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-              Pagado
-            </span>
-            <p className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">
-              {formatCurrency(totalPaidSoFar)}
-            </p>
+
+          {/* Card 2: Tasa de Interés Promedio */}
+          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-bl-full" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-textMuted-light dark:text-textMuted-dark">
+                  Tasa de Interés Promedio
+                </span>
+                <Percent size={18} className="text-blue-500" />
+              </div>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                {avgInterestRate > 0 ? `${avgInterestRate.toFixed(2)}%` : '—'}
+              </p>
+              <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
+                {debts.filter((d) => d.interestRate > 0).length} de {debts.length} deudas generan interés
+              </p>
+            </div>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
-            <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-              Deudas Activas
-            </span>
-            <p className="text-2xl font-bold mt-1 text-text-light dark:text-text-dark">
-              {debts.length}
-            </p>
-          </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
-            <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-              Pago Mínimo Total
-            </span>
-            <p className="text-2xl font-bold mt-1 text-text-light dark:text-text-dark">
-              {formatCurrency(totalMinPayments)}
-            </p>
+
+          {/* Card 3: Simulador de Fecha de Libertad Financiera */}
+          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-bl-full" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold uppercase tracking-wider text-textMuted-light dark:text-textMuted-dark">
+                  Libertad Financiera
+                </span>
+                <Sparkles size={18} className="text-emerald-500" />
+              </div>
+              {snowballResult ? (
+                <>
+                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                    {formatMonths(snowballResult.totalMonths)}
+                  </p>
+                  <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
+                    Aportando {formatCurrency(extraPerMonth || totalMinPayments)}/mes · Pago total: {formatCurrency(snowballResult.totalPaid)}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-3xl font-bold text-textMuted-light dark:text-textMuted-dark tabular-nums">
+                    {totalMinPayments > 0 ? formatMonths(
+                      Math.max(...debts.map((d) => calculatePayoffMonths(
+                        d.totalAmount - (d.paidAmount || 0),
+                        d.minimumPayment,
+                        d.interestRate,
+                      )))
+                    ) : '—'}
+                  </p>
+                  <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
+                    Basado en pagos mínimos actuales
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* ══════════════════════════════════════════════
+            SALUD FINANCIERA + INGRESOS
+           ══════════════════════════════════════════════ */}
         <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <BadgeInfo size={16} className="text-indigo-500" />
+            <BadgeInfo size={16} className="text-blue-500" />
             <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
               Indicador de Salud Financiera
             </h2>
@@ -437,7 +569,7 @@ export default function DeudasPage() {
                 placeholder="Tu ingreso mensual"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
             </div>
             <div className="text-center sm:text-left">
@@ -447,20 +579,20 @@ export default function DeudasPage() {
               <span
                 className={`text-2xl font-bold ${
                   debtRatio > 50
-                    ? 'text-red-600 dark:text-red-400'
+                    ? 'text-rose-600 dark:text-rose-400'
                     : debtRatio > 30
                       ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-green-600 dark:text-green-400'
+                      : 'text-emerald-600 dark:text-emerald-400'
                 }`}
               >
                 {debtRatio.toFixed(1)}%
               </span>
             </div>
-            {debtRatio > 30 && (
+            {debtRatio > 30 ? (
               <div
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
                   debtRatio > 50
-                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                    ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300'
                     : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
                 }`}
               >
@@ -469,373 +601,460 @@ export default function DeudasPage() {
                   ? 'Crítico — tu deuda supera la mitad de tus ingresos'
                   : 'Alerta — tu deuda supera el 30% de tus ingresos'}
               </div>
-            )}
-            {debtRatio <= 30 && monthlyIncome > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+            ) : monthlyIncome > 0 ? (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300">
                 <PiggyBank size={16} />
                 Saludable — tu deuda está controlada
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
-          <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
-            Agregar Deuda
-          </h2>
-          <form onSubmit={handleAdd} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-              />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Monto Total"
-                value={totalAmount}
-                onChange={(e) => setTotalAmount(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-              />
-              <input
-                type="number"
-                step="0.1"
-                min="0"
-                placeholder="Tasa Anual %"
-                value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-              />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Pago Mínimo"
-                value={minimumPayment}
-                onChange={(e) => setMinimumPayment(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-              />
-              <input
-                type="text"
-                placeholder="Acreedor"
-                value={creditor}
-                onChange={(e) => setCreditor(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center gap-1.5"
-            >
-              <Plus size={16} />
-              Agregar Deuda
-            </button>
-          </form>
-        </div>
+        {/* ══════════════════════════════════════════════
+            AGREGAR DEUDA (colapsable)
+           ══════════════════════════════════════════════ */}
+        <div className="mb-8">
+          <button
+            onClick={() => setShowForm((p) => !p)}
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mb-3"
+          >
+            {showForm ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            {showForm ? 'Ocultar formulario' : 'Agregar nueva deuda'}
+          </button>
 
-        {debts.length > 0 && (
-          <>
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <PiggyBank size={16} className="text-indigo-500" />
-                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
-                  Calculadora Bola de Nieve
-                </h2>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-                <div className="w-full sm:w-64">
-                  <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1">
-                    Extra por mes para deudas
-                  </label>
+          {showForm && (
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <form onSubmit={handleAdd} className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Nombre"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  />
                   <input
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="0"
-                    value={extraPerMonth}
-                    onChange={(e) => setExtraPerMonth(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    placeholder="Monto Total"
+                    value={totalAmount}
+                    onChange={(e) => setTotalAmount(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  />
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="Tasa Anual %"
+                    value={interestRate}
+                    onChange={(e) => setInterestRate(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="Pago Mínimo"
+                    value={minimumPayment}
+                    onChange={(e) => setMinimumPayment(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Acreedor"
+                    value={creditor}
+                    onChange={(e) => setCreditor(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
                   />
                 </div>
-                {snowballResult ? (
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <div className="px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800">
-                      <span className="text-textMuted-light dark:text-textMuted-dark">Tiempo total: </span>
-                      <strong className="text-blue-700 dark:text-blue-300">{formatMonths(snowballResult.totalMonths)}</strong>
-                    </div>
-                    <div className="px-4 py-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                      <span className="text-textMuted-light dark:text-textMuted-dark">Total a pagar: </span>
-                      <strong className="text-green-700 dark:text-green-300">{formatCurrency(snowballResult.totalPaid)}</strong>
-                    </div>
-                    <div className="px-4 py-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-                      <span className="text-textMuted-light dark:text-textMuted-dark">En intereses: </span>
-                      <strong className="text-purple-700 dark:text-purple-300">
-                        {formatCurrency(snowballResult.totalPaid - totalDebt)}
-                      </strong>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-textMuted-light dark:text-textMuted-dark">
-                    Ingresa un monto extra mensual para ver la proyección
-                  </p>
-                )}
-              </div>
-
-              {snowballResult && snowballResult.schedule && (
-                <details className="group">
-                  <summary className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark cursor-pointer hover:text-text-light dark:hover:text-text-dark transition-colors">
-                    Ver calendario de pagos mensual ({snowballResult.schedule.length} meses)
-                  </summary>
-                  <div className="mt-3 max-h-72 overflow-y-auto">
-                    <table className="w-full text-xs">
-                      <thead>
-                        <tr className="border-b border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-                          <th className="text-left py-1.5 pr-2 font-medium">Mes</th>
-                          <th className="text-left py-1.5 px-2 font-medium">Deudas activas</th>
-                          <th className="text-right py-1.5 pl-2 font-medium">Restante</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {snowballResult.schedule.map((row) => (
-                          <tr key={row.month} className="border-b border-border-light dark:border-border-dark">
-                            <td className="py-1.5 pr-2 text-text-light dark:text-text-dark">#{row.month}</td>
-                            <td className="py-1.5 px-2 text-textMuted-light dark:text-textMuted-dark">{row.activeCount}</td>
-                            <td className="py-1.5 pl-2 text-right font-medium tabular-nums text-text-light dark:text-text-dark">
-                              {formatCurrency(row.totalRemaining)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </details>
-              )}
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center gap-1.5"
+                >
+                  <Plus size={16} />
+                  Agregar Deuda
+                </button>
+              </form>
             </div>
+          )}
+        </div>
 
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
-              <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
-                Tabla de Amortización
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark text-xs uppercase tracking-wide">
-                      <th className="text-left py-2 pr-2 font-medium w-6"></th>
-                      <th className="text-left py-2 pr-2 font-medium">Deuda</th>
-                      <th className="text-left py-2 px-2 font-medium">Acreedor</th>
-                      <th className="text-right py-2 px-2 font-medium">Original</th>
-                      <th className="text-right py-2 px-2 font-medium">Tasa</th>
-                      <th className="text-right py-2 px-2 font-medium">Mínimo</th>
-                      <th className="text-right py-2 px-2 font-medium">Pagado</th>
-                      <th className="text-left py-2 px-2 font-medium min-w-[120px]">Progreso</th>
-                      <th className="text-right py-2 pl-2 font-medium w-10"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {debts.map((d) => {
-                      const remaining = d.totalAmount - (d.paidAmount || 0);
-                      const progress = d.totalAmount > 0 ? ((d.paidAmount || 0) / d.totalAmount) * 100 : 0;
-                      const isExpanded = expandedDebtId === d.id;
-                      const abonos = abonosMap[d.id] || [];
-                      const loading = loadingAbonos[d.id];
-                      return (
-                        <React.Fragment key={d.id}>
-                          <tr
-                            className={`border-b border-border-light dark:border-border-dark transition-colors cursor-pointer ${
-                              isExpanded
-                                ? 'bg-indigo-50/50 dark:bg-indigo-900/10'
-                                : 'hover:bg-bg-light dark:hover:bg-bg-dark'
-                            }`}
-                            onClick={() => toggleAccordion(d.id)}
-                          >
-                            <td className="py-2.5 pr-2 text-textMuted-light dark:text-textMuted-dark">
-                              {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            </td>
-                            <td className="py-2.5 pr-2 text-text-light dark:text-text-dark font-medium">
-                              {d.name}
-                            </td>
-                            <td className="py-2.5 px-2 text-textMuted-light dark:text-textMuted-dark">
-                              {d.creditor}
-                            </td>
-                            <td className="py-2.5 px-2 text-right tabular-nums text-text-light dark:text-text-dark">
-                              {formatCurrency(d.totalAmount)}
-                            </td>
-                            <td className="py-2.5 px-2 text-right tabular-nums text-textMuted-light dark:text-textMuted-dark">
-                              {d.interestRate > 0 ? `${d.interestRate}%` : '—'}
-                            </td>
-                            <td className="py-2.5 px-2 text-right tabular-nums text-text-light dark:text-text-dark">
-                              {formatCurrency(d.minimumPayment)}
-                            </td>
-                            <td className="py-2.5 px-2 text-right">
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                max={d.totalAmount}
-                                value={d.paidAmount || 0}
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => handlePaidChange(d.id, e.target.value)}
-                                className="w-24 px-2 py-1 text-xs text-right rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
-                              />
-                            </td>
-                            <td className="py-2.5 px-2">
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 h-2 rounded-full bg-bg-light dark:bg-bg-dark overflow-hidden">
-                                  <div
-                                    className={`h-full rounded-full transition-all duration-500 ${
-                                      remaining <= 0
-                                        ? 'bg-green-500'
-                                        : progress > 50
-                                          ? 'bg-yellow-500'
-                                          : 'bg-red-500'
-                                    }`}
-                                    style={{ width: `${Math.min(progress, 100)}%` }}
-                                  />
-                                </div>
-                                <span className="text-xs tabular-nums text-textMuted-light dark:text-textMuted-dark w-10 text-right">
-                                  {progress.toFixed(0)}%
-                                </span>
-                              </div>
-                            </td>
-                            <td className="py-2.5 pl-2 text-right">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleDelete(d.id); }}
-                                className="p-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                aria-label="Eliminar deuda"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </td>
-                          </tr>
-
-                          {isExpanded && (
-                            <tr className="border-b border-border-light dark:border-border-dark">
-                              <td colSpan={9} className="p-0">
-                                <div className="px-6 py-4 bg-bg-light/50 dark:bg-bg-dark/50">
-                                  {!supabaseReady ? (
-                                    <div className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-4">
-                                      Configura <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
-                                      <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu archivo <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">.env</code> para activar el historial de abonos.
-                                    </div>
-                                  ) : loading ? (
-                                    <div className="flex items-center justify-center gap-2 py-4 text-sm text-textMuted-light dark:text-textMuted-dark">
-                                      <Loader2 size={16} className="animate-spin" />
-                                      Cargando abonos…
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                                        <div>
-                                          <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
-                                            <CalendarDays size={12} />
-                                            Fecha
-                                          </label>
-                                          <input
-                                            type="date"
-                                            value={abonoFecha}
-                                            onChange={(e) => setAbonoFecha(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
-                                            <Plus size={12} />
-                                            Cantidad Abonada
-                                          </label>
-                                          <input
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            placeholder="0.00"
-                                            value={abonoCantidad}
-                                            onChange={(e) => setAbonoCantidad(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-                                          />
-                                        </div>
-                                        <div>
-                                          <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
-                                            <FileText size={12} />
-                                            Nota
-                                          </label>
-                                          <div className="flex gap-2">
-                                            <input
-                                              type="text"
-                                              placeholder="Ej. Abono con dinero extra de consultoría"
-                                              value={abonoNota}
-                                              onChange={(e) => setAbonoNota(e.target.value)}
-                                              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
-                                            />
-                                            <button
-                                              onClick={() => handleAddAbono(d.id)}
-                                              disabled={savingAbono || !abonoCantidad || parseFloat(abonoCantidad) <= 0}
-                                              className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white transition-colors flex items-center gap-1"
-                                            >
-                                              {savingAbono ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                                              Guardar
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      {abonos.length === 0 ? (
-                                        <p className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-3">
-                                          No hay abonos registrados para esta deuda.
-                                        </p>
-                                      ) : (
-                                        <div className="max-h-60 overflow-y-auto">
-                                          <table className="w-full text-xs">
-                                            <thead>
-                                              <tr className="border-b border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
-                                                <th className="text-left py-1.5 pr-2 font-medium">Fecha</th>
-                                                <th className="text-right py-1.5 px-2 font-medium">Cantidad</th>
-                                                <th className="text-left py-1.5 pl-2 font-medium">Nota</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {abonos.map((a) => (
-                                                <tr key={a.id} className="border-b border-border-light dark:border-border-dark">
-                                                  <td className="py-1.5 pr-2 text-text-light dark:text-text-dark">
-                                                    {formatDate(a.fecha)}
-                                                  </td>
-                                                  <td className="py-1.5 px-2 text-right font-medium tabular-nums text-green-600 dark:text-green-400">
-                                                    {formatCurrency(a.cantidad_abonada)}
-                                                  </td>
-                                                  <td className="py-1.5 pl-2 text-textMuted-light dark:text-textMuted-dark">
-                                                    {a.nota || '—'}
-                                                  </td>
-                                                </tr>
-                                              ))}
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
+        {/* ══════════════════════════════════════════════
+            STRATEGY SELECTOR + EXTRA PAYMENT
+           ══════════════════════════════════════════════ */}
+        {debts.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <ArrowUpDown size={16} className="text-blue-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-textMuted-light dark:text-textMuted-dark">
+                Estrategia
+              </span>
+              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800">
+                <button
+                  onClick={() => setStrategy('snowball')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    strategy === 'snowball'
+                      ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
+                      : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
+                  }`}
+                >
+                  <Snowflake size={13} />
+                  Bola de Nieve
+                </button>
+                <button
+                  onClick={() => setStrategy('avalanche')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    strategy === 'avalanche'
+                      ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
+                      : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
+                  }`}
+                >
+                  <Zap size={13} />
+                  Avalancha
+                </button>
               </div>
             </div>
-          </>
+
+            <div className="flex items-center gap-3">
+              <label className="text-xs text-textMuted-light dark:text-textMuted-dark whitespace-nowrap">
+                Extra mensual
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="$0"
+                value={extraPerMonth}
+                onChange={(e) => setExtraPerMonth(parseFloat(e.target.value) || 0)}
+                className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
+              />
+            </div>
+          </div>
         )}
 
-        {debts.length === 0 && (
+        {/* ══════════════════════════════════════════════
+            SIMULATION RESULT BANNER
+           ══════════════════════════════════════════════ */}
+        {snowballResult && debts.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3 mb-6 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-2 text-sm">
+              <Calculator size={15} className="text-blue-600 dark:text-blue-400" />
+              <span className="text-textMuted-light dark:text-textMuted-dark">Proyección:</span>
+              <strong className="text-text-light dark:text-text-dark">{formatMonths(snowballResult.totalMonths)}</strong>
+              <span className="text-textMuted-light dark:text-textMuted-dark">· Pago total:</span>
+              <strong className="text-text-light dark:text-text-dark">{formatCurrency(snowballResult.totalPaid)}</strong>
+              <span className="text-textMuted-light dark:text-textMuted-dark">· Intereses:</span>
+              <strong className="text-rose-600 dark:text-rose-400">{formatCurrency(snowballResult.totalPaid - totalDebt)}</strong>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════
+            PER-DEBT CARDS
+           ══════════════════════════════════════════════ */}
+        {sortedDebts.length === 0 ? (
           <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+            <PiggyBank size={32} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No hay deudas registradas. Agrega tu primera deuda arriba.
             </p>
           </div>
+        ) : (
+          <div className="space-y-4 mb-8">
+            {sortedDebts.map((d, idx) => {
+              const remaining = Math.max(0, d.totalAmount - (d.paidAmount || 0));
+              const progress = d.totalAmount > 0 ? ((d.paidAmount || 0) / d.totalAmount) * 100 : 0;
+              const minPayoffMonths = calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate);
+              const extraSim = parseFloat(extraSimMap[d.id]) || 0;
+              const simPayoffMonths = extraSim > 0 ? calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate, extraSim) : null;
+              const monthsSaved = simPayoffMonths !== null ? minPayoffMonths - simPayoffMonths : 0;
+              const isExpanded = expandedDebtId === d.id;
+
+              return (
+                <div
+                  key={d.id}
+                  className="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden transition-shadow hover:shadow-sm"
+                >
+                  {/* Card Header — click to expand */}
+                  <div
+                    className="p-5 cursor-pointer"
+                    onClick={() => toggleAccordion(d.id)}
+                  >
+                    {/* Top row: rank + name + creditor + amount */}
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                          remaining <= 0
+                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
+                            : strategy === 'snowball'
+                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                              : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+                        }`}>
+                          {idx + 1}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-text-light dark:text-text-dark truncate">
+                              {d.name}
+                            </h3>
+                            {remaining <= 0 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-700/30">
+                                Pagada
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-0.5">
+                            {d.creditor} · {d.interestRate > 0 ? `${d.interestRate}% anual` : 'Sin interés'} · Pago mín. {formatCurrency(d.minimumPayment)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold tabular-nums text-text-light dark:text-text-dark">
+                          {formatCurrency(remaining)}
+                        </p>
+                        <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                          de {formatCurrency(d.totalAmount)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="flex-1 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ease-out ${
+                            remaining <= 0
+                              ? 'bg-emerald-500'
+                              : progress > 66
+                                ? 'bg-blue-500'
+                                : progress > 33
+                                  ? 'bg-yellow-500'
+                                  : 'bg-rose-500'
+                          }`}
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold tabular-nums text-textMuted-light dark:text-textMuted-dark w-12 text-right">
+                        {progress.toFixed(0)}%
+                      </span>
+                    </div>
+
+                    {/* Payoff info + extra sim */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      {minPayoffMonths > 0 && minPayoffMonths < Infinity && remaining > 0 ? (
+                        <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
+                          A este ritmo, liquidarás en{' '}
+                          <strong className="text-text-light dark:text-text-dark">
+                            {formatMonths(minPayoffMonths)}
+                          </strong>
+                        </p>
+                      ) : remaining <= 0 ? (
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                          ¡Deuda liquidada!
+                        </p>
+                      ) : (
+                        <p className="text-xs text-rose-600 dark:text-rose-400">
+                          El pago mínimo no cubre los intereses
+                        </p>
+                      )}
+
+                      {/* Extra payment simulator */}
+                      {remaining > 0 && (
+                        <div className="flex items-center gap-2 ml-auto" onClick={(e) => e.stopPropagation()}>
+                          <label className="text-[10px] text-textMuted-light dark:text-textMuted-dark whitespace-nowrap">
+                            +$ extra/mes
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0"
+                            value={extraSimMap[d.id] || ''}
+                            onChange={(e) => setExtraSimMap((prev) => ({ ...prev, [d.id]: e.target.value }))}
+                            className="w-20 px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
+                          />
+                          {simPayoffMonths !== null && (
+                            <span className={`text-[10px] font-medium whitespace-nowrap ${
+                              monthsSaved > 0
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : 'text-textMuted-light dark:text-textMuted-dark'
+                            }`}>
+                              {monthsSaved > 0
+                                ? `→ ${formatMonths(simPayoffMonths)} (${monthsSaved} menos 🎯)`
+                                : `→ ${formatMonths(simPayoffMonths)}`
+                              }
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Expand indicator */}
+                    <div className="flex items-center justify-end mt-2">
+                      <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark flex items-center gap-1">
+                        {isExpanded ? 'Ocultar abonos' : 'Ver abonos'}
+                        {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* ── Expanded Abonos Section ── */}
+                  {isExpanded && (
+                    <div className="border-t border-border-light dark:border-border-dark px-5 py-4 bg-bg-light/30 dark:bg-bg-dark/30">
+                      {!supabaseReady ? (
+                        <div className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-4">
+                          Configura <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
+                          <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu archivo <code className="px-1.5 py-0.5 rounded bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs font-mono">.env</code> para activar el historial de abonos.
+                        </div>
+                      ) : loadingAbonos[d.id] ? (
+                        <div className="flex items-center justify-center gap-2 py-4 text-sm text-textMuted-light dark:text-textMuted-dark">
+                          <Loader2 size={16} className="animate-spin" />
+                          Cargando abonos…
+                        </div>
+                      ) : (
+                        <>
+                          {/* Add abono form */}
+                          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+                            <div>
+                              <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
+                                <CalendarDays size={12} />
+                                Fecha
+                              </label>
+                              <input
+                                type="date"
+                                value={abonoFecha}
+                                onChange={(e) => setAbonoFecha(e.target.value)}
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
+                                <Plus size={12} />
+                                Cantidad
+                              </label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="0.00"
+                                value={abonoCantidad}
+                                onChange={(e) => setAbonoCantidad(e.target.value)}
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                              />
+                            </div>
+                            <div className="sm:col-span-2">
+                              <label className="block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1 flex items-center gap-1">
+                                <FileText size={12} />
+                                Nota
+                              </label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Ej. Abono con dinero extra"
+                                  value={abonoNota}
+                                  onChange={(e) => setAbonoNota(e.target.value)}
+                                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                />
+                                <button
+                                  onClick={() => handleAddAbono(d.id)}
+                                  disabled={savingAbono || !abonoCantidad || parseFloat(abonoCantidad) <= 0}
+                                  className="px-3 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white transition-colors flex items-center gap-1"
+                                >
+                                  {savingAbono ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                  Guardar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Abonos list */}
+                          {(abonosMap[d.id] || []).length === 0 ? (
+                            <p className="text-sm text-textMuted-light dark:text-textMuted-dark text-center py-3">
+                              No hay abonos registrados para esta deuda.
+                            </p>
+                          ) : (
+                            <div className="max-h-60 overflow-y-auto">
+                              <table className="w-full text-xs">
+                                <thead>
+                                  <tr className="border-b border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
+                                    <th className="text-left py-1.5 pr-2 font-medium">Fecha</th>
+                                    <th className="text-right py-1.5 px-2 font-medium">Cantidad</th>
+                                    <th className="text-left py-1.5 pl-2 font-medium">Nota</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {(abonosMap[d.id] || []).map((a) => (
+                                    <tr key={a.id} className="border-b border-border-light dark:border-border-dark">
+                                      <td className="py-1.5 pr-2 text-text-light dark:text-text-dark">
+                                        {formatDate(a.fecha)}
+                                      </td>
+                                      <td className="py-1.5 px-2 text-right font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
+                                        {formatCurrency(a.cantidad_abonada)}
+                                      </td>
+                                      <td className="py-1.5 pl-2 text-textMuted-light dark:text-textMuted-dark">
+                                        {a.nota || '—'}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
+
+        {/* ══════════════════════════════════════════════
+            SNOWBALL CALENDAR (colapsable)
+           ══════════════════════════════════════════════ */}
+        {snowballResult && snowballResult.schedule && snowballResult.schedule.length > 0 && (
+          <details className="group mb-8">
+            <summary className="flex items-center gap-2 text-sm font-medium text-textMuted-light dark:text-textMuted-dark cursor-pointer hover:text-text-light dark:hover:text-text-dark transition-colors p-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <Calculator size={15} className="text-blue-500" />
+              Ver calendario de pagos mensual ({snowballResult.schedule.length} meses)
+              <ChevronRight size={14} className="ml-auto group-open:rotate-90 transition-transform" />
+            </summary>
+            <div className="mt-3 max-h-72 overflow-y-auto rounded-xl border border-border-light dark:border-border-dark">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide bg-bg-light/50 dark:bg-bg-dark/50 sticky top-0">
+                    <th className="text-left py-2 pr-2 pl-3 font-medium">Mes</th>
+                    <th className="text-left py-2 px-2 font-medium">Deudas activas</th>
+                    <th className="text-right py-2 pl-2 pr-3 font-medium">Restante</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {snowballResult.schedule.map((row) => (
+                    <tr key={row.month} className="border-b border-border-light dark:border-border-dark hover:bg-bg-light/50 dark:hover:bg-bg-dark/50 transition-colors">
+                      <td className="py-2 pr-2 pl-3 text-text-light dark:text-text-dark font-medium">#{row.month}</td>
+                      <td className="py-2 px-2 text-textMuted-light dark:text-textMuted-dark">{row.activeCount}</td>
+                      <td className="py-2 pl-2 pr-3 text-right font-medium tabular-nums text-text-light dark:text-text-dark">
+                        {formatCurrency(row.totalRemaining)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        )}
+
+        {/* Delete button per debt (floating at bottom for convenience) */}
+        {sortedDebts.length > 0 && (
+          <div className="flex justify-end">
+            <div className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+              {debts.length} deuda{debts.length !== 1 ? 's' : ''} registrada{debts.length !== 1 ? 's' : ''} · Estrategia: {strategy === 'snowball' ? 'Bola de Nieve' : 'Avalancha'}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

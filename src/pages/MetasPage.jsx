@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2, Target, Clock, TrendingUp, Wallet } from 'luci
 import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
+import { enrichWithUser } from '../services/withUser';
 import { useEffect } from 'react';
 
 const LOCALE = 'es-MX';
@@ -88,11 +89,11 @@ export default function MetasPage() {
 
     setGoals((prev) => [...prev, newGoal]);
 
-    if (supabaseReady && session?.user?.id) {
+    if (supabaseReady) {
       try {
         const { error } = await supabase
           .from('metas')
-          .insert([{
+          .insert([enrichWithUser({
             nombre: newGoal.name,
             name: newGoal.name,
             monto_objective: parseFloat(targetAmount),
@@ -101,8 +102,7 @@ export default function MetasPage() {
             monto_actual: 0,
             current_amount: 0,
             deadline,
-            user_id: session.user.id,
-          }]);
+          }, user)]);
         if (error) alert('Error al sincronizar meta: ' + error.message);
       } catch (err) {
         alert('Error al sincronizar meta: ' + err.message);
@@ -154,7 +154,7 @@ export default function MetasPage() {
 
     if (supabaseReady) {
       try {
-        await supabase.from('metas').update({ monto_actual: newAmount, current_amount: newAmount }).eq('id', id);
+        await supabase.from('metas').update({ monto_actual: newAmount, current_amount: newAmount }).eq('id', id).eq('user_id', user.id);
       } catch (err) {
         console.error('Error al actualizar meta:', err);
       }
