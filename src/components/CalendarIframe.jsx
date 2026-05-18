@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function CalendarIframe() {
   return (
     <div className="p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300">

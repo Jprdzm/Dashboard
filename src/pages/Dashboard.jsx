@@ -1,10 +1,10 @@
-import React from 'react';
 import WelcomeBanner from '../components/WelcomeBanner';
 import NotionLink from '../components/NotionLink';
 import CalendarEmbed from '../components/CalendarEmbed';
 import PomodoroTimer from '../components/PomodoroTimer';
 import FinanceCard from '../components/FinanceCard';
 import ProjectTracker from '../components/ProjectTracker';
+import HabitTracker from '../components/HabitTracker';
 
 export default function Dashboard() {
   return (
@@ -22,6 +22,10 @@ export default function Dashboard() {
 
         <div className="md:col-span-2 lg:col-span-3">
           <ProjectTracker />
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-3">
+          <HabitTracker />
         </div>
 
         <div className="md:col-span-2 lg:col-span-3">

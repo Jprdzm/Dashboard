@@ -26,27 +26,29 @@ export function usePomodoro(initialWorkMinutes = 25) {
 
   const tickRef = useRef(null);
 
-  tickRef.current = () => {
-    const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
-    setTimeLeft(remaining);
-    if (remaining > 0) return;
+  useEffect(() => {
+    tickRef.current = () => {
+      const remaining = Math.max(0, Math.ceil((endTimeRef.current - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      if (remaining > 0) return;
 
-    if (isBreakRef.current) {
-      setIsBreak(false);
-      isBreakRef.current = false;
-      remainingRef.current = WORK_SECONDS;
-      setTimeLeft(WORK_SECONDS);
-    } else {
-      setIsBreak(true);
-      isBreakRef.current = true;
-      const secs = breakDurationRef.current * 60;
-      remainingRef.current = secs;
-      setTimeLeft(secs);
-    }
-    endTimeRef.current = 0;
-    setIsRunning(false);
-    clearTimer();
-  };
+      if (isBreakRef.current) {
+        setIsBreak(false);
+        isBreakRef.current = false;
+        remainingRef.current = WORK_SECONDS;
+        setTimeLeft(WORK_SECONDS);
+      } else {
+        setIsBreak(true);
+        isBreakRef.current = true;
+        const secs = breakDurationRef.current * 60;
+        remainingRef.current = secs;
+        setTimeLeft(secs);
+      }
+      endTimeRef.current = 0;
+      setIsRunning(false);
+      clearTimer();
+    };
+  }, [clearTimer, WORK_SECONDS]);
 
   useEffect(() => {
     if (!isRunning) {

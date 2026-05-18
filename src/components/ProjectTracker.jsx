@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Trash2, Minus } from 'lucide-react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
+import { sanitizeInput } from '../utils/sanitize';
 
 const MAX = 100;
 
@@ -14,11 +15,12 @@ export default function ProjectTracker() {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    const name = sanitizeInput(newName);
+    if (!name) return;
     const progress = Math.min(Math.max(parseInt(newProgress) || 0, 0), MAX);
     setProjects((prev) => [
       ...prev,
-      { id: Date.now(), name: newName.trim(), progress },
+      { id: crypto.randomUUID(), name, progress },
     ]);
     setNewName('');
     setNewProgress('');

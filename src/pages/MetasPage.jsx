@@ -5,7 +5,8 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
-import { sanitizeInput } from '../utils/sanitize';
+import { sanitizeInput, safeParseFloat } from '../utils/sanitize';
+import { useToast } from '../components/Toast';
 import { useEffect } from 'react';
 
 const LOCALE = 'es-MX';
@@ -35,8 +36,9 @@ function progressColor(pct) {
 }
 
 export default function MetasPage() {
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const supabaseReady = isSupabaseConfigured;
+  const addToast = useToast();
 
   const [goals, setGoals, isLoadingGoals] = useIndexedDB('goals', []);
 
@@ -79,12 +81,15 @@ export default function MetasPage() {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
 
-    const safeName = sanitizeInput(name);
+    const safeName = sanitizeInput(name).slice(0, 100);
+    const target = safeParseFloat(targetAmount);
+    if (target <= 0) { addToast('El monto objetivo debe ser mayor a 0', 'warning'); return; }
+    if (!deadline) { addToast('Selecciona una fecha límite', 'warning'); return; }
 
     const newGoal = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       name: safeName,
-      targetAmount: parseFloat(targetAmount),
+      targetAmount: target,
       currentAmount: 0,
       deadline,
       contributions: [],
@@ -99,17 +104,20 @@ export default function MetasPage() {
           .insert([enrichWithUser({
             nombre: safeName,
             name: safeName,
-            monto_objective: parseFloat(targetAmount),
-            target_amount: parseFloat(targetAmount),
-            goal_amount: parseFloat(targetAmount),
+            monto_objective: target,
+            target_amount: target,
+            goal_amount: target,
             monto_actual: 0,
             current_amount: 0,
             deadline,
           }, user)]);
-        if (error) alert('Error al sincronizar meta: ' + error.message);
+        if (error) addToast('Error al sincronizar meta: ' + error.message, 'error');
+        else addToast('Meta creada correctamente', 'success');
       } catch (err) {
-        alert('Error al sincronizar meta: ' + err.message);
+        addToast('Error al sincronizar meta: ' + err.message, 'error');
       }
+    } else {
+      addToast('Meta creada correctamente', 'success');
     }
 
     setName('');
@@ -135,8 +143,8 @@ export default function MetasPage() {
   };
 
   const handleQuickAdd = async (id) => {
-    const amt = parseFloat(quickAddAmount[id]);
-    if (!amt || amt <= 0) return;
+    const amt = safeParseFloat(quickAddAmount[id]);
+    if (amt <= 0) return;
 
     let newAmount = 0;
     setGoals((prev) =>
@@ -148,7 +156,7 @@ export default function MetasPage() {
           currentAmount: newAmount,
           contributions: [
             ...g.contributions,
-            { id: Date.now(), amount: amt, date: new Date().toISOString() },
+            { id: crypto.randomUUID(), amount: amt, date: new Date().toISOString() },
           ],
         };
       }),

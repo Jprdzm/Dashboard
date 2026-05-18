@@ -1,7 +1,7 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, Plus, Trash2, AlertTriangle, PiggyBank, BadgeInfo,
+  ArrowLeft, Plus, AlertTriangle, PiggyBank, BadgeInfo,
   ChevronDown, ChevronRight, CalendarDays, FileText, Loader2,
   ArrowUpDown, Sparkles, Percent, Calculator, Zap, Snowflake,
 } from 'lucide-react';
@@ -9,7 +9,8 @@ import { useIndexedDB } from '../hooks/useIndexedDB';
 import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
-import { sanitizeInput } from '../utils/sanitize';
+import { sanitizeInput, safeParseFloat } from '../utils/sanitize';
+import { useToast } from '../components/Toast';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -154,6 +155,7 @@ export default function DeudasPage() {
 
   const { user, session } = useAuth();
   const supabaseReady = isSupabaseConfigured;
+  const addToast = useToast();
 
   useEffect(() => {
     if (!supabaseReady || !user || isLoadingDebts) return;
@@ -235,11 +237,13 @@ export default function DeudasPage() {
     if (!name || !totalAmount || !minimumPayment) return;
 
     const localId = crypto.randomUUID();
-    const parsedTotal = parseFloat(totalAmount);
-    const parsedRate = parseFloat(interestRate) || 0;
-    const parsedMin = parseFloat(minimumPayment);
-    const safeName = sanitizeInput(name);
-    const safeCreditor = sanitizeInput(creditor) || safeName;
+    const parsedTotal = safeParseFloat(totalAmount);
+    const parsedRate = safeParseFloat(interestRate);
+    const parsedMin = safeParseFloat(minimumPayment);
+    if (parsedTotal <= 0) { addToast('El monto total debe ser mayor a 0', 'warning'); return; }
+    if (parsedMin <= 0) { addToast('El pago mínimo debe ser mayor a 0', 'warning'); return; }
+    const safeName = sanitizeInput(name).slice(0, 100);
+    const safeCreditor = sanitizeInput(creditor).slice(0, 100) || safeName;
 
     const newDebt = {
       id: localId,
@@ -252,6 +256,7 @@ export default function DeudasPage() {
     };
 
     setDebts((prev) => [...prev, newDebt]);
+    addToast('Deuda agregada correctamente', 'success');
 
     if (supabaseReady) {
       try {
@@ -273,7 +278,7 @@ export default function DeudasPage() {
 
         if (error) {
           setDebts((prev) => prev.filter((d) => d.id !== localId));
-          alert('Error al sincronizar deuda: ' + error.message);
+          addToast('Error al sincronizar deuda: ' + error.message, 'error');
           return;
         }
 
@@ -284,7 +289,7 @@ export default function DeudasPage() {
         }
       } catch (err) {
         setDebts((prev) => prev.filter((d) => d.id !== localId));
-        alert('Error al sincronizar deuda: ' + err.message);
+        addToast('Error al sincronizar deuda: ' + err.message, 'error');
       }
     }
 
@@ -295,6 +300,7 @@ export default function DeudasPage() {
     setCreditor('');
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDelete = async (id) => {
     const snapshot = debts;
     setDebts((prev) => prev.filter((d) => d.id !== id));
@@ -318,6 +324,7 @@ export default function DeudasPage() {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handlePaidChange = async (id, value) => {
     const amt = parseFloat(value);
     if (isNaN(amt)) return;
@@ -389,29 +396,29 @@ export default function DeudasPage() {
   };
 
   const handleAddAbono = async (debtId) => {
-    const cantidadAbonada = parseFloat(abonoCantidad);
-    if (!cantidadAbonada || cantidadAbonada <= 0) return;
+    const cantidadAbonada = safeParseFloat(abonoCantidad);
+    if (cantidadAbonada <= 0) { addToast('La cantidad debe ser mayor a 0', 'warning'); return; }
     if (!supabaseReady) return;
 
     if (!session?.user?.id) { setSavingAbono(false); return; }
 
     setSavingAbono(true);
-    const safeNota = sanitizeInput(abonoNota);
+    const safeNota = sanitizeInput(abonoNota).slice(0, 200);
     try {
       const { error } = await supabase
         .from('deudas_abonos')
         .insert([enrichWithUser({
           deuda_id: debtId,
           fecha: abonoFecha || todayISO(),
-          cantidad_abonada: parseFloat(abonoCantidad),
-          amount_paid: parseFloat(abonoCantidad),
-          amount: parseFloat(abonoCantidad),
+          cantidad_abonada: cantidadAbonada,
+          amount_paid: cantidadAbonada,
+          amount: cantidadAbonada,
           nota: safeNota,
           note: safeNota,
         }, user)]);
 
       if (error) {
-        alert('Error al sincronizar abono: ' + error.message);
+        addToast('Error al sincronizar abono: ' + error.message, 'error');
         setSavingAbono(false);
         return;
       }
@@ -423,7 +430,7 @@ export default function DeudasPage() {
         .eq('deuda_id', debtId);
 
       if (fetchError) {
-        alert('Error al refrescar abonos: ' + fetchError.message);
+        addToast('Error al refrescar abonos: ' + fetchError.message, 'error');
         setSavingAbono(false);
         return;
       }
@@ -443,7 +450,7 @@ export default function DeudasPage() {
       setAbonoCantidad('');
       setAbonoNota('');
     } catch (err) {
-      alert('Error al sincronizar abono: ' + err.message);
+      addToast('Error al sincronizar abono: ' + err.message, 'error');
     }
     setSavingAbono(false);
   };
@@ -572,7 +579,7 @@ export default function DeudasPage() {
                 min="0"
                 placeholder="Tu ingreso mensual"
                 value={monthlyIncome}
-                onChange={(e) => setMonthlyIncome(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setMonthlyIncome(safeParseFloat(e.target.value))}
                 className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
             </div>
@@ -730,7 +737,7 @@ export default function DeudasPage() {
                 min="0"
                 placeholder="$0"
                 value={extraPerMonth}
-                onChange={(e) => setExtraPerMonth(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setExtraPerMonth(safeParseFloat(e.target.value))}
                 className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
               />
             </div>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { useIndexedDB } from '../hooks/useIndexedDB';
+import { sanitizeInput, safeParseFloat } from '../utils/sanitize';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
@@ -26,10 +27,12 @@ export default function FinanceTracker() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amount || !description) return;
+    const amt = safeParseFloat(amount);
+    const desc = sanitizeInput(description);
+    if (amt <= 0 || !desc) return;
 
     setTransactions((prev) => [
-      { id: Date.now(), amount: parseFloat(amount), type, description, date: new Date().toISOString() },
+      { id: crypto.randomUUID(), amount: amt, type: type === 'income' ? 'income' : 'expense', description: desc, date: new Date().toISOString() },
       ...prev,
     ]);
     setAmount('');

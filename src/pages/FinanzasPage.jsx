@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, Plus, Trash2, Filter, Loader2,
+  ArrowLeft, Plus, Trash2, Filter, Loader2, Search, Download,
   Wallet, TrendingUp, TrendingDown, PiggyBank,
   ArrowUpRight, ArrowDownLeft, CheckCircle2, CalendarDays, AlertTriangle,
 } from 'lucide-react';
@@ -12,15 +12,14 @@ import supabase, { isSupabaseConfigured } from '../services/supabaseClient';
 import { useAuth } from '../services/AuthContext';
 import { enrichWithUser } from '../services/withUser';
 import { useIndexedDB } from '../hooks/useIndexedDB';
-import { sanitizeInput } from '../utils/sanitize';
+import db from '../services/db';
+import { sanitizeInput, safeParseFloat, validateEnum, sanitizeCSVField, ALLOWED_CATEGORIES, ALLOWED_TIPOS } from '../utils/sanitize';
+import { useToast } from '../components/Toast';
 
 const LOCALE = 'es-MX';
 const CURRENCY = 'MXN';
 
-const CATEGORIAS = [
-  'Estudios', 'Gimnasio', 'Comida', 'Transporte',
-  'Entretenimiento', 'Vivienda', 'Salud', 'Otros',
-];
+const CATEGORIAS = ALLOWED_CATEGORIES;
 
 function formatCurrency(value) {
   return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: CURRENCY }).format(value);
@@ -59,6 +58,7 @@ function CustomTooltip({ active, payload, label }) {
 export default function FinanzasPage() {
   const { user } = useAuth();
   const supabaseReady = isSupabaseConfigured;
+  const addToast = useToast();
 
   const [transacciones, setTransacciones] = useState([]);
   const [cargando, setCargando] = useState(() => isSupabaseConfigured);
@@ -68,6 +68,7 @@ export default function FinanzasPage() {
   const [categoria, setCategoria] = useState('Otros');
   const [filtroCategoria, setFiltroCategoria] = useState('Todos');
   const [orden, setOrden] = useState('newest');
+  const [busqueda, setBusqueda] = useState('');
   const [mesSeleccionado, setMesSeleccionado] = useState(null);
   const [refrescar, setRefrescar] = useState(0);
 
@@ -133,6 +134,7 @@ export default function FinanzasPage() {
   useEffect(() => {
     if (!supabaseReady || !user) return;
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingAbonos(true);
     (async () => {
       try {
@@ -165,12 +167,17 @@ export default function FinanzasPage() {
           .order('fecha', { ascending: false });
         if (cancelled) return;
         if (error) {
-          console.error('[FinanzasPage] Error al obtener transacciones:', error);
+          const cached = await db.getItem('finanzas_cache');
+          if (cached) setTransacciones(cached);
         } else if (data) {
+          await db.setItem('finanzas_cache', data);
           setTransacciones(data);
         }
-      } catch (err) {
-        if (!cancelled) console.error('[FinanzasPage] Error inesperado al obtener transacciones:', err);
+      } catch {
+        if (!cancelled) {
+          const cached = await db.getItem('finanzas_cache');
+          if (cached) setTransacciones(cached);
+        }
       }
       if (!cancelled) setCargando(false);
     })();
@@ -213,13 +220,20 @@ export default function FinanzasPage() {
     if (filtroCategoria !== 'Todos') {
       list = list.filter((t) => (t.categoria || 'Otros') === filtroCategoria);
     }
+    if (busqueda.trim()) {
+      const q = busqueda.trim().toLowerCase();
+      list = list.filter((t) =>
+        (t.descripcion || '').toLowerCase().includes(q) ||
+        (t.categoria || '').toLowerCase().includes(q)
+      );
+    }
     list.sort((a, b) =>
       orden === 'newest'
         ? new Date(b.fecha) - new Date(a.fecha)
         : new Date(a.fecha) - new Date(b.fecha),
     );
     return list;
-  }, [transacciones, filtroCategoria, orden, limiteSemanal]);
+  }, [transacciones, filtroCategoria, orden, limiteSemanal, busqueda]);
 
   const totalesPorCategoria = useMemo(() => {
     const totals = {};
@@ -232,15 +246,6 @@ export default function FinanzasPage() {
     const max = Math.max(...Object.values(totals), 1);
     return { totals, max };
   }, [transacciones]);
-
-  const totalIngresos = useMemo(
-    () => transacciones.reduce((acc, t) => (t.tipo === 'ingreso' ? acc + t.monto : acc), 0),
-    [transacciones],
-  );
-  const totalGastos = useMemo(
-    () => transacciones.reduce((acc, t) => (t.tipo === 'gasto' ? acc + t.monto : acc), 0),
-    [transacciones],
-  );
 
   const mesActualKey = useMemo(() => {
     const now = new Date();
@@ -266,53 +271,95 @@ export default function FinanzasPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!monto || !descripcion) return;
-    if (!supabaseReady) return;
+    const montoVal = safeParseFloat(monto);
+    if (montoVal <= 0) { addToast('El monto debe ser mayor a 0', 'warning'); return; }
+    const tipoVal = validateEnum(tipo, ALLOWED_TIPOS, 'gasto');
+    const catVal = validateEnum(categoria, ALLOWED_CATEGORIES, 'Otros');
 
-    try {
-      const { error } = await supabase
-        .from('finanzas')
-        .insert([enrichWithUser({
-          monto: parseFloat(monto),
-          amount: parseFloat(monto),
-          tipo,
-          descripcion: sanitizeInput(descripcion),
-          categoria,
-          fecha: new Date().toISOString(),
-        }, user)]);
+    const newTx = {
+      id: crypto.randomUUID(),
+      monto: montoVal,
+      amount: montoVal,
+      tipo: tipoVal,
+      descripcion: sanitizeInput(descripcion),
+      categoria: catVal,
+      fecha: new Date().toISOString(),
+      user_id: user?.id,
+    };
 
-      if (error) {
-        alert('Error crítico de Supabase: ' + error.message);
+    const cacheKey = 'finanzas_cache';
+
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('finanzas')
+          .insert([enrichWithUser({
+            monto: montoVal,
+            amount: montoVal,
+            tipo: tipoVal,
+            descripcion: sanitizeInput(descripcion),
+            categoria: catVal,
+            fecha: new Date().toISOString(),
+          }, user)]);
+
+        if (error) {
+          const cached = await db.getItem(cacheKey) || [];
+          cached.unshift(newTx);
+          await db.setItem(cacheKey, cached);
+          setTransacciones(cached);
+          addToast('Guardado localmente (sin conexión)', 'warning');
+          setMonto(''); setDescripcion(''); setCategoria('Otros');
+          return;
+        }
+      } catch {
+        const cached = await db.getItem(cacheKey) || [];
+        cached.unshift(newTx);
+        await db.setItem(cacheKey, cached);
+        setTransacciones(cached);
+        addToast('Guardado localmente (sin conexión)', 'warning');
+        setMonto(''); setDescripcion(''); setCategoria('Otros');
         return;
       }
-
-      setMonto('');
-      setDescripcion('');
-      setCategoria('Otros');
-      setRefrescar((c) => c + 1);
-    } catch (err) {
-      alert('Error crítico de Supabase: ' + err.message);
+    } else {
+      const cached = await db.getItem(cacheKey) || [];
+      cached.unshift(newTx);
+      await db.setItem(cacheKey, cached);
+      setTransacciones(cached);
     }
+
+    addToast('Movimiento registrado', 'success');
+    setMonto('');
+    setDescripcion('');
+    setCategoria('Otros');
+    setRefrescar((c) => c + 1);
   };
 
   const handleDelete = async (id) => {
-    if (!supabaseReady) return;
+    const cacheKey = 'finanzas_cache';
 
-    try {
-      const { error } = await supabase
-        .from('finanzas')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
+    if (supabaseReady) {
+      try {
+        const { error } = await supabase
+          .from('finanzas')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', user.id);
 
-      if (error) {
-        alert('Error crítico de Supabase: ' + error.message);
+        if (error) {
+          addToast('Error al eliminar: ' + error.message, 'error');
+          return;
+        }
+      } catch (err) {
+        addToast('Error al eliminar: ' + err.message, 'error');
         return;
       }
-
-      setRefrescar((c) => c + 1);
-    } catch (err) {
-      alert('Error crítico de Supabase: ' + err.message);
     }
+
+    const cached = await db.getItem(cacheKey) || [];
+    const filtered = cached.filter((t) => t.id !== id && t.id !== id);
+    await db.setItem(cacheKey, filtered);
+    setTransacciones(filtered);
+    addToast('Movimiento eliminado', 'success');
   };
 
   const handleBarClick = (entry) => {
@@ -502,7 +549,17 @@ export default function FinanzasPage() {
                     ({recientesFiltradas.length} movimientos)
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="relative">
+                    <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-textMuted-light dark:text-textMuted-dark pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Buscar..."
+                      value={busqueda}
+                      onChange={(e) => setBusqueda(e.target.value)}
+                      className="pl-7 pr-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors w-28"
+                    />
+                  </div>
                   <Filter size={14} className="text-textMuted-light dark:text-textMuted-dark" />
                   <select
                     value={filtroCategoria}
@@ -522,6 +579,26 @@ export default function FinanzasPage() {
                     <option value="newest">Más reciente</option>
                     <option value="oldest">Más antiguo</option>
                   </select>
+                  <button
+                    onClick={() => {
+                      const header = 'Tipo,Categoría,Descripción,Fecha,Monto\n';
+                      const rows = transacciones.map((t) =>
+                        `"${sanitizeCSVField(t.tipo)}","${sanitizeCSVField(t.categoria || 'Otros')}","${sanitizeCSVField(t.descripcion || '')}","${t.fecha}",${t.monto}`
+                      ).join('\n');
+                      const blob = new Blob(['\uFEFF' + header + rows], { type: 'text/csv;charset=utf-8;' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `finanzas_${new Date().toISOString().slice(0, 10)}.csv`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      addToast('CSV exportado correctamente', 'success');
+                    }}
+                    className="p-1.5 rounded-md border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                    title="Exportar CSV"
+                  >
+                    <Download size={14} />
+                  </button>
                 </div>
               </div>
 
