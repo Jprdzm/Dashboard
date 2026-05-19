@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Wallet, AlertTriangle, Target, CheckSquare, LogOut, Brain, X } from 'lucide-react';
+import { LayoutDashboard, Wallet, AlertTriangle, Target, CheckSquare, LogOut, Brain, X, PlaySquare } from 'lucide-react';
 import supabase from '../services/supabaseClient';
 import { useToast } from './Toast';
 
@@ -8,6 +8,7 @@ const NAV = [
   { to: '/finanzas', icon: Wallet, label: 'Finanzas' },
   { to: '/deudas', icon: AlertTriangle, label: 'Deudas' },
   { to: '/metas', icon: Target, label: 'Metas' },
+  { to: '/suscripciones', icon: PlaySquare, label: 'Suscripciones' },
   { to: '/habits', icon: CheckSquare, label: 'Hábitos' },
 ];
 

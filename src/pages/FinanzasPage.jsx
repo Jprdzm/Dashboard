@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Plus, Trash2, Filter, Loader2, Search, Download,
   Wallet, TrendingUp, TrendingDown, PiggyBank,
-  ArrowUpRight, ArrowDownLeft, CheckCircle2, CalendarDays, AlertTriangle,
+  ArrowUpRight, ArrowDownLeft, CheckCircle2, CalendarDays, AlertTriangle, PlaySquare
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell,
@@ -77,6 +77,8 @@ export default function FinanzasPage() {
   const [debts, setDebts] = useIndexedDB('debts', []);
   const [recentAbonos, setRecentAbonos] = useState([]);
   const [loadingAbonos, setLoadingAbonos] = useState(false);
+  const [goals, setGoals] = useIndexedDB('goals', []);
+  const [subs, setSubs] = useIndexedDB('suscripciones', []);
 
   const deudasActivas = useMemo(
     () => debts
@@ -130,6 +132,36 @@ export default function FinanzasPage() {
     })();
     return () => { cancelled = true; };
   }, [supabaseReady, user, setDebts]);
+
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.from('metas').select('*').eq('user_id', user.id);
+        if (!cancelled && data) {
+          setGoals(data.map((d) => ({ id: d.id, currentAmount: d.monto_actual || d.current_amount || 0 })));
+        }
+      } catch (err) {}
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, setGoals]);
+
+  useEffect(() => {
+    if (!supabaseReady || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase.from('suscripciones').select('*').eq('user_id', user.id);
+        if (!cancelled && data) {
+          setSubs(data.map((d) => ({
+            id: d.id, name: d.nombre, cost: d.costo, renewalDate: d.fecha_renovacion, bank: d.banco_pago
+          })));
+        }
+      } catch (err) {}
+    })();
+    return () => { cancelled = true; };
+  }, [supabaseReady, user, setSubs]);
 
   useEffect(() => {
     if (!supabaseReady || !user) return;
@@ -266,7 +298,7 @@ export default function FinanzasPage() {
     [transacciones, mesActualKey],
   );
 
-  const ahorroTotal = balance;
+  const ahorroTotal = useMemo(() => goals.reduce((s, g) => s + (g.currentAmount || 0), 0), [goals]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -717,17 +749,11 @@ export default function FinanzasPage() {
                 )}
               </div>
 
-              {deudasActivas.length === 0 ? (
+              {deudasActivas.length === 0 && subs.length === 0 ? (
                 <div className="py-6 text-center">
                   <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
-                    Sin deudas activas
+                    Sin pagos programados
                   </p>
-                  <Link
-                    to="/deudas"
-                    className="mt-2 inline-block text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                  >
-                    Registrar deuda →
-                  </Link>
                 </div>
               ) : (
                 <div className="space-y-1.5">
@@ -777,6 +803,38 @@ export default function FinanzasPage() {
                           </span>
                           <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
                             {Math.round(progress)}% pagado
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                  {subs.map((s) => {
+                    const days = Math.ceil((new Date(s.renewalDate) - new Date()) / (1000 * 60 * 60 * 24));
+                    return (
+                      <Link
+                        key={s.id}
+                        to="/suscripciones"
+                        className="block p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-indigo-100 dark:bg-indigo-900/30">
+                              <PlaySquare size={11} className="text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                              {s.name}
+                            </p>
+                          </div>
+                          <span className="text-xs font-semibold tabular-nums text-text-light dark:text-text-dark ml-2 shrink-0">
+                            {formatCurrency(s.cost)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            Vía {s.bank || 'No especificado'}
+                          </span>
+                          <span className={`text-[10px] font-medium ${days <= 5 ? 'text-orange-600 dark:text-orange-400' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
+                            {days < 0 ? 'Vencido' : days === 0 ? '¡Hoy!' : `En ${days} días`}
                           </span>
                         </div>
                       </Link>

@@ -12,6 +12,7 @@ import FinanzasPage from './pages/FinanzasPage';
 import DeudasPage from './pages/DeudasPage';
 import MetasPage from './pages/MetasPage';
 import HabitsPage from './pages/HabitsPage';
+import SuscripcionesPage from './pages/SuscripcionesPage';
 
 function AppShell() {
   const { session, loading } = useAuth();
@@ -51,6 +52,7 @@ function AppShell() {
             <Route path="/deudas" element={<DeudasPage />} />
             <Route path="/metas" element={<MetasPage />} />
             <Route path="/habits" element={<HabitsPage />} />
+            <Route path="/suscripciones" element={<SuscripcionesPage />} />
           </Routes>
         </main>
       </div>
