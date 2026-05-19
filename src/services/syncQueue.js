@@ -93,7 +93,7 @@ async function executeOperation(item) {
       break;
     }
     case 'upsert': {
-      const { error } = await supabase.from(table).upsert(enriched, { onConflict: 'user_id,id' });
+      const { error } = await supabase.from(table).upsert(enriched, { onConflict: 'id' });
       if (error) throw error;
       break;
     }
@@ -122,7 +122,7 @@ export async function syncUpsert(table, data, user) {
   }
   try {
     const enriched = enrichWithUser(data, user);
-    const { error } = await supabase.from(table).upsert(enriched, { onConflict: 'user_id,id' });
+    const { error } = await supabase.from(table).upsert(enriched, { onConflict: 'id' });
     if (error) throw error;
     } catch {
       await enqueue({ table, action: 'upsert', data, userId: user.id });

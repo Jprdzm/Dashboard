@@ -142,7 +142,9 @@ export default function FinanzasPage() {
         if (!cancelled && data) {
           setGoals(data.map((d) => ({ id: d.id, currentAmount: d.monto_actual || d.current_amount || 0 })));
         }
-      } catch (err) {}
+      } catch {
+        // Ignored
+      }
     })();
     return () => { cancelled = true; };
   }, [supabaseReady, user, setGoals]);
@@ -158,7 +160,9 @@ export default function FinanzasPage() {
             id: d.id, name: d.nombre, cost: d.costo, renewalDate: d.fecha_renovacion, bank: d.banco_pago
           })));
         }
-      } catch (err) {}
+      } catch {
+        // Ignored
+      }
     })();
     return () => { cancelled = true; };
   }, [supabaseReady, user, setSubs]);

@@ -6,13 +6,11 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [configError, setConfigError] = useState(false);
+  const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [configError] = useState(!isSupabaseConfigured);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      setConfigError(true);
-      setLoading(false);
       return;
     }
 
