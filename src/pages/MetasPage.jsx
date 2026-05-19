@@ -60,15 +60,20 @@ export default function MetasPage() {
         if (error) {
           console.error('Error al obtener metas:', error);
         } else if (data) {
-          const mapped = data.map(d => ({
-            id: d.id,
-            name: d.nombre || d.name,
-            targetAmount: d.monto_objective || d.target_amount || d.goal_amount,
-            currentAmount: d.monto_actual || d.current_amount || 0,
-            deadline: d.deadline,
-            contributions: [],
-          }));
-          setGoals(mapped);
+          setGoals((prev) => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            return data.map(d => {
+              const existing = safePrev.find(g => g.id === d.id) || safePrev.find(g => g.name === (d.nombre || d.name));
+              return {
+                id: d.id,
+                name: d.nombre || d.name,
+                targetAmount: Number(d.monto_objective || d.target_amount || d.goal_amount || 0),
+                currentAmount: Number(d.monto_actual || d.current_amount || 0),
+                deadline: d.deadline,
+                contributions: (existing && Array.isArray(existing.contributions)) ? existing.contributions : [],
+              };
+            });
+          });
         }
       } catch (err) {
         if (!cancelled) console.error('Error:', err);
@@ -86,8 +91,9 @@ export default function MetasPage() {
     if (target <= 0) { addToast('El monto objetivo debe ser mayor a 0', 'warning'); return; }
     if (!deadline) { addToast('Selecciona una fecha límite', 'warning'); return; }
 
+    const localId = crypto.randomUUID();
     const newGoal = {
-      id: crypto.randomUUID(),
+      id: localId,
       name: safeName,
       targetAmount: target,
       currentAmount: 0,
@@ -99,7 +105,7 @@ export default function MetasPage() {
 
     if (supabaseReady) {
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('metas')
           .insert([enrichWithUser({
             nombre: safeName,
@@ -110,10 +116,20 @@ export default function MetasPage() {
             monto_actual: 0,
             current_amount: 0,
             deadline,
-          }, user)]);
-        if (error) addToast('Error al sincronizar meta: ' + error.message, 'error');
-        else addToast('Meta creada correctamente', 'success');
+          }, user)])
+          .select();
+
+        if (error) {
+          setGoals((prev) => prev.filter((g) => g.id !== localId));
+          addToast('Error al sincronizar meta: ' + error.message, 'error');
+        } else {
+          if (data?.[0]?.id) {
+            setGoals((prev) => prev.map((g) => g.id === localId ? { ...g, id: data[0].id } : g));
+          }
+          addToast('Meta creada correctamente', 'success');
+        }
       } catch (err) {
+        setGoals((prev) => prev.filter((g) => g.id !== localId));
         addToast('Error al sincronizar meta: ' + err.message, 'error');
       }
     } else {
@@ -173,8 +189,9 @@ export default function MetasPage() {
   };
 
   const stats = useMemo(() => {
-    const totalTarget = goals.reduce((s, g) => s + g.targetAmount, 0);
-    const totalCurrent = goals.reduce((s, g) => s + g.currentAmount, 0);
+    const safeGoals = Array.isArray(goals) ? goals : [];
+    const totalTarget = safeGoals.reduce((s, g) => s + (Number(g.targetAmount) || 0), 0);
+    const totalCurrent = safeGoals.reduce((s, g) => s + (Number(g.currentAmount) || 0), 0);
     return { totalTarget, totalCurrent, remaining: totalTarget - totalCurrent };
   }, [goals]);
 
@@ -269,7 +286,7 @@ export default function MetasPage() {
         )}
 
         <div className="space-y-6">
-          {goals.map((goal) => {
+          {(Array.isArray(goals) ? goals : []).map((goal) => {
             const progress = goal.targetAmount > 0
               ? Math.min((goal.currentAmount / goal.targetAmount) * 100, 100)
               : 0;
@@ -279,8 +296,9 @@ export default function MetasPage() {
             const suggestedWeekly = remaining / weeksLeft;
             const isCompleted = goal.currentAmount >= goal.targetAmount;
 
-            const recentContributions = goal.contributions
-              .filter((c) => Date.now() - new Date(c.date).getTime() < 7 * 24 * 60 * 60 * 1000)
+            const safeContributions = Array.isArray(goal.contributions) ? goal.contributions : [];
+            const recentContributions = safeContributions
+              .filter((c) => c && c.date && Date.now() - new Date(c.date).getTime() < 7 * 24 * 60 * 60 * 1000)
               .sort((a, b) => new Date(b.date) - new Date(a.date));
 
             return (
