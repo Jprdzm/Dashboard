@@ -95,7 +95,12 @@ export default function HabitTracker() {
         </div>
       ) : (
         <div className="space-y-1.5">
-          {habits.map((habit) => {
+          {[...habits].sort((a, b) => {
+            const aDone = a.logs.includes(today);
+            const bDone = b.logs.includes(today);
+            if (aDone === bDone) return 0;
+            return aDone ? 1 : -1;
+          }).map((habit) => {
             const done = habit.logs.includes(today);
             const streak = streakToToday(habit);
             return (

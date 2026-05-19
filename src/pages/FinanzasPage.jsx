@@ -300,6 +300,8 @@ export default function FinanzasPage() {
 
   const ahorroTotal = useMemo(() => goals.reduce((s, g) => s + (g.currentAmount || 0), 0), [goals]);
 
+  const suscripcionesTotal = useMemo(() => subs.reduce((acc, s) => acc + (Number(s.cost) || 0), 0), [subs]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!monto || !descripcion) return;
@@ -457,7 +459,7 @@ export default function FinanzasPage() {
         {/* ══════════════════════════════════════════════
             FILA SUPERIOR — 4 TARJETAS DE RESUMEN
            ══════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
 
           {/* Card 1: Balance Total */}
           <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
@@ -508,6 +510,20 @@ export default function FinanzasPage() {
             </span>
             <p className={`text-2xl font-bold mt-1 ${ahorroTotal >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'}`}>
               {formatCurrency(ahorroTotal)}
+            </p>
+          </div>
+
+          {/* Card 5: Suscripciones */}
+          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="mb-3">
+              <PlaySquare size={18} className="text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
+              Suscripciones
+            </span>
+            <p className="text-2xl font-bold mt-1 text-indigo-600 dark:text-indigo-400">
+              {formatCurrency(suscripcionesTotal)}
+              <span className="text-xs text-textMuted-light dark:text-textMuted-dark font-normal ml-1">/mes</span>
             </p>
           </div>
         </div>

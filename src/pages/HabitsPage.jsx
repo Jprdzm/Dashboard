@@ -232,6 +232,42 @@ export default function HabitsPage() {
         </div>
 
         {/* ════════════════════════════════════════
+            DETALLE SEMANAL
+           ════════════════════════════════════════ */}
+        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarDays size={16} className="text-indigo-500" />
+            <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Progreso de esta semana</h2>
+          </div>
+          <div className="flex items-end justify-between gap-2 h-24">
+            {weekDays.map((day, i) => {
+              const doneCount = habits.filter((h) => h.logs.includes(day)).length;
+              const total = habits.length;
+              const pct = total > 0 ? (doneCount / total) * 100 : 0;
+              const isToday = day === today;
+              return (
+                <div key={day} className="flex-1 flex flex-col items-center justify-end gap-2 group">
+                  <div className="w-full flex justify-center">
+                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {doneCount}/{total}
+                    </span>
+                  </div>
+                  <div className="w-full max-w-[32px] h-full bg-slate-100 dark:bg-slate-800 rounded-t-md overflow-hidden relative flex items-end">
+                    <div 
+                      className={`w-full transition-all duration-700 ease-out rounded-t-md ${isToday ? 'bg-indigo-500' : 'bg-indigo-400 dark:bg-indigo-600'}`}
+                      style={{ height: `${pct}%` }}
+                    />
+                  </div>
+                  <span className={`text-[10px] font-medium ${isToday ? 'text-indigo-600 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
+                    {DAYS[i]}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ════════════════════════════════════════
             ADD HABIT FORM
            ════════════════════════════════════════ */}
         <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-6">
