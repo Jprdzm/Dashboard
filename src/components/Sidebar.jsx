@@ -33,11 +33,11 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 z-50 bg-surface-light dark:bg-[#0B0F19]/95 backdrop-blur-xl border-r border-border-light dark:border-border-dark transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed top-0 left-0 h-full w-64 z-50 flex flex-col bg-surface-light dark:bg-[#0B0F19]/95 backdrop-blur-xl border-r border-border-light dark:border-border-dark transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between p-5 border-b border-border-light dark:border-border-dark">
+        <div className="flex items-center justify-between p-5 border-b border-border-light dark:border-border-dark shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center">
               <Brain size={18} className="text-white" />
@@ -52,7 +52,7 @@ export default function Sidebar({ open, onClose }) {
           </button>
         </div>
 
-        <nav className="p-3 space-y-1">
+        <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
@@ -73,7 +73,7 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-border-light dark:border-border-dark">
+        <div className="p-3 border-t border-border-light dark:border-border-dark mt-auto shrink-0">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200"
