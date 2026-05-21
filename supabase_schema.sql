@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS deudas (
   acreedor TEXT DEFAULT '',
   amount_paid NUMERIC(12,2) DEFAULT 0,
   paidAmount NUMERIC(12,2) DEFAULT 0,
+  payment_frequency TEXT DEFAULT 'monthly' CHECK (payment_frequency IN ('monthly', 'yearly')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

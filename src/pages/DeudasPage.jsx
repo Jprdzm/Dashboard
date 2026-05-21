@@ -39,7 +39,7 @@ function snowballSimulation(debts, extraPerMonth) {
     id: d.id,
     name: d.name,
     remaining: d.totalAmount - (d.paidAmount || 0),
-    minPayment: d.minimumPayment,
+    minPayment: d.paymentFrequency === 'yearly' ? d.minimumPayment / 12 : d.minimumPayment,
     rate: d.interestRate,
     originalRemaining: d.totalAmount - (d.paidAmount || 0),
   }));
@@ -114,15 +114,16 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function calculatePayoffMonths(remaining, minPayment, annualRate, extraSim = 0) {
+function calculatePayoffMonths(remaining, minPayment, annualRate, extraSim = 0, paymentFrequency = 'monthly') {
   if (remaining <= 0) return 0;
   const monthlyRate = annualRate / 100 / 12;
+  const effectiveMonthlyPayment = paymentFrequency === 'yearly' ? minPayment / 12 : minPayment;
   let balance = remaining;
   let months = 0;
   const maxMonths = 600;
   while (balance > 0 && months < maxMonths) {
     balance *= 1 + monthlyRate;
-    const payment = minPayment + extraSim;
+    const payment = effectiveMonthlyPayment + extraSim;
     if (payment <= 0) return Infinity;
     balance -= Math.min(payment, balance);
     if (balance < 0.01) balance = 0;
@@ -144,6 +145,7 @@ export default function DeudasPage() {
   const [interestRate, setInterestRate] = useState('');
   const [minimumPayment, setMinimumPayment] = useState('');
   const [creditor, setCreditor] = useState('');
+  const [paymentFrequency, setPaymentFrequency] = useState('monthly');
 
   const [expandedDebtId, setExpandedDebtId] = useState(null);
   const [abonosMap, setAbonosMap] = useState({});
@@ -178,6 +180,7 @@ export default function DeudasPage() {
             minimumPayment: d.minimum_payment,
             creditor: d.acreedor || d.creditor,
             paidAmount: d.amount_paid || d.paidAmount || 0,
+            paymentFrequency: d.payment_frequency || 'monthly',
           }));
           setDebts(mapped);
         }
@@ -253,6 +256,7 @@ export default function DeudasPage() {
       minimumPayment: parsedMin,
       creditor: safeCreditor,
       paidAmount: 0,
+      paymentFrequency,
     };
 
     setDebts((prev) => [...prev, newDebt]);
@@ -273,6 +277,7 @@ export default function DeudasPage() {
             minimum_payment: parsedMin,
             creditor: safeCreditor,
             acreedor: safeCreditor,
+            payment_frequency: paymentFrequency,
           }, user)])
           .select();
 
@@ -298,6 +303,7 @@ export default function DeudasPage() {
     setInterestRate('');
     setMinimumPayment('');
     setCreditor('');
+    setPaymentFrequency('monthly');
   };
 
   const handleDelete = async (id) => {
@@ -546,6 +552,8 @@ export default function DeudasPage() {
                         d.totalAmount - (d.paidAmount || 0),
                         d.minimumPayment,
                         d.interestRate,
+                        0,
+                        d.paymentFrequency || 'monthly',
                       )))
                     ) : '—'}
                   </p>
@@ -635,7 +643,7 @@ export default function DeudasPage() {
           {showForm && (
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <form onSubmit={handleAdd} className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                   <input
                     type="text"
                     placeholder="Nombre"
@@ -677,6 +685,14 @@ export default function DeudasPage() {
                     onChange={(e) => setCreditor(e.target.value)}
                     className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
                   />
+                  <select
+                    value={paymentFrequency}
+                    onChange={(e) => setPaymentFrequency(e.target.value)}
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                  >
+                    <option value="monthly">Mensual</option>
+                    <option value="yearly">Anual</option>
+                  </select>
                 </div>
                 <button
                   type="submit"
@@ -775,9 +791,10 @@ export default function DeudasPage() {
             {sortedDebts.map((d, idx) => {
               const remaining = Math.max(0, d.totalAmount - (d.paidAmount || 0));
               const progress = d.totalAmount > 0 ? ((d.paidAmount || 0) / d.totalAmount) * 100 : 0;
-              const minPayoffMonths = calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate);
+              const freq = d.paymentFrequency || 'monthly';
+              const minPayoffMonths = calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate, 0, freq);
               const extraSim = parseFloat(extraSimMap[d.id]) || 0;
-              const simPayoffMonths = extraSim > 0 ? calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate, extraSim) : null;
+              const simPayoffMonths = extraSim > 0 ? calculatePayoffMonths(remaining, d.minimumPayment, d.interestRate, extraSim, freq) : null;
               const monthsSaved = simPayoffMonths !== null ? minPayoffMonths - simPayoffMonths : 0;
               const isExpanded = expandedDebtId === d.id;
 
@@ -815,7 +832,7 @@ export default function DeudasPage() {
                             )}
                           </div>
                           <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-0.5">
-                            {d.creditor} · {d.interestRate > 0 ? `${d.interestRate}% anual` : 'Sin interés'} · Pago mín. {formatCurrency(d.minimumPayment)}
+                            {d.creditor} · {d.interestRate > 0 ? `${d.interestRate}% anual` : 'Sin interés'} · Pago mín. {formatCurrency(d.minimumPayment)}{freq === 'yearly' ? '/año' : '/mes'}
                           </p>
                         </div>
                       </div>
