@@ -70,7 +70,7 @@ export default function MetasPage() {
                 targetAmount: Number(d.monto_objective || d.target_amount || d.goal_amount || 0),
                 currentAmount: Number(d.monto_actual || d.current_amount || 0),
                 deadline: d.deadline,
-                contributions: (existing && Array.isArray(existing.contributions)) ? existing.contributions : [],
+                contributions: Array.isArray(d.contributions) ? d.contributions : ((existing && Array.isArray(existing.contributions)) ? existing.contributions : []),
               };
             });
           });
@@ -116,6 +116,7 @@ export default function MetasPage() {
             monto_actual: 0,
             current_amount: 0,
             deadline,
+            contributions: [],
           }, user)])
           .select();
 
@@ -142,6 +143,8 @@ export default function MetasPage() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar esta meta?')) return;
+
     setGoals((prev) => prev.filter((g) => g.id !== id));
 
     if (supabaseReady) {
@@ -163,17 +166,19 @@ export default function MetasPage() {
     if (amt <= 0) return;
 
     let newAmount = 0;
+    let newContributions = [];
     setGoals((prev) =>
       prev.map((g) => {
         if (g.id !== id) return g;
         newAmount = Math.min(g.currentAmount + amt, g.targetAmount);
+        newContributions = [
+          ...g.contributions,
+          { id: crypto.randomUUID(), amount: amt, date: new Date().toISOString() },
+        ];
         return {
           ...g,
           currentAmount: newAmount,
-          contributions: [
-            ...g.contributions,
-            { id: crypto.randomUUID(), amount: amt, date: new Date().toISOString() },
-          ],
+          contributions: newContributions,
         };
       }),
     );
@@ -181,7 +186,11 @@ export default function MetasPage() {
 
     if (supabaseReady) {
       try {
-        await supabase.from('metas').update({ monto_actual: newAmount, current_amount: newAmount }).eq('id', id).eq('user_id', user.id);
+        await supabase.from('metas').update({ 
+          monto_actual: newAmount, 
+          current_amount: newAmount,
+          contributions: newContributions
+        }).eq('id', id).eq('user_id', user.id);
       } catch (err) {
         console.error('Error al actualizar meta:', err);
       }
@@ -312,9 +321,9 @@ export default function MetasPage() {
                       : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md'
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <div className="flex flex-row items-start justify-between gap-3 mb-4">
                   <div>
-                    <h3 className="font-semibold text-text-light dark:text-text-dark">
+                    <h3 className="font-semibold text-text-light dark:text-text-dark pr-2">
                       {goal.name}
                       {isCompleted && (
                         <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400">
@@ -330,10 +339,11 @@ export default function MetasPage() {
                   </div>
                   <button
                     onClick={() => handleDelete(goal.id)}
-                    className="p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0"
+                    className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-md sm:rounded-lg text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0 bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30"
                     aria-label="Eliminar meta"
                   >
                     <Trash2 size={15} />
+                    <span className="hidden sm:inline">Eliminar</span>
                   </button>
                 </div>
 

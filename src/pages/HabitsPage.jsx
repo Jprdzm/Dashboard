@@ -89,6 +89,7 @@ export default function HabitsPage() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este hábito?')) return;
     await remove(id);
     if (editingId === id) setEditingId(null);
     addToast('Hábito eliminado', 'success');
@@ -324,7 +325,7 @@ export default function HabitsPage() {
                   )}
                   <th className="py-3 px-2 text-right font-medium text-textMuted-light dark:text-textMuted-dark w-12">Racha</th>
                   <th className="py-3 px-2 text-right font-medium text-textMuted-light dark:text-textMuted-dark w-12">%</th>
-                  <th className="py-3 pr-3 pl-2 w-20" />
+                  <th className="py-3 pr-3 pl-2 w-20 sticky right-0 bg-surface-light dark:bg-surface-dark shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)] z-10" />
                 </tr>
               </thead>
               <tbody>
@@ -338,7 +339,7 @@ export default function HabitsPage() {
                     : Math.round((weekDays.filter((d) => habit.logs.includes(d)).length / 7) * 100);
 
                   return (
-                    <tr key={habit.id} className="border-b border-border-light dark:border-border-dark hover:bg-bg-light/30 dark:hover:bg-bg-dark/30 transition-colors">
+                    <tr key={habit.id} className="group border-b border-border-light dark:border-border-dark hover:bg-bg-light/30 dark:hover:bg-bg-dark/30 transition-colors">
                       <td className="py-2.5 pl-4 pr-3">
                         {isEditing ? (
                           <div className="flex items-center gap-1">
@@ -408,21 +409,21 @@ export default function HabitsPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="py-2.5 pr-3 pl-2">
+                      <td className="py-2.5 pr-3 pl-2 sticky right-0 bg-bg-light dark:bg-bg-dark border-l border-border-light/50 dark:border-border-dark/50 shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)] z-10 group-hover:bg-bg-light/80 dark:group-hover:bg-bg-dark/80 transition-colors">
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => startEdit(habit)}
-                            className="p-1 rounded text-textMuted-light dark:text-textMuted-dark hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                            className="p-1.5 rounded text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                             title="Editar"
                           >
-                            <Pencil size={12} />
+                            <Pencil size={14} />
                           </button>
                           <button
                             onClick={() => handleDelete(habit.id)}
-                            className="p-1 rounded text-textMuted-light dark:text-textMuted-dark hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
+                            className="p-1.5 rounded text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors bg-rose-50/30 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30"
                             title="Eliminar"
                           >
-                            <Trash2 size={12} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
                       </td>
