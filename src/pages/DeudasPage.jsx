@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowLeft, Plus, AlertTriangle, PiggyBank, BadgeInfo,
+  ArrowLeft, Plus, Trash2, AlertTriangle, PiggyBank, BadgeInfo,
   ChevronDown, ChevronRight, CalendarDays, FileText, Loader2,
   ArrowUpDown, Sparkles, Percent, Calculator, Zap, Snowflake,
 } from 'lucide-react';
@@ -300,7 +300,6 @@ export default function DeudasPage() {
     setCreditor('');
   };
 
-  // eslint-disable-next-line no-unused-vars
   const handleDelete = async (id) => {
     const snapshot = debts;
     setDebts((prev) => prev.filter((d) => d.id !== id));
@@ -820,13 +819,25 @@ export default function DeudasPage() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-sm font-bold tabular-nums text-text-light dark:text-text-dark">
-                          {formatCurrency(remaining)}
-                        </p>
-                        <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
-                          de {formatCurrency(d.totalAmount)}
-                        </p>
+                      <div className="text-right shrink-0 flex items-start gap-1.5">
+                        <div>
+                          <p className="text-sm font-bold tabular-nums text-text-light dark:text-text-dark">
+                            {formatCurrency(remaining)}
+                          </p>
+                          <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            de {formatCurrency(d.totalAmount)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(d.id);
+                          }}
+                          className="p-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all opacity-40 hover:opacity-100"
+                          aria-label="Eliminar deuda"
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
                     </div>
 

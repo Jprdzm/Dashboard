@@ -753,10 +753,11 @@ export default function FinanzasPage() {
           </div>
 
           {/* ─────── Columna Derecha (1/4) ─────── */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 self-start">
+            <div className="lg:sticky lg:top-24 space-y-4">
 
             {/* Schedule Payments — vinculado a deudas activas */}
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md lg:sticky lg:top-24">
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
                   <CalendarDays size={14} className="text-blue-600 dark:text-blue-400" />
@@ -877,7 +878,7 @@ export default function FinanzasPage() {
             </div>
 
             {/* ─────── Pagos Recientes ─────── */}
-            <div className="mt-4 p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
                   <TrendingDown size={14} className="text-emerald-600 dark:text-emerald-400" />
@@ -930,6 +931,7 @@ export default function FinanzasPage() {
                 </div>
               )}
             </div>
+          </div>
           </div>
         </div>
 
