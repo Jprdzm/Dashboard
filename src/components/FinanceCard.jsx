@@ -13,7 +13,7 @@ export default function FinanceCard() {
       <span className="block text-sm font-medium text-slate-500 dark:text-slate-400">
         Finanzas
       </span>
-      <div className="flex gap-2">
+      <div className="flex gap-2 justify-center">
         {NAV_ITEMS.map((item) => (
           <Link
             key={item.to}

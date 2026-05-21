@@ -750,6 +750,61 @@ export default function FinanzasPage() {
                 </div>
               )}
             </div>
+
+            {/* ─────── Pagos Recientes ─────── */}
+            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
+                  <TrendingDown size={14} className="text-emerald-600 dark:text-emerald-400" />
+                  Pagos Recientes
+                </h2>
+                <Link
+                  to="/deudas"
+                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  Ver todo →
+                </Link>
+              </div>
+
+              {loadingAbonos ? (
+                <div className="py-4 text-center">
+                  <Loader2 size={16} className="animate-spin text-textMuted-light dark:text-textMuted-dark mx-auto" />
+                </div>
+              ) : abonosConNombre.length === 0 ? (
+                <div className="py-4 text-center">
+                  <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
+                    Sin pagos registrados
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {abonosConNombre.map((a) => (
+                    <div
+                      key={a.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-bg-light dark:bg-bg-dark"
+                    >
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                          <TrendingDown size={11} className="text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                            {a.debtName}
+                          </p>
+                          <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                            {new Date(a.fecha).toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' })}
+                            {a.nota ? ` · ${a.nota}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-xs font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 ml-2 shrink-0">
+                        -{formatCurrency(a.cantidad_abonada || a.amount_paid || 0)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ─────── Columna Derecha (1/4) ─────── */}
@@ -875,61 +930,6 @@ export default function FinanzasPage() {
                   Gestionar →
                 </Link>
               </div>
-            </div>
-
-            {/* ─────── Pagos Recientes ─────── */}
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
-                  <TrendingDown size={14} className="text-emerald-600 dark:text-emerald-400" />
-                  Pagos Recientes
-                </h2>
-                <Link
-                  to="/deudas"
-                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                >
-                  Ver todo →
-                </Link>
-              </div>
-
-              {loadingAbonos ? (
-                <div className="py-4 text-center">
-                  <Loader2 size={16} className="animate-spin text-textMuted-light dark:text-textMuted-dark mx-auto" />
-                </div>
-              ) : abonosConNombre.length === 0 ? (
-                <div className="py-4 text-center">
-                  <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
-                    Sin pagos registrados
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {abonosConNombre.map((a) => (
-                    <div
-                      key={a.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-bg-light dark:bg-bg-dark"
-                    >
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                          <TrendingDown size={11} className="text-emerald-600 dark:text-emerald-400" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
-                            {a.debtName}
-                          </p>
-                          <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
-                            {new Date(a.fecha).toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' })}
-                            {a.nota ? ` · ${a.nota}` : ''}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-semibold tabular-nums text-emerald-600 dark:text-emerald-400 ml-2 shrink-0">
-                        -{formatCurrency(a.cantidad_abonada || a.amount_paid || 0)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
           </div>
