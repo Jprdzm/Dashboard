@@ -36,7 +36,7 @@ function AppShell() {
         <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-[#0B0F19]/80 backdrop-blur-md">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
             aria-label="Abrir menú"
           >
             <Menu size={20} />

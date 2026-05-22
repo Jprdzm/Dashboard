@@ -32,8 +32,8 @@ function formatMonths(m) {
     : `${years} año${years > 1 ? 's' : ''}`;
 }
 
-function snowballSimulation(debts, extraPerMonth) {
-  if (!debts.length || extraPerMonth <= 0) return null;
+function runSimulation(debts, extraPerMonth, strategy = 'snowball') {
+  if (!debts.length) return null;
 
   let simulation = debts.map((d) => ({
     id: d.id,
@@ -44,9 +44,14 @@ function snowballSimulation(debts, extraPerMonth) {
     originalRemaining: d.totalAmount - (d.paidAmount || 0),
   }));
 
-  simulation.sort((a, b) => a.remaining - b.remaining);
+  if (strategy === 'snowball') {
+    simulation.sort((a, b) => a.remaining - b.remaining);
+  } else {
+    simulation.sort((a, b) => (b.rate || 0) - (a.rate || 0));
+  }
 
   let month = 0;
+  let totalPaid = 0;
   const schedule = [];
   const maxMonths = 600;
 
@@ -63,6 +68,7 @@ function snowballSimulation(debts, extraPerMonth) {
       if (d.remaining > 0) {
         const payment = Math.min(d.minPayment, d.remaining);
         d.remaining -= payment;
+        totalPaid += payment;
       }
     });
 
@@ -76,9 +82,10 @@ function snowballSimulation(debts, extraPerMonth) {
     available += freedMin;
 
     for (const d of simulation) {
-      if (d.remaining > 0) {
+      if (d.remaining > 0 && available > 0) {
         const extra = Math.min(available, d.remaining);
         d.remaining -= extra;
+        totalPaid += extra;
         available -= extra;
         if (d.remaining <= 0.01) d.remaining = 0;
       }
@@ -100,8 +107,6 @@ function snowballSimulation(debts, extraPerMonth) {
     if (active.length === 0) break;
     month++;
   }
-
-  const totalPaid = simulation.reduce((s, d) => s + d.originalRemaining, 0);
 
   return {
     totalMonths: month + 1,
@@ -208,9 +213,9 @@ export default function DeudasPage() {
 
   const debtRatio = monthlyIncome > 0 ? (totalDebt / monthlyIncome) * 100 : 0;
 
-  const snowballResult = useMemo(
-    () => snowballSimulation(debts, extraPerMonth),
-    [debts, extraPerMonth],
+  const simulationResult = useMemo(
+    () => runSimulation(debts, extraPerMonth, strategy),
+    [debts, extraPerMonth, strategy],
   );
 
   const avgInterestRate = useMemo(() => {
@@ -535,13 +540,13 @@ export default function DeudasPage() {
                 </span>
                 <Sparkles size={18} className="text-emerald-500" />
               </div>
-              {snowballResult ? (
+              {simulationResult ? (
                 <>
                   <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                    {formatMonths(snowballResult.totalMonths)}
+                    {formatMonths(simulationResult.totalMonths)}
                   </p>
                   <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
-                    Aportando {formatCurrency(extraPerMonth || totalMinPayments)}/mes · Pago total: {formatCurrency(snowballResult.totalPaid)}
+                    Aportando {formatCurrency(extraPerMonth || totalMinPayments)}/mes · Pago total: {formatCurrency(simulationResult.totalPaid)}
                   </p>
                 </>
               ) : (
@@ -762,16 +767,16 @@ export default function DeudasPage() {
         {/* ══════════════════════════════════════════════
             SIMULATION RESULT BANNER
            ══════════════════════════════════════════════ */}
-        {snowballResult && debts.length > 0 && (
+        {simulationResult && debts.length > 0 && (
           <div className="flex flex-wrap items-center gap-3 mb-6 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
             <div className="flex items-center gap-2 text-sm">
               <Calculator size={15} className="text-blue-600 dark:text-blue-400" />
               <span className="text-textMuted-light dark:text-textMuted-dark">Proyección:</span>
-              <strong className="text-text-light dark:text-text-dark">{formatMonths(snowballResult.totalMonths)}</strong>
+              <strong className="text-text-light dark:text-text-dark">{formatMonths(simulationResult.totalMonths)}</strong>
               <span className="text-textMuted-light dark:text-textMuted-dark">· Pago total:</span>
-              <strong className="text-text-light dark:text-text-dark">{formatCurrency(snowballResult.totalPaid)}</strong>
+              <strong className="text-text-light dark:text-text-dark">{formatCurrency(simulationResult.totalPaid)}</strong>
               <span className="text-textMuted-light dark:text-textMuted-dark">· Intereses:</span>
-              <strong className="text-rose-600 dark:text-rose-400">{formatCurrency(snowballResult.totalPaid - totalDebt)}</strong>
+              <strong className="text-rose-600 dark:text-rose-400">{formatCurrency(simulationResult.totalPaid - totalDebt)}</strong>
             </div>
           </div>
         )}
@@ -1053,11 +1058,11 @@ export default function DeudasPage() {
         {/* ══════════════════════════════════════════════
             SNOWBALL CALENDAR (colapsable)
            ══════════════════════════════════════════════ */}
-        {snowballResult && snowballResult.schedule && snowballResult.schedule.length > 0 && (
+        {simulationResult && simulationResult.schedule && simulationResult.schedule.length > 0 && (
           <details className="group mb-8">
             <summary className="flex items-center gap-2 text-sm font-medium text-textMuted-light dark:text-textMuted-dark cursor-pointer hover:text-text-light dark:hover:text-text-dark transition-colors p-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <Calculator size={15} className="text-blue-500" />
-              Ver calendario de pagos mensual ({snowballResult.schedule.length} meses)
+              Ver calendario de pagos mensual ({simulationResult.schedule.length} meses)
               <ChevronRight size={14} className="ml-auto group-open:rotate-90 transition-transform" />
             </summary>
             <div className="mt-3 max-h-72 overflow-y-auto rounded-xl border border-border-light dark:border-border-dark">
@@ -1070,7 +1075,7 @@ export default function DeudasPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {snowballResult.schedule.map((row) => (
+                  {simulationResult.schedule.map((row) => (
                     <tr key={row.month} className="border-b border-border-light dark:border-border-dark hover:bg-bg-light/50 dark:hover:bg-bg-dark/50 transition-colors">
                       <td className="py-2 pr-2 pl-3 text-text-light dark:text-text-dark font-medium">#{row.month}</td>
                       <td className="py-2 px-2 text-textMuted-light dark:text-textMuted-dark">{row.activeCount}</td>

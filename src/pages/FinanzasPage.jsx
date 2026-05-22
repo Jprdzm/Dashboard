@@ -807,16 +807,12 @@ export default function FinanzasPage() {
             </div>
           </div>
 
-          {/* ─────── Columna Derecha (1/4) ─────── */}
-          <div className="lg:col-span-1 self-start">
-            <div className="lg:sticky lg:top-24 space-y-4">
-
             {/* Schedule Payments — vinculado a deudas activas */}
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
                   <CalendarDays size={14} className="text-blue-600 dark:text-blue-400" />
-                  Schedule Payments
+                  Pagos Programados
                 </h2>
                 {totalDeudaActiva > 0 && (
                   <span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 tabular-nums">
@@ -931,7 +927,6 @@ export default function FinanzasPage() {
                 </Link>
               </div>
             </div>
-          </div>
           </div>
         </div>
 

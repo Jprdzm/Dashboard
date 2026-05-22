@@ -33,7 +33,7 @@ export default function Sidebar({ open, onClose }) {
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-64 z-50 flex flex-col bg-surface-light dark:bg-[#0B0F19]/95 backdrop-blur-xl border-r border-border-light dark:border-border-dark transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto ${
+        className={`fixed top-0 left-0 h-full w-64 z-50 flex flex-col bg-surface-light dark:bg-[#0B0F19]/95 backdrop-blur-xl border-r border-border-light dark:border-border-dark transform transition-transform duration-300 ease-in-out ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -46,7 +46,7 @@ export default function Sidebar({ open, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="lg:hidden p-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+            className="p-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
           >
             <X size={18} />
           </button>
