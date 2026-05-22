@@ -27,6 +27,13 @@ CREATE POLICY "Usuarios eliminan SOLO sus suscripciones" ON suscripciones
   FOR DELETE USING (user_id = auth.uid());
 
 -- ─────────────────────────────
+-- ACTUALIZACIÓN: suscripciones - renovación
+-- ─────────────────────────────
+ALTER TABLE suscripciones 
+ADD COLUMN IF NOT EXISTS ultima_renovacion TIMESTAMPTZ DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS renovado BOOLEAN DEFAULT false;
+
+-- ─────────────────────────────
 -- NUEVA TABLA: habits (Hábitos)
 -- ─────────────────────────────
 CREATE TABLE IF NOT EXISTS habits (

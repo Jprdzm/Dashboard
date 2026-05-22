@@ -57,6 +57,8 @@ export default function SuscripcionesPage() {
             cost: d.costo,
             renewalDate: d.fecha_renovacion,
             bank: d.banco_pago,
+            renovado: d.renovado ?? false,
+            ultimaRenovacion: d.ultima_renovacion,
           }));
           setSubs(mapped);
         }
@@ -82,6 +84,8 @@ export default function SuscripcionesPage() {
       cost: target,
       renewalDate,
       bank: safeBank,
+      renovado: false,
+      ultimaRenovacion: null,
     };
 
     setSubs((prev) => [...prev, newSub]);
@@ -95,6 +99,8 @@ export default function SuscripcionesPage() {
             costo: target,
             fecha_renovacion: renewalDate,
             banco_pago: safeBank,
+            renovado: false,
+            ultima_renovacion: null,
           }, user)]);
         if (error) addToast('Error al sincronizar: ' + error.message, 'error');
         else addToast('Suscripción añadida correctamente', 'success');
@@ -132,16 +138,25 @@ export default function SuscripcionesPage() {
     const current = new Date(currentRenewal);
     current.setMonth(current.getMonth() + 1);
     const nextRenewal = current.toISOString().split('T')[0];
+    const now = new Date().toISOString();
 
     setSubs((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, renewalDate: nextRenewal } : s)),
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, renewalDate: nextRenewal, renovado: true, ultimaRenovacion: now }
+          : s,
+      ),
     );
 
     if (supabaseReady) {
       try {
         await supabase
           .from('suscripciones')
-          .update({ fecha_renovacion: nextRenewal })
+          .update({
+            fecha_renovacion: nextRenewal,
+            renovado: true,
+            ultima_renovacion: now,
+          })
           .eq('id', id)
           .eq('user_id', user.id);
         addToast('Suscripción renovada para el próximo mes', 'success');
@@ -270,6 +285,11 @@ export default function SuscripcionesPage() {
                         <CalendarDays size={14} />
                         <span>Renueva: {formatDate(sub.renewalDate)}</span>
                       </div>
+                      {sub.renovado && (
+                        <div className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                          ✓ Renovada {sub.ultimaRenovacion ? formatDate(sub.ultimaRenovacion.split('T')[0]) : ''}
+                        </div>
+                      )}
                     </div>
                   </div>
 
