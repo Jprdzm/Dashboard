@@ -807,6 +807,9 @@ export default function FinanzasPage() {
             </div>
           </div>
 
+          {/* ─────── Columna Derecha (1/4) ─────── */}
+          <div className="lg:col-span-1 space-y-6">
+
             {/* Schedule Payments — vinculado a deudas activas */}
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
