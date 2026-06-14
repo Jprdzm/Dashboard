@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Menu } from 'lucide-react';
 import { AuthProvider, useAuth } from './services/AuthContext';
-import ThemeToggle from './components/ThemeToggle';
-import Sidebar from './components/Sidebar';
+import Navbar from './components/Navbar';
 import { ToastProvider } from './components/Toast';
 import OnlineStatus from './components/OnlineStatus';
 import AuthPage from './pages/AuthPage';
@@ -16,7 +13,6 @@ import SuscripcionesPage from './pages/SuscripcionesPage';
 
 function AppShell() {
   const { session, loading } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -29,33 +25,18 @@ function AppShell() {
   if (!session) return <AuthPage />;
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300 flex">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-[#0B0F19]/80 backdrop-blur-md">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
-            aria-label="Abrir menú"
-          >
-            <Menu size={20} />
-          </button>
-          <div className="flex-1" />
-          <ThemeToggle />
-        </header>
-
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/finanzas" element={<FinanzasPage />} />
-            <Route path="/deudas" element={<DeudasPage />} />
-            <Route path="/metas" element={<MetasPage />} />
-            <Route path="/habits" element={<HabitsPage />} />
-            <Route path="/suscripciones" element={<SuscripcionesPage />} />
-          </Routes>
-        </main>
-      </div>
+    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300 flex flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/finanzas" element={<FinanzasPage />} />
+          <Route path="/deudas" element={<DeudasPage />} />
+          <Route path="/metas" element={<MetasPage />} />
+          <Route path="/habits" element={<HabitsPage />} />
+          <Route path="/suscripciones" element={<SuscripcionesPage />} />
+        </Routes>
+      </main>
     </div>
   );
 }

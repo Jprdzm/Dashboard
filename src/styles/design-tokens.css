@@ -1,0 +1,151 @@
+:root {
+  /* Color System - Semantic Tokens */
+  --color-primary: #3b82f6; /* Blue-500 */
+  --color-primary-dark: #2563eb; /* Blue-600 */
+  --color-success: #10b981; /* Emerald-500 */
+  --color-warning: #f59e0b; /* Amber-500 */
+  --color-danger: #ef4444; /* Red-500 */
+  --color-info: #6366f1; /* Indigo-500 */
+  --color-muted: #64748b; /* Slate-500 */
+  --color-background: #ffffff; /* White */
+  --color-surface: #f8fafc; /* Slate-50 */
+  --color-border: #e2e8f0; /* Slate-200 */
+  --color-text-primary: #1e293b; /* Slate-800 */
+  --color-text-secondary: #64748b; /* Slate-500 */
+
+  /* Dark Mode Variables */
+  --color-background-dark: #0f172a; /* Slate-900 */
+  --color-surface-dark: #1e293b; /* Slate-800 */
+  --color-border-dark: #334155; /* Slate-600 */
+  --color-text-primary-dark: #f1f5f9; /* Slate-100 */
+  --color-primary-dark-mode: #60a5fa; /* Blue-400 */
+  --color-success-dark-mode: #34d399; /* Emerald-400 */
+  --color-warning-dark-mode: #fbbf24; /* Amber-400 */
+  --color-danger-dark-mode: #f87171; /* Red-400 */
+  --color-info-dark-mode: #a78bfa; /* Indigo-400 */
+
+  /* Typography System */
+  --font-family-base: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem; /* 36px */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing System (4px Grid) */
+  --space-0: 0px;
+  --space-1: 4px; /* 0.25rem */
+  --space-2: 8px; /* 0.5rem */
+  --space-3: 12px; /* 0.75rem */
+  --space-4: 16px; /* 1rem */
+  --space-5: 20px; /* 1.25rem */
+  --space-6: 24px; /* 1.5rem */
+  --space-8: 32px; /* 2rem */
+  --space-10: 40px; /* 2.5rem */
+  --space-12: 48px; /* 3rem */
+  --space-16: 64px; /* 4rem */
+  --space-20: 80px; /* 5rem */
+
+  /* Border Radius System */
+  --radius-none: 0px;
+  --radius-sm: 4px; /* 0.25rem */
+  --radius-md: 8px; /* 0.5rem */
+  --radius-lg: 12px; /* 0.75rem */
+  --radius-xl: 16px; /* 1rem */
+  --radius-full: 9999px;
+
+  /* Shadow/Elevation System */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -3px rgba(0, 0, 0, 0.06);
+}
+
+.dark {
+  --color-background: var(--color-background-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-border: var(--color-border-dark);
+  --color-text-primary: var(--color-text-primary-dark);
+  --color-primary: var(--color-primary-dark-mode);
+  --color-success: var(--color-success-dark-mode);
+  --color-warning: var(--color-warning-dark-mode);
+  --color-danger: var(--color-danger-dark-mode);
+  --color-info: var(--color-info-dark-mode);
+}
+
+/* Utility classes for design tokens */
+.text-primary { color: var(--color-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+.text-info { color: var(--color-info); }
+.text-muted { color: var(--color-muted); }
+.text-text-primary { color: var(--color-text-primary); }
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-danger { background-color: var(--color-danger); }
+.bg-info { background-color: var(--color-info); }
+.bg-muted { background-color: var(--color-muted); }
+.bg-background { background-color: var(--color-background); }
+.bg-surface { background-color: var(--color-surface); }
+
+.border-primary { border-color: var(--color-primary); }
+.border-success { border-color: var(--color-success); }
+.border-warning { border-color: var(--color-warning); }
+.border-danger { border-color: var(--color-danger); }
+.border-info { border-color: var(--color-info); }
+.border-muted { border-color: var(--color-muted); }
+.border-border { border-color: var(--color-border); }
+
+.hover\:bg-primary:hover { background-color: var(--color-primary-dark); }
+.hover\:bg-success:hover { background-color: var(--color-success-dark); }
+.hover\:bg-warning:hover { background-color: var(--color-warning-dark); }
+.hover\:bg-danger:hover { background-color: var(--color-danger-dark); }
+.hover\:bg-info:hover { background-color: var(--color-info-dark); }
+
+.focus\:ring-primary:focus { --tw-ring-color: var(--color-primary); }
+.focus\:ring-success:focus { --tw-ring-color: var(--color-success); }
+.focus\:ring-warning:focus { --tw-ring-color: var(--color-warning); }
+.focus\:ring-danger:focus { --tw-ring-color: var(--color-danger); }
+.focus\:ring-info:focus { --tw-ring-color: var(--color-info); }
+
+/* Dark mode specific utilities */
+.dark .text-primary { color: var(--color-primary-dark-mode); }
+.dark .text-success { color: var(--color-success-dark-mode); }
+.dark .text-warning { color: var(--color-warning-dark-mode); }
+.dark .text-danger { color: var(--color-danger-dark-mode); }
+.dark .text-info { color: var(--color-info-dark-mode); }
+
+.dark .bg-primary { background-color: var(--color-primary-dark-mode); }
+.dark .bg-success { background-color: var(--color-success-dark-mode); }
+.dark .bg-warning { background-color: var(--color-warning-dark-mode); }
+.dark .bg-danger { background-color: var(--color-danger-dark-mode); }
+.dark .bg-info { background-color: var(--color-info-dark-mode); }
+
+.dark .border-primary { border-color: var(--color-primary-dark-mode); }
+.dark .border-success { border-color: var(--color-success-dark-mode); }
+.dark .border-warning { border-color: var(--color-warning-dark-mode); }
+.dark .border-danger { border-color: var(--color-danger-dark-mode); }
+.dark .border-info { border-color: var(--color-info-dark-mode); }
+
+.dark .hover\:bg-primary:hover { background-color: var(--color-primary-dark); }
+.dark .hover\:bg-success:hover { background-color: var(--color-success-dark); }
+.dark .hover\:bg-warning:hover { background-color: var(--color-warning-dark); }
+.dark .hover\:bg-danger:hover { background-color: var(--color-danger-dark); }
+.dark .hover\:bg-info:hover { background-color: var(--color-info-dark); }

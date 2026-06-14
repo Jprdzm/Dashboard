@@ -7,6 +7,7 @@ import {
 import useSyncData from '../hooks/useSyncData';
 import { sanitizeInput } from '../utils/sanitize';
 import { useToast } from '../components/Toast';
+import { Checkbox } from '../components/ui/checkbox';
 
 const DAYS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
 const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -151,11 +152,11 @@ export default function HabitsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300">
+    <div className="min-h-screen bg-background dark:bg-background text-text-primary dark:text-text-primary">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors duration-200 mb-6"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors duration-200 mb-6"
         >
           <ArrowLeft size={16} />
           Volver al Dashboard
@@ -163,8 +164,8 @@ export default function HabitsPage() {
 
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark flex items-center gap-3">
-              <Target size={28} className="text-indigo-500" />
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-primary dark:text-text-primary flex items-center gap-3">
+              <Target size={28} className="text-primary" />
               Hábitos
             </h1>
             {syncing && (
@@ -176,16 +177,16 @@ export default function HabitsPage() {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800">
+          <div className="flex items-center gap-1 p-0.5 rounded-lg bg-muted/10 dark:bg-slate-800">
             <button
               onClick={() => setView('week')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'week' ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'week' ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary'}`}
             >
               Semana
             </button>
             <button
               onClick={() => setView('month')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'month' ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${view === 'month' ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary'}`}
             >
               Mes
             </button>
@@ -197,8 +198,8 @@ export default function HabitsPage() {
            ════════════════════════════════════════ */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
           <div className="p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
-            <BarChart3 size={16} className="mx-auto mb-1.5 text-indigo-500" />
-            <p className="text-xl font-bold text-text-light dark:text-text-dark tabular-nums">{stats.active}</p>
+            <BarChart3 size={16} className="mx-auto mb-1.5 text-primary" />
+            <p className="text-xl font-bold text-text-primary dark:text-text-primary tabular-nums">{stats.active}</p>
             <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Hábitos</p>
           </div>
           <div className="p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
@@ -237,8 +238,8 @@ export default function HabitsPage() {
            ════════════════════════════════════════ */}
         <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <CalendarDays size={16} className="text-indigo-500" />
-            <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Progreso de esta semana</h2>
+            <CalendarDays size={16} className="text-primary" />
+            <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm">Progreso de esta semana</h2>
           </div>
           <div className="flex items-end justify-between gap-2 h-24">
             {weekDays.map((day, i) => {
@@ -249,17 +250,17 @@ export default function HabitsPage() {
               return (
                 <div key={day} className="flex-1 flex flex-col items-center justify-end gap-2 group">
                   <div className="w-full flex justify-center">
-                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-bold text-primary/80 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
                       {doneCount}/{total}
                     </span>
                   </div>
-                  <div className="w-full max-w-[32px] h-full bg-slate-100 dark:bg-slate-800 rounded-t-md overflow-hidden relative flex items-end">
+                  <div className="w-full max-w-[32px] h-full bg-muted/10 dark:bg-slate-800 rounded-t-md overflow-hidden relative flex items-end">
                     <div 
                       className={`w-full transition-all duration-700 ease-out rounded-t-md ${isToday ? 'bg-indigo-500' : 'bg-indigo-400 dark:bg-indigo-600'}`}
                       style={{ height: `${pct}%` }}
                     />
                   </div>
-                  <span className={`text-[10px] font-medium ${isToday ? 'text-indigo-600 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
+                  <span className={`text-[10px] font-medium ${isToday ? 'text-primary/80 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
                     {DAYS[i]}
                   </span>
                 </div>
@@ -279,7 +280,7 @@ export default function HabitsPage() {
               value={newName}
               maxLength={100}
               onChange={(e) => setNewName(e.target.value)}
-              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
             />
             <button
               type="submit"
@@ -305,14 +306,14 @@ export default function HabitsPage() {
           <div className="overflow-x-auto rounded-xl border border-border-light dark:border-border-dark">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-border-light dark:border-border-dark bg-bg-light/50 dark:bg-bg-dark/50">
+                <tr className="border-b border-border-light dark:border-border-dark bg-background/50 dark:bg-background-dark/50">
                   <th className="text-left py-3 pl-4 pr-3 font-medium text-textMuted-light dark:text-textMuted-dark w-[40%]">Hábito</th>
                   {view === 'week' ? (
                     weekDays.map((day, i) => (
                       <th
                         key={day}
                         className={`py-3 px-1.5 text-center font-medium w-8 ${
-                          day === today ? 'text-indigo-600 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'
+                          day === today ? 'text-primary/80 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'
                         }`}
                       >
                         {DAYS[i]}
@@ -339,7 +340,7 @@ export default function HabitsPage() {
                     : Math.round((weekDays.filter((d) => habit.logs.includes(d)).length / 7) * 100);
 
                   return (
-                    <tr key={habit.id} className="group border-b border-border-light dark:border-border-dark hover:bg-bg-light/30 dark:hover:bg-bg-dark/30 transition-colors">
+                    <tr key={habit.id} className="group border-b border-border-light dark:border-border-dark hover:bg-background/30 dark:hover:bg-background-dark/30 transition-colors">
                       <td className="py-2.5 pl-4 pr-3">
                         {isEditing ? (
                           <div className="flex items-center gap-1">
@@ -349,44 +350,44 @@ export default function HabitsPage() {
                               maxLength={100}
                               onChange={(e) => setEditName(e.target.value)}
                               onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditingId(null); }}
-                              className="flex-1 px-2 py-1 text-xs rounded border border-indigo-400 dark:border-indigo-500 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                              className="flex-1 px-2 py-1 text-xs rounded border border-indigo-400 dark:border-indigo-500 bg-background dark:bg-background-dark text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
                               autoFocus
                             />
                             <button onClick={commitEdit} className="p-1 rounded text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
                               <Save size={13} />
                             </button>
-                            <button onClick={() => setEditingId(null)} className="p-1 rounded text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <button onClick={() => setEditingId(null)} className="p-1 rounded text-textMuted-light dark:text-textMuted-dark hover:bg-muted/10 dark:hover:bg-slate-800 transition-colors">
                               <X size={13} />
                             </button>
                           </div>
                         ) : (
-                          <span className="text-text-light dark:text-text-dark font-medium">{habit.name}</span>
+                          <span className="text-text-primary dark:text-text-primary font-medium">{habit.name}</span>
                         )}
                       </td>
 
                       {view === 'week' ? (
                         weekDays.map((day) => {
                           const checked = habit.logs.includes(day);
+                          const isToday = day === today;
                           return (
-                            <td key={day} className="py-2.5 px-1.5 text-center">
-                              <button
-                                onClick={() => toggleDay(habit.id, day)}
-                                className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 ${
-                                  checked
-                                    ? 'bg-emerald-500 text-white'
-                                    : day === today
-                                      ? 'bg-slate-100 dark:bg-slate-800 text-textMuted-light dark:text-textMuted-dark hover:bg-slate-200 dark:hover:bg-slate-700'
-                                      : 'bg-transparent text-textMuted-light/30 dark:text-textMuted-dark/30'
-                                }`}
-                              >
-                                {checked && <Check size={12} strokeWidth={3} />}
-                              </button>
+                            <td
+                              key={day}
+                              className={`py-2.5 px-1.5 text-center ${isToday ? 'bg-teal-50/40 dark:bg-teal-900/10' : ''}`}
+                            >
+                              <div className="flex justify-center">
+                                <Checkbox
+                                  isSelected={checked}
+                                  onChange={() => toggleDay(habit.id, day)}
+                                  aria-label={`${habit.name} - ${day}`}
+                                  className={!isToday && !checked ? 'opacity-30' : ''}
+                                />
+                              </div>
                             </td>
                           );
                         })
                       ) : (
                         <td className="py-2.5 px-1.5 text-center">
-                          <span className="text-sm font-bold tabular-nums text-indigo-600 dark:text-indigo-400">
+                          <span className="text-sm font-bold tabular-nums text-primary/80 dark:text-indigo-400">
                             {monthCompletions}
                           </span>
                           <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">/{monthTotal}</span>
@@ -409,11 +410,11 @@ export default function HabitsPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="py-2.5 pr-3 pl-2 sticky right-0 bg-bg-light dark:bg-bg-dark border-l border-border-light/50 dark:border-border-dark/50 shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)] z-10 group-hover:bg-bg-light/80 dark:group-hover:bg-bg-dark/80 transition-colors">
+                      <td className="py-2.5 pr-3 pl-2 sticky right-0 bg-background dark:bg-background-dark border-l border-border-light/50 dark:border-border-dark/50 shadow-[-4px_0_6px_-1px_rgba(0,0,0,0.05)] z-10 group-hover:bg-background/80 dark:group-hover:bg-background-dark/80 transition-colors">
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => startEdit(habit)}
-                            className="p-1.5 rounded text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                            className="p-1.5 rounded text-primary dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                             title="Editar"
                           >
                             <Pencil size={14} />
@@ -442,16 +443,16 @@ export default function HabitsPage() {
           <div className="flex items-center justify-center gap-4 mt-4">
             <button
               onClick={handlePrevMonth}
-              className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+              className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors"
             >
               ← {MONTHS[calMonth === 0 ? 11 : calMonth - 1]}
             </button>
-            <span className="text-sm font-semibold text-text-light dark:text-text-dark">
+            <span className="text-sm font-semibold text-text-primary dark:text-text-primary">
               {MONTHS[calMonth]} {calYear}
             </span>
             <button
               onClick={handleNextMonth}
-              className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+              className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors"
             >
               {MONTHS[calMonth === 11 ? 0 : calMonth + 1]} →
             </button>
@@ -463,7 +464,7 @@ export default function HabitsPage() {
            ════════════════════════════════════════ */}
         {view === 'month' && habits.length > 0 && (
           <div className="mt-8 p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
-            <h2 className="font-semibold text-text-light dark:text-text-dark text-sm mb-4 flex items-center gap-2">
+            <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm mb-4 flex items-center gap-2">
               <CalendarDays size={14} className="text-blue-500" />
               Resumen Mensual — {MONTHS[calMonth]} {calYear}
             </h2>
@@ -489,7 +490,7 @@ export default function HabitsPage() {
                       isToday ? 'ring-2 ring-indigo-400 dark:ring-indigo-500' : ''
                     } ${
                       intensity === 0
-                        ? 'bg-slate-100 dark:bg-slate-800 text-textMuted-light/50 dark:text-textMuted-dark/50'
+                        ? 'bg-muted/10 dark:bg-slate-800 text-textMuted-light/50 dark:text-textMuted-dark/50'
                         : intensity <= 0.33
                           ? 'bg-indigo-200 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
                           : intensity <= 0.66
@@ -505,7 +506,7 @@ export default function HabitsPage() {
             </div>
             <div className="flex items-center justify-end gap-2 mt-3">
               <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Menos</span>
-              <div className="w-3 h-3 rounded bg-slate-100 dark:bg-slate-800" />
+              <div className="w-3 h-3 rounded bg-muted/10 dark:bg-slate-800" />
               <div className="w-3 h-3 rounded bg-indigo-200 dark:bg-indigo-900/40" />
               <div className="w-3 h-3 rounded bg-indigo-400 dark:bg-indigo-700" />
               <div className="w-3 h-3 rounded bg-indigo-600 dark:bg-indigo-500" />
