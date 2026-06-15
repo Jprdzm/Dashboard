@@ -18,8 +18,8 @@ const NAV = [
     to: '/',
     icon: LayoutDashboard,
     label: 'Dashboard',
-    activeClass: 'bg-indigo-500/12 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-500/15',
-    dotClass: 'bg-indigo-500',
+    activeClass: 'bg-blue-500/12 text-blue-600 dark:text-blue-400 dark:bg-blue-500/15',
+    dotClass: 'bg-blue-500',
   },
   {
     to: '/finanzas',
@@ -79,7 +79,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-sm">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-sm">
               <Brain size={15} className="text-white" />
             </div>
             <span className="font-bold text-sm tracking-tight hidden sm:block text-slate-800 dark:text-slate-100">
