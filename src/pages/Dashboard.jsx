@@ -1,5 +1,6 @@
 import WelcomeBanner from '../components/WelcomeBanner';
 import NotionLink from '../components/NotionLink';
+import OneDriveLink from '../components/OneDriveLink';
 import CalendarEmbed from '../components/CalendarEmbed';
 import PomodoroTimer from '../components/PomodoroTimer';
 import FinanceCard from '../components/FinanceCard';
@@ -8,30 +9,35 @@ import HabitTracker from '../components/HabitTracker';
 
 export default function Dashboard() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
-      <header className="flex justify-between items-start mb-10">
-        <WelcomeBanner />
-      </header>
+    <div className="min-h-screen bg-background dark:bg-background text-text-primary dark:text-text-primary">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+        <header className="flex justify-between items-start mb-8">
+          <WelcomeBanner />
+        </header>
 
-      <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <FinanceCard />
+        <main className="grid gap-6">
+          {/* Top row: Finance and Pomodoro side by side */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FinanceCard className="card" />
+            <PomodoroTimer className="card" />
+          </div>
 
-        <PomodoroTimer />
+          {/* Middle row: Projects full width */}
+          <ProjectTracker className="card" />
 
-        <NotionLink />
+          {/* Habits row: full width */}
+          <HabitTracker className="card" />
 
-        <div className="md:col-span-2 lg:col-span-3">
-          <ProjectTracker />
-        </div>
+          {/* Links row: OneDrive and Notion side by side */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <OneDriveLink className="card" />
+            <NotionLink className="card" />
+          </div>
 
-        <div className="md:col-span-2 lg:col-span-3">
-          <HabitTracker />
-        </div>
-
-        <div className="md:col-span-2 lg:col-span-3">
-          <CalendarEmbed />
-        </div>
-      </main>
+          {/* Bottom row: Calendar full width */}
+          <CalendarEmbed className="card" />
+        </main>
+      </div>
     </div>
   );
 }

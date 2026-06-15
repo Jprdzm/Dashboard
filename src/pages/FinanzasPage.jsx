@@ -47,7 +47,7 @@ function CustomTooltip({ active, payload, label }) {
   const val = payload[0].value;
   return (
     <div className="px-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-xs shadow-sm">
-      <p className="font-medium text-text-light dark:text-text-dark mb-1">{label}</p>
+      <p className="font-medium text-text-primary dark:text-text-primary mb-1">{label}</p>
       <p className={val >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
         {val >= 0 ? '+' : ''}{formatCurrency(val)}
       </p>
@@ -408,7 +408,7 @@ export default function FinanzasPage() {
 
   if (cargando) {
     return (
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
+      <div className="min-h-screen bg-background dark:bg-background-dark flex items-center justify-center">
         <Loader2 size={24} className="animate-spin text-textMuted-light dark:text-textMuted-dark" />
       </div>
     );
@@ -416,11 +416,11 @@ export default function FinanzasPage() {
 
   if (!supabaseReady) {
     return (
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark flex items-center justify-center px-4">
+      <div className="min-h-screen bg-background dark:bg-background-dark text-text-primary dark:text-text-primary flex items-center justify-center px-4">
         <div className="text-center max-w-sm p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
           <p className="text-sm text-textMuted-light dark:text-textMuted-dark mb-2">
-            Configura <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
-            <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu <code className="px-1.5 py-0.5 rounded bg-bg-light dark:bg-bg-dark text-xs font-mono">.env</code> para usar Finanzas.
+            Configura <code className="px-1.5 py-0.5 rounded bg-background dark:bg-background-dark text-xs font-mono">VITE_SUPABASE_URL</code> y{' '}
+            <code className="px-1.5 py-0.5 rounded bg-background dark:bg-background-dark text-xs font-mono">VITE_SUPABASE_ANON_KEY</code> en tu <code className="px-1.5 py-0.5 rounded bg-background dark:bg-background-dark text-xs font-mono">.env</code> para usar Finanzas.
           </p>
         </div>
       </div>
@@ -428,32 +428,32 @@ export default function FinanzasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300">
+    <div className="min-h-screen bg-background dark:bg-background-dark text-text-primary dark:text-text-primary transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
 
         {/* ── Header ── */}
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors duration-200 mb-6"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors duration-200 mb-6"
         >
           <ArrowLeft size={16} />
           Volver al Dashboard
         </Link>
 
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-primary dark:text-text-primary">
             Finanzas
           </h1>
           <div className="flex items-center gap-3">
             <Link
               to="/deudas"
-              className="text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+              className="text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors"
             >
               Deudas
             </Link>
             <Link
               to="/metas"
-              className="text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+              className="text-sm font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors"
             >
               Metas
             </Link>
@@ -543,7 +543,7 @@ export default function FinanzasPage() {
             {/* Gráfico de Balance */}
             {datosBarraMensual.length > 0 && (
               <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
-                <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
+                <h2 className="font-semibold mb-4 text-text-primary dark:text-text-primary text-sm">
                   Balance Neto por Mes
                   <span className="ml-2 text-xs font-normal text-textMuted-light dark:text-textMuted-dark">
                     — haz clic en una barra para ver su desglose
@@ -594,7 +594,7 @@ export default function FinanzasPage() {
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
+                  <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm">
                     Historial de Transacciones
                   </h2>
                   <span className="text-xs text-textMuted-light dark:text-textMuted-dark">
@@ -609,14 +609,14 @@ export default function FinanzasPage() {
                       placeholder="Buscar..."
                       value={busqueda}
                       onChange={(e) => setBusqueda(e.target.value)}
-                      className="pl-7 pr-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors w-28"
+                      className="pl-7 pr-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors w-28"
                     />
                   </div>
                   <Filter size={14} className="text-textMuted-light dark:text-textMuted-dark" />
                   <select
                     value={filtroCategoria}
                     onChange={(e) => setFiltroCategoria(e.target.value)}
-                    className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
                   >
                     <option value="Todos">Todas las categorías</option>
                     {CATEGORIAS.map((c) => (
@@ -626,7 +626,7 @@ export default function FinanzasPage() {
                   <select
                     value={orden}
                     onChange={(e) => setOrden(e.target.value)}
-                    className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
                   >
                     <option value="newest">Más reciente</option>
                     <option value="oldest">Más antiguo</option>
@@ -695,7 +695,7 @@ export default function FinanzasPage() {
 
                             {/* Descripción + fecha (móvil) */}
                             <td className="py-3 pr-3">
-                              <p className="text-sm font-medium text-text-light dark:text-text-dark leading-tight">
+                              <p className="text-sm font-medium text-text-primary dark:text-text-primary leading-tight">
                                 {t.descripcion}
                               </p>
                               <p className="text-[11px] text-textMuted-light dark:text-textMuted-dark mt-0.5 sm:hidden">
@@ -754,7 +754,7 @@ export default function FinanzasPage() {
             {/* ─────── Pagos Recientes ─────── */}
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
+                <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm flex items-center gap-2">
                   <TrendingDown size={14} className="text-emerald-600 dark:text-emerald-400" />
                   Pagos Recientes
                 </h2>
@@ -781,14 +781,14 @@ export default function FinanzasPage() {
                   {abonosConNombre.map((a) => (
                     <div
                       key={a.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-bg-light dark:bg-bg-dark"
+                      className="flex items-center justify-between p-2 rounded-lg bg-background dark:bg-background-dark"
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                           <TrendingDown size={11} className="text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                          <p className="text-xs font-medium text-text-primary dark:text-text-primary truncate leading-tight">
                             {a.debtName}
                           </p>
                           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
@@ -813,7 +813,7 @@ export default function FinanzasPage() {
             {/* Schedule Payments — vinculado a deudas activas */}
             <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
+                <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm flex items-center gap-2">
                   <CalendarDays size={14} className="text-blue-600 dark:text-blue-400" />
                   Pagos Programados
                 </h2>
@@ -841,7 +841,7 @@ export default function FinanzasPage() {
                       <Link
                         key={d.id}
                         to="/deudas"
-                        className="block p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                        className="block p-2.5 rounded-lg bg-background dark:bg-background-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -855,11 +855,11 @@ export default function FinanzasPage() {
                                 : <CalendarDays size={11} className="text-blue-600 dark:text-blue-400" />
                               }
                             </div>
-                            <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                            <p className="text-xs font-medium text-text-primary dark:text-text-primary truncate leading-tight">
                               {d.name || d.creditor}
                             </p>
                           </div>
-                          <span className="text-xs font-semibold tabular-nums text-text-light dark:text-text-dark ml-2 shrink-0">
+                          <span className="text-xs font-semibold tabular-nums text-text-primary dark:text-text-primary ml-2 shrink-0">
                             {formatCurrency(remaining)}
                           </span>
                         </div>
@@ -889,18 +889,18 @@ export default function FinanzasPage() {
                       <Link
                         key={s.id}
                         to="/suscripciones"
-                        className="block p-2.5 rounded-lg bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+                        className="block p-2.5 rounded-lg bg-background dark:bg-background-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-indigo-100 dark:bg-indigo-900/30">
                               <PlaySquare size={11} className="text-indigo-600 dark:text-indigo-400" />
                             </div>
-                            <p className="text-xs font-medium text-text-light dark:text-text-dark truncate leading-tight">
+                            <p className="text-xs font-medium text-text-primary dark:text-text-primary truncate leading-tight">
                               {s.name}
                             </p>
                           </div>
-                          <span className="text-xs font-semibold tabular-nums text-text-light dark:text-text-dark ml-2 shrink-0">
+                          <span className="text-xs font-semibold tabular-nums text-text-primary dark:text-text-primary ml-2 shrink-0">
                             {formatCurrency(s.cost)}
                           </span>
                         </div>
@@ -939,12 +939,12 @@ export default function FinanzasPage() {
         {mesSeleccionado && transaccionesMesSeleccionado.length > 0 && (
           <div className="p-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20 mb-8">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
+              <h2 className="font-semibold text-text-primary dark:text-text-primary text-sm">
                 Desglose — {formatMonthLabel(mesSeleccionado)}
               </h2>
               <button
                 onClick={() => setMesSeleccionado(null)}
-                className="text-xs text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                className="text-xs text-textMuted-light dark:text-textMuted-dark hover:text-text-primary dark:hover:text-text-primary transition-colors"
               >
                 Cerrar
               </button>
@@ -977,7 +977,7 @@ export default function FinanzasPage() {
                         {transaccionesMesSeleccionado.map((t) => (
                           <tr key={t.id} className="border-b border-border-light dark:border-border-dark">
                             <td className="py-1.5 pr-2 text-textMuted-light dark:text-textMuted-dark whitespace-nowrap text-xs">{formatDate(t.fecha)}</td>
-                            <td className="py-1.5 px-2 text-text-light dark:text-text-dark text-xs">{t.descripcion}</td>
+                            <td className="py-1.5 px-2 text-text-primary dark:text-text-primary text-xs">{t.descripcion}</td>
                             <td className="py-1.5 px-2 text-textMuted-light dark:text-textMuted-dark hidden sm:table-cell text-xs">{t.categoria || 'Otros'}</td>
                             <td className={`py-1.5 pl-2 text-right font-medium tabular-nums whitespace-nowrap text-xs ${t.tipo === 'ingreso' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                               {t.tipo === 'ingreso' ? '+' : '-'}{formatCurrency(t.monto)}
@@ -998,7 +998,7 @@ export default function FinanzasPage() {
            ══════════════════════════════════════════════ */}
         {Object.keys(totalesPorCategoria.totals).length > 0 && (
           <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
-            <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
+            <h2 className="font-semibold mb-4 text-text-primary dark:text-text-primary text-sm">
               Gastos por Categoría
             </h2>
             <div className="space-y-2">
@@ -1008,7 +1008,7 @@ export default function FinanzasPage() {
                     <span>{cat}</span>
                     <span>{formatCurrency(totalesPorCategoria.totals[cat])}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-bg-light dark:bg-bg-dark overflow-hidden">
+                  <div className="h-2 rounded-full bg-background dark:bg-background-dark overflow-hidden">
                     <div
                       className="h-full rounded-full bg-blue-500 transition-all"
                       style={{ width: `${(totalesPorCategoria.totals[cat] / totalesPorCategoria.max) * 100}%` }}
@@ -1024,7 +1024,7 @@ export default function FinanzasPage() {
             NUEVO MOVIMIENTO (formulario)
            ══════════════════════════════════════════════ */}
         <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
-          <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
+          <h2 className="font-semibold mb-4 text-text-primary dark:text-text-primary text-sm">
             Nuevo Movimiento
           </h2>
           <form onSubmit={handleSubmit} className="space-y-3">
@@ -1036,12 +1036,12 @@ export default function FinanzasPage() {
                 placeholder="Monto"
                 value={monto}
                 onChange={(e) => setMonto(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
               <select
                 value={tipo}
                 onChange={(e) => setTipo(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
                 <option value="gasto">Gasto</option>
                 <option value="ingreso">Ingreso</option>
@@ -1049,7 +1049,7 @@ export default function FinanzasPage() {
               <select
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               >
                 {CATEGORIAS.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -1062,7 +1062,7 @@ export default function FinanzasPage() {
                 placeholder="Mensualidad del gym"
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
-                className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-background dark:bg-background-dark text-text-primary dark:text-text-primary placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
               />
               <button
                 type="submit"

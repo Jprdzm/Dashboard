@@ -1,5 +1,5 @@
 const MAX_STRING_LENGTH = 500;
-const ALLOWED_CATEGORIES = ['Estudios', 'Gimnasio', 'Comida', 'Transporte', 'Entretenimiento', 'Vivienda', 'Salud', 'Otros'];
+const ALLOWED_CATEGORIES = ['Estudios', 'Gimnasio', 'Comida', 'Transporte', 'Entretenimiento', 'Vivienda', 'Salud', 'Suscripciones', 'Otros'];
 const ALLOWED_TIPOS = ['gasto', 'ingreso'];
 
 const CSV_FORMULA_PREFIXES = ['=', '+', '-', '@', '\t', '\n', '\r'];
