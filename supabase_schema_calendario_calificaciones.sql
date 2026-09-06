@@ -35,15 +35,21 @@ CREATE TABLE IF NOT EXISTS eventos (
 
 ALTER TABLE eventos ENABLE ROW LEVEL SECURITY;
 
+-- DROP POLICY IF EXISTS antes de cada CREATE porque Postgres no soporta
+-- "CREATE POLICY IF NOT EXISTS" — así el script es seguro de re-correr.
+DROP POLICY IF EXISTS "Usuarios ven SOLO sus eventos" ON eventos;
 CREATE POLICY "Usuarios ven SOLO sus eventos" ON eventos
   FOR SELECT USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios insertan SOLO sus eventos" ON eventos;
 CREATE POLICY "Usuarios insertan SOLO sus eventos" ON eventos
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios actualizan SOLO sus eventos" ON eventos;
 CREATE POLICY "Usuarios actualizan SOLO sus eventos" ON eventos
   FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios eliminan SOLO sus eventos" ON eventos;
 CREATE POLICY "Usuarios eliminan SOLO sus eventos" ON eventos
   FOR DELETE USING (user_id = auth.uid());
 
@@ -65,15 +71,19 @@ CREATE TABLE IF NOT EXISTS calificaciones (
 
 ALTER TABLE calificaciones ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Usuarios ven SOLO sus calificaciones" ON calificaciones;
 CREATE POLICY "Usuarios ven SOLO sus calificaciones" ON calificaciones
   FOR SELECT USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios insertan SOLO sus calificaciones" ON calificaciones;
 CREATE POLICY "Usuarios insertan SOLO sus calificaciones" ON calificaciones
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios actualizan SOLO sus calificaciones" ON calificaciones;
 CREATE POLICY "Usuarios actualizan SOLO sus calificaciones" ON calificaciones
   FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Usuarios eliminan SOLO sus calificaciones" ON calificaciones;
 CREATE POLICY "Usuarios eliminan SOLO sus calificaciones" ON calificaciones
   FOR DELETE USING (user_id = auth.uid());
 
