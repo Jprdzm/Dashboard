@@ -8,9 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Glassmorphism / Linear-style palette
+        // Soft-depth palette: bg is a subtle tint distinct from surface (card)
+        // white, so cards visibly lift off the page instead of blending into
+        // it (the old bg.light === surface.light meant zero depth in light mode).
         bg: {
-          light: '#ffffff',
+          light: '#F7F8FA',
           dark: '#0B0F19',
         },
         surface: {
@@ -26,12 +28,30 @@ export default {
           dark: '#e2e8f0',
         },
         textMuted: {
-          light: '#94a3b8',
-          dark: '#64748b',
-        }
+          light: '#64748b',
+          dark: '#94a3b8',
+        },
+        // Brand primary (already the de-facto accent throughout the app —
+        // formalized here so it reads as a system, not a scattered choice).
+        primary: {
+          light: '#6366f1',
+          dark: '#818cf8',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
+      boxShadow: {
+        // Soft, layered elevation — replaces ad-hoc one-off shadow strings.
+        'soft-sm': '0 1px 2px 0 rgba(15, 23, 42, 0.04), 0 1px 1px 0 rgba(15, 23, 42, 0.03)',
+        'soft-md': '0 4px 10px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
+        'soft-lg': '0 12px 24px -8px rgba(15, 23, 42, 0.10), 0 4px 10px -4px rgba(15, 23, 42, 0.06)',
+        'soft-dark-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.20)',
+        'soft-dark-md': '0 4px 12px -2px rgba(0, 0, 0, 0.35)',
+        'soft-dark-lg': '0 16px 32px -8px rgba(0, 0, 0, 0.45)',
+      },
+      transitionTimingFunction: {
+        'soft-out': 'cubic-bezier(0.16, 1, 0.3, 1)',
       }
     },
   },

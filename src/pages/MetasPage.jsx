@@ -220,33 +220,33 @@ export default function MetasPage() {
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Meta Total
             </span>
-            <p className="text-2xl font-bold mt-1 text-text-light dark:text-text-dark">
+            <p className="text-2xl font-bold mt-1 text-text-light dark:text-text-dark tabular-nums">
               {formatCurrency(stats.totalTarget)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Ahorrado
             </span>
-            <p className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">
+            <p className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400 tabular-nums">
               {formatCurrency(stats.totalCurrent)}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out text-center">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Por Ahorrar
             </span>
-            <p className="text-2xl font-bold mt-1 text-indigo-600 dark:text-indigo-400">
+            <p className="text-2xl font-bold mt-1 text-indigo-600 dark:text-indigo-400 tabular-nums">
               {formatCurrency(stats.remaining)}
             </p>
           </div>
         </div>
 
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
+        <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out mb-8">
           <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark text-sm">
             Crear Nueva Meta
           </h2>
@@ -276,7 +276,7 @@ export default function MetasPage() {
               />
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center justify-center gap-1.5"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
               >
                 <Plus size={16} />
                 Crear Meta
@@ -286,7 +286,7 @@ export default function MetasPage() {
         </div>
 
         {goals.length === 0 && (
-          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="p-12 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm text-center">
             <Target size={32} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No hay metas registradas. Crea tu primera meta arriba.
@@ -313,7 +313,7 @@ export default function MetasPage() {
             return (
               <div
                 key={goal.id}
-                className={`p-5 rounded-xl border transition-all duration-300 ${
+                className={`p-5 rounded-2xl border shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 transition-all duration-300 ease-soft-out ${
                   isCompleted
                     ? 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-950/20'
                     : daysLeft < 30
@@ -323,7 +323,7 @@ export default function MetasPage() {
               >
                 <div className="flex flex-row items-start justify-between gap-3 mb-4">
                   <div>
-                    <h3 className="font-semibold text-text-light dark:text-text-dark pr-2">
+                    <h3 className="text-sm font-semibold text-text-light dark:text-text-dark pr-2">
                       {goal.name}
                       {isCompleted && (
                         <span className="ml-2 text-xs font-medium text-green-600 dark:text-green-400">
@@ -339,8 +339,8 @@ export default function MetasPage() {
                   </div>
                   <button
                     onClick={() => handleDelete(goal.id)}
-                    className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-md sm:rounded-lg text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors shrink-0 bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30"
-                    aria-label="Eliminar meta"
+                    className="flex items-center gap-1.5 p-2 sm:px-2.5 sm:py-1.5 rounded-md sm:rounded-lg text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500/40 transition-all duration-200 ease-soft-out shrink-0 bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30"
+                    aria-label={`Eliminar meta ${goal.name}`}
                   >
                     <Trash2 size={15} />
                     <span className="hidden sm:inline">Eliminar</span>
@@ -394,12 +394,13 @@ export default function MetasPage() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') { e.preventDefault(); handleQuickAdd(goal.id); }
                       }}
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
                     />
                     <button
                       onClick={() => handleQuickAdd(goal.id)}
                       disabled={isCompleted}
-                      className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 text-white transition-colors"
+                      aria-label={`Aportar a ${goal.name}`}
+                      className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
                     >
                       <Plus size={16} />
                     </button>

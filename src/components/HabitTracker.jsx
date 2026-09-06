@@ -72,7 +72,7 @@ export default function HabitTracker() {
   };
 
   return (
-    <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300">
+    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
           <Target size={15} className="text-teal-500" />
@@ -80,7 +80,7 @@ export default function HabitTracker() {
         </h2>
         <Link
           to="/habits"
-          className="text-[10px] font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors flex items-center gap-1"
+          className="text-[10px] font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors duration-200 ease-soft-out flex items-center gap-1"
         >
           <BarChart3 size={12} />
           Ver todo
@@ -88,17 +88,17 @@ export default function HabitTracker() {
       </div>
 
       <div className="flex gap-3 mb-4">
-        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark">
+        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark hover:-translate-y-0.5 transition-transform duration-200 ease-soft-out">
           <p className="text-lg font-bold text-text-light dark:text-text-dark tabular-nums">{stats.completionRate}%</p>
           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Hoy</p>
         </div>
-        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark">
+        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark hover:-translate-y-0.5 transition-transform duration-200 ease-soft-out">
           <p className="text-lg font-bold text-teal-600 dark:text-teal-400 tabular-nums">
             {stats.doneToday}/{stats.total}
           </p>
           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Completados</p>
         </div>
-        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark">
+        <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark hover:-translate-y-0.5 transition-transform duration-200 ease-soft-out">
           <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">{stats.bestStreak}</p>
           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Mejor racha</p>
         </div>
@@ -131,9 +131,9 @@ export default function HabitTracker() {
             return (
               <GridListItem key={habit.id} id={habit.id}>
                 <span
-                  className={`flex-1 text-sm transition-all ${
+                  className={`flex-1 text-sm transition-all duration-200 ease-soft-out ${
                     done
-                      ? 'line-through text-slate-400 dark:text-slate-500'
+                      ? 'line-through text-textMuted-light dark:text-textMuted-dark'
                       : 'text-text-light dark:text-text-dark'
                   }`}
                 >

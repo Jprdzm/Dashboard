@@ -265,7 +265,7 @@ export default function CalificacionesPage() {
               <button
                 type="button"
                 onClick={() => addSubNota(materia.id, topSlug)}
-                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-indigo-500 hover:bg-indigo-600 active:scale-[0.96] text-white transition-all duration-150 ease-soft-out"
               >
                 <Plus size={12} /> Nota
               </button>
@@ -289,7 +289,7 @@ export default function CalificacionesPage() {
                   <button
                     type="button"
                     onClick={() => removeSubNota(materia.id, topSlug, idx)}
-                    className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-90 transition-all duration-150 ease-soft-out"
                     aria-label="Quitar nota"
                   >
                     <Trash2 size={14} />
@@ -353,11 +353,11 @@ export default function CalificacionesPage() {
         <p className="text-sm text-textMuted-light dark:text-textMuted-dark mb-8">{semestre}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+          <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Promedio general del semestre
             </span>
-            <p className="text-2xl font-bold mt-1 text-text-light dark:text-text-dark tabular-nums">
+            <p className="text-4xl font-bold mt-1 text-fuchsia-600 dark:text-fuchsia-400 tabular-nums">
               {resumen.promedioGeneral !== null ? resumen.promedioGeneral.toFixed(1) : 'N/D'}
             </p>
             <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1">
@@ -366,15 +366,15 @@ export default function CalificacionesPage() {
                 : 'Todas las materias tienen datos capturados'}
             </p>
           </div>
-          <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+          <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Semáforo
             </span>
             <p className="text-sm mt-2 text-text-light dark:text-text-dark">
-              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />{resumen.counts.verde} verde</span>
-              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />{resumen.counts.ambar} ámbar</span>
-              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" />{resumen.counts.rojo} rojo</span>
-              <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 inline-block" />{resumen.counts.pendiente} pendientes</span>
+              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" /><span className="tabular-nums">{resumen.counts.verde}</span>&nbsp;verde</span>
+              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /><span className="tabular-nums">{resumen.counts.ambar}</span>&nbsp;ámbar</span>
+              <span className="inline-flex items-center gap-1.5 mr-3"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" /><span className="tabular-nums">{resumen.counts.rojo}</span>&nbsp;rojo</span>
+              <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 inline-block" /><span className="tabular-nums">{resumen.counts.pendiente}</span>&nbsp;pendientes</span>
             </p>
           </div>
         </div>
@@ -392,7 +392,7 @@ export default function CalificacionesPage() {
             return (
               <div
                 key={materia.id}
-                className={`p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300 ${color ? SEMAFORO_BORDER[color] : ''}`}
+                className={`p-5 rounded-2xl rounded-l-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out ${color ? SEMAFORO_BORDER[color] : ''}`}
               >
                 <div className="flex items-start justify-between gap-2 mb-1">
                   <h2 className="font-semibold text-text-light dark:text-text-dark">{materia.nombre}</h2>
@@ -414,7 +414,7 @@ export default function CalificacionesPage() {
                     <span className="font-semibold tabular-nums">
                       {stats.promedio !== null ? stats.promedio.toFixed(2) : 'N/D'}
                     </span>{' '}
-                    <span className="text-textMuted-light dark:text-textMuted-dark">
+                    <span className="text-textMuted-light dark:text-textMuted-dark tabular-nums">
                       ({stats.porcentajeEvaluado.toFixed(0)}% evaluado)
                     </span>
                   </p>
@@ -463,7 +463,7 @@ export default function CalificacionesPage() {
                       <button
                         type="button"
                         onClick={() => handleCalcular(materia, pendientes)}
-                        className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
+                        className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white transition-all duration-150 ease-soft-out"
                       >
                         Calcular
                       </button>

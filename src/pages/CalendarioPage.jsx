@@ -171,7 +171,7 @@ export default function CalendarioPage() {
           </div>
           <button
             onClick={() => openCreate(todayISO())}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white text-sm font-semibold transition-colors duration-200 ease-soft-out"
           >
             <Plus size={15} />
             Nuevo evento
@@ -220,7 +220,7 @@ export default function CalendarioPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={goPrev}
-              className="p-2 rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+              className="p-2 rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-95 transition-all duration-200 ease-soft-out"
               aria-label="Anterior"
             >
               <ChevronLeft size={16} />
@@ -230,14 +230,14 @@ export default function CalendarioPage() {
             </span>
             <button
               onClick={goNext}
-              className="p-2 rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+              className="p-2 rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-95 transition-all duration-200 ease-soft-out"
               aria-label="Siguiente"
             >
               <ChevronRight size={16} />
             </button>
             <button
               onClick={goToday}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-95 transition-all duration-200 ease-soft-out"
             >
               Hoy
             </button>
@@ -246,7 +246,7 @@ export default function CalendarioPage() {
           <div className="flex items-center gap-0.5 bg-slate-100/80 dark:bg-white/[0.04] rounded-xl p-1">
             <button
               onClick={() => setViewMode('month')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 ease-soft-out ${
                 viewMode === 'month'
                   ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm'
                   : 'text-textMuted-light dark:text-textMuted-dark'
@@ -256,7 +256,7 @@ export default function CalendarioPage() {
             </button>
             <button
               onClick={() => setViewMode('week')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 ease-soft-out ${
                 viewMode === 'week'
                   ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm'
                   : 'text-textMuted-light dark:text-textMuted-dark'
@@ -300,12 +300,12 @@ export default function CalendarioPage() {
                   <div
                     key={day.iso}
                     onClick={() => openCreate(day.iso)}
-                    className={`group relative flex flex-col p-1.5 rounded-xl border cursor-pointer transition-colors duration-200 ${
+                    className={`group relative flex flex-col p-1.5 rounded-xl border cursor-pointer transition-all duration-200 ease-soft-out ${
                       viewMode === 'month' ? 'min-h-[6.5rem]' : 'min-h-[16rem]'
                     } ${
                       isToday
                         ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20'
-                        : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md hover:border-indigo-200 dark:hover:border-indigo-900/50'
+                        : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm'
                     } ${!day.isCurrentMonth ? 'opacity-40' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -319,7 +319,7 @@ export default function CalendarioPage() {
                       </span>
                       <button
                         onClick={(e) => { e.stopPropagation(); openCreate(day.iso); }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-textMuted-light dark:text-textMuted-dark hover:text-indigo-500 transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-textMuted-light dark:text-textMuted-dark hover:text-indigo-500 active:scale-90 transition-all duration-200 ease-soft-out"
                         aria-label="Agregar evento"
                       >
                         <Plus size={12} />
@@ -347,7 +347,7 @@ export default function CalendarioPage() {
         </div>
 
         {safeEvents.length === 0 && (
-          <div className="mt-6 p-8 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="mt-6 p-8 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm text-center">
             <CalendarClock size={28} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-sm text-textMuted-light dark:text-textMuted-dark">
               No hay eventos todavía. Haz clic en un día o en "Nuevo evento" para crear el primero.

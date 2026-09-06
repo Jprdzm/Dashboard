@@ -9,11 +9,11 @@ const CALENDAR_URL =
 
 export default function CalendarEmbed() {
   return (
-    <div className="p-6 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300 shadow-sm shadow-slate-200/50 dark:shadow-none hover:shadow-md">
+    <div className="p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
       <h2 className="font-semibold mb-4 text-text-light dark:text-text-dark">
         Calendario
       </h2>
-      <div className="w-full h-[400px] sm:h-[450px] rounded-xl overflow-hidden shadow-sm border border-border-light dark:border-white/[0.06] dark:invert-[0.9] dark:hue-rotate-180">
+      <div className="w-full h-[400px] sm:h-[450px] rounded-xl overflow-hidden shadow-soft-sm border border-border-light dark:border-white/[0.06] dark:invert-[0.9] dark:hue-rotate-180">
         <iframe
           src={CALENDAR_URL}
           className="w-full h-full border-0"

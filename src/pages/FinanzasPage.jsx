@@ -79,7 +79,7 @@ function KpiCard({ icon: Icon, iconColor, iconBg, label, value, pct, pctPositive
   const isPos = pct >= 0;
   const isGood = pctPositiveIsGood ? isPos : !isPos;
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
       <div className="flex items-start justify-between mb-3">
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${iconBg}`}>
           <Icon size={16} className={iconColor} />
@@ -96,7 +96,7 @@ function KpiCard({ icon: Icon, iconColor, iconBg, label, value, pct, pctPositive
         )}
       </div>
       <p className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-1">{label}</p>
-      <p className="text-xl font-bold text-text-light dark:text-text-dark tabular-nums leading-tight">{value}</p>
+      <p className="text-xl sm:text-2xl font-bold text-text-light dark:text-text-dark tabular-nums leading-tight">{value}</p>
     </div>
   );
 }
@@ -104,7 +104,7 @@ function KpiCard({ icon: Icon, iconColor, iconBg, label, value, pct, pctPositive
 /* ── Donut Chart Card ── */
 function DonutCard({ title, data, centerLabel, centerValue, centerColor = 'text-text-light dark:text-text-dark' }) {
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
       <h3 className="font-semibold text-text-light dark:text-text-dark text-sm mb-4">{title}</h3>
       {data.length === 0 ? (
         <p className="text-xs text-textMuted-light dark:text-textMuted-dark text-center py-6">Sin datos</p>
@@ -616,7 +616,7 @@ export default function FinanzasPage() {
 
   if (!supabaseReady) return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center px-4">
-      <div className="text-center p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+      <div className="text-center p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
         <p className="text-sm text-textMuted-light dark:text-textMuted-dark">Configura <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs">VITE_SUPABASE_URL</code> y <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-xs">VITE_SUPABASE_ANON_KEY</code></p>
       </div>
     </div>
@@ -633,7 +633,7 @@ export default function FinanzasPage() {
             <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors mb-2">
               <ArrowLeft size={13} /> Volver
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
               <Wallet size={22} className="text-emerald-500" />
               Finanzas
             </h1>
@@ -644,14 +644,15 @@ export default function FinanzasPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={exportCSV}
-              className="p-2 rounded-xl border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all"
+              className="p-2 rounded-xl border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
               title="Exportar CSV"
+              aria-label="Exportar CSV"
             >
               <Download size={15} />
             </button>
             <button
               onClick={() => setShowForm((v) => !v)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
             >
               <Plus size={15} />
               Nuevo
@@ -665,19 +666,19 @@ export default function FinanzasPage() {
             <h2 className="text-sm font-semibold text-text-light dark:text-text-dark mb-3">Nuevo Movimiento</h2>
             <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 items-end">
               <input type="number" step="0.01" min="0" placeholder="Monto" value={monto} onChange={(e) => setMonto(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40 w-32" />
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-32" />
               <select value={tipo} onChange={(e) => setTipo(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
                 <option value="gasto">Gasto</option>
                 <option value="ingreso">Ingreso</option>
               </select>
               <select value={categoria} onChange={(e) => setCategoria(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
                 {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
               <input type="text" placeholder="Descripción..." value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
-                className="flex-1 min-w-[160px] px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
-              <button type="submit" className="px-4 py-2 text-sm font-semibold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition-colors">
+                className="flex-1 min-w-[160px] px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40" />
+              <button type="submit" className="px-4 py-2 text-sm font-semibold rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out">
                 Guardar
               </button>
             </form>
@@ -700,7 +701,7 @@ export default function FinanzasPage() {
 
             {/* Area Chart */}
             {areaData.length > 0 && (
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <h2 className="font-semibold text-sm text-text-light dark:text-text-dark mb-1">Ingresos vs Gastos</h2>
                 <p className="text-xs text-textMuted-light dark:text-textMuted-dark mb-4">Últimos {areaData.length} meses</p>
                 <ResponsiveContainer width="100%" height={220}>
@@ -727,23 +728,23 @@ export default function FinanzasPage() {
             )}
 
             {/* Transactions Table */}
-            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <h2 className="font-semibold text-sm text-text-light dark:text-text-dark">Transacciones Recientes</h2>
                 <div className="flex items-center gap-2 flex-wrap">
                   <div className="relative">
                     <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-textMuted-light dark:text-textMuted-dark pointer-events-none" />
                     <input type="text" placeholder="Buscar..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-                      className="pl-7 pr-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40 w-28" />
+                      className="pl-7 pr-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-28" />
                   </div>
                   <Filter size={13} className="text-textMuted-light dark:text-textMuted-dark" />
                   <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}
-                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
                     <option value="Todos">Todas</option>
                     {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <select value={orden} onChange={(e) => setOrden(e.target.value)}
-                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-emerald-500/40">
+                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
                     <option value="newest">Más reciente</option>
                     <option value="oldest">Más antiguo</option>
                   </select>
@@ -798,7 +799,7 @@ export default function FinanzasPage() {
                               {isIngreso ? '+' : '-'}{fmt(t.monto)}
                             </td>
                             <td className="py-3 pl-2">
-                              <button onClick={() => handleDelete(t.id)} className="p-1 rounded-lg text-textMuted-light dark:text-textMuted-dark opacity-0 group-hover:opacity-100 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all" aria-label="Eliminar">
+                              <button onClick={() => handleDelete(t.id)} className="p-2 -m-1 rounded-lg text-textMuted-light dark:text-textMuted-dark opacity-0 group-hover:opacity-100 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 focus:outline-none focus:ring-2 focus:ring-rose-500/40 transition-all duration-200 ease-soft-out" aria-label="Eliminar movimiento">
                                 <Trash2 size={12} />
                               </button>
                             </td>
@@ -813,7 +814,7 @@ export default function FinanzasPage() {
 
             {/* Pagos Recientes (abonos) */}
             {abonosConNombre.length > 0 && (
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-sm text-text-light dark:text-text-dark flex items-center gap-2">
                     <TrendingDown size={14} className="text-emerald-500" /> Pagos Recientes
@@ -869,7 +870,7 @@ export default function FinanzasPage() {
 
             {/* Pagos Programados */}
             {(deudasActivas.length > 0 || subs.length > 0) && (
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-sm text-text-light dark:text-text-dark flex items-center gap-2">
                     <CalendarDays size={14} className="text-blue-500" /> Pagos Pendientes
@@ -881,7 +882,7 @@ export default function FinanzasPage() {
                     const remaining = d.totalAmount - (d.paidAmount || 0);
                     const progress = d.totalAmount > 0 ? ((d.paidAmount || 0) / d.totalAmount) * 100 : 0;
                     return (
-                      <Link key={d.id} to="/deudas" className="block p-2.5 rounded-xl bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors">
+                      <Link key={d.id} to="/deudas" className="block p-2.5 rounded-xl bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:-translate-y-0.5 transition-all duration-200 ease-soft-out">
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2 min-w-0">
                             <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${idx === 0 ? 'bg-rose-100 dark:bg-rose-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
@@ -903,7 +904,7 @@ export default function FinanzasPage() {
                   {subs.slice(0, 2).map((s) => {
                     const days = Math.ceil((new Date(s.renewalDate) - new Date()) / 86400000);
                     return (
-                      <Link key={s.id} to="/suscripciones" className="block p-2.5 rounded-xl bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors">
+                      <Link key={s.id} to="/suscripciones" className="block p-2.5 rounded-xl bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:-translate-y-0.5 transition-all duration-200 ease-soft-out">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 min-w-0">
                             <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
@@ -947,13 +948,13 @@ export default function FinanzasPage() {
                 <>
                   <button
                     onClick={handleSaveBudget}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
                   >
                     <Check size={13} /> Guardar
                   </button>
                   <button
                     onClick={() => setEditingBudget(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
                   >
                     <X size={13} /> Cancelar
                   </button>
@@ -961,7 +962,7 @@ export default function FinanzasPage() {
               ) : (
                 <button
                   onClick={() => { setBudgetDraft({ ...budgetCats }); setIngresoObjDraft(ingresoObjetivo > 0 ? String(ingresoObjetivo) : ''); setEditingBudget(true); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
                 >
                   <Edit3 size={13} /> Editar presupuesto
                 </button>
@@ -973,7 +974,7 @@ export default function FinanzasPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
 
             {/* Health Score */}
-            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center gap-4">
+            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out flex items-center gap-4">
               <div className={`w-16 h-16 rounded-2xl flex flex-col items-center justify-center shrink-0 ${grade.bg}`}>
                 <span className={`text-3xl font-black leading-none ${grade.color}`}>{grade.grade}</span>
               </div>
@@ -987,7 +988,7 @@ export default function FinanzasPage() {
             </div>
 
             {/* Proyección fin de mes */}
-            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-2 flex items-center gap-1.5">
                 <CalendarDays size={11} /> Proyección Fin de Mes
               </p>
@@ -1015,7 +1016,7 @@ export default function FinanzasPage() {
             </div>
 
             {/* Ingreso objetivo */}
-            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-2">Ingreso Objetivo del Mes</p>
               {editingBudget ? (
                 <input
@@ -1066,26 +1067,26 @@ export default function FinanzasPage() {
 
           {/* KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="p-4 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+            <div className="p-4 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-1">Total Presupuestado</p>
               <p className="text-lg font-bold text-text-light dark:text-text-dark tabular-nums">{fmt(totalPresupuestado)}</p>
               <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark mt-0.5">Fijo {fmt(totalGastosFijosPresupuesto)} + Variable {fmt(totalVariablePresupuestado)}</p>
             </div>
-            <div className={`p-4 rounded-2xl border bg-surface-light dark:bg-surface-dark ${gastosMes > totalPresupuestado && totalPresupuestado > 0 ? 'border-rose-300 dark:border-rose-800' : 'border-border-light dark:border-border-dark'}`}>
+            <div className={`p-4 rounded-2xl border bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out ${gastosMes > totalPresupuestado && totalPresupuestado > 0 ? 'border-rose-300 dark:border-rose-800' : 'border-border-light dark:border-border-dark'}`}>
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-1">Total Gastado</p>
               <p className={`text-lg font-bold tabular-nums ${gastosMes > totalPresupuestado && totalPresupuestado > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-text-light dark:text-text-dark'}`}>{fmt(gastosMes)}</p>
               {totalPresupuestado > 0 && (
                 <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark mt-0.5">{Math.min(100, Math.round((gastosMes / totalPresupuestado) * 100))}% del presupuesto</p>
               )}
             </div>
-            <div className={`p-4 rounded-2xl border bg-surface-light dark:bg-surface-dark ${(ingresosMes - gastosMes) < 0 ? 'border-rose-300 dark:border-rose-800' : 'border-border-light dark:border-border-dark'}`}>
+            <div className={`p-4 rounded-2xl border bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out ${(ingresosMes - gastosMes) < 0 ? 'border-rose-300 dark:border-rose-800' : 'border-border-light dark:border-border-dark'}`}>
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-1">Remanente del Mes</p>
               <p className={`text-lg font-bold tabular-nums ${(ingresosMes - gastosMes) < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {fmt(ingresosMes - gastosMes)}
               </p>
               <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark mt-0.5">Ingresos − gastos del mes</p>
             </div>
-            <div className="p-4 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+            <div className="p-4 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <p className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide mb-1">Tasa de Ahorro</p>
               <p className={`text-lg font-bold tabular-nums ${tasaAhorro >= 20 ? 'text-emerald-600 dark:text-emerald-400' : tasaAhorro >= 10 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
                 {tasaAhorro.toFixed(1)}%
@@ -1103,7 +1104,7 @@ export default function FinanzasPage() {
             <div className="lg:col-span-2 space-y-5">
 
               {/* Category limits with prev-month comparison */}
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="font-semibold text-sm text-text-light dark:text-text-dark">Límites por Categoría</h3>
@@ -1184,7 +1185,7 @@ export default function FinanzasPage() {
 
               {/* Bar chart */}
               {budgetChartData.length > 0 && (
-                <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+                <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                   <h3 className="font-semibold text-sm text-text-light dark:text-text-dark mb-1">Presupuesto vs Gastado</h3>
                   <p className="text-xs text-textMuted-light dark:text-textMuted-dark mb-4">Comparativa por categoría este mes</p>
                   <ResponsiveContainer width="100%" height={200}>
@@ -1214,7 +1215,7 @@ export default function FinanzasPage() {
             <div className="space-y-5">
 
               {/* Gastos fijos auto */}
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm text-text-light dark:text-text-dark flex items-center gap-2">
                     <DollarSign size={14} className="text-violet-500" />
@@ -1251,7 +1252,7 @@ export default function FinanzasPage() {
               </div>
 
               {/* 50/30/20 */}
-              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+              <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <h3 className="font-semibold text-sm text-text-light dark:text-text-dark mb-0.5">Regla 50 / 30 / 20</h3>
                 <p className="text-[11px] text-textMuted-light dark:text-textMuted-dark mb-4">
                   {regla5030.base > 0

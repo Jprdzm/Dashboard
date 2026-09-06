@@ -70,11 +70,11 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-xl max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-lg dark:shadow-soft-dark-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -83,7 +83,7 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+            className="p-1.5 rounded-md text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-90 transition-all duration-150 ease-soft-out"
             aria-label="Cerrar"
           >
             <X size={16} />
@@ -196,7 +196,7 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
               <button
                 type="button"
                 onClick={() => onDelete(event.id)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-900/20 active:scale-[0.98] border border-rose-100 dark:border-rose-900/30 transition-all duration-150 ease-soft-out"
               >
                 <Trash2 size={14} />
                 Eliminar
@@ -208,13 +208,13 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-[0.98] transition-all duration-150 ease-soft-out"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white transition-all duration-150 ease-soft-out"
               >
                 <Save size={14} />
                 Guardar

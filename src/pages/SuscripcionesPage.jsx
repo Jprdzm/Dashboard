@@ -193,15 +193,15 @@ export default function SuscripcionesPage() {
             <span className="text-xs font-medium uppercase tracking-wider opacity-80 block">
               Gasto Mensual
             </span>
-            <span className="text-2xl font-bold">
+            <span className="text-2xl font-bold tabular-nums">
               {formatCurrency(totalMonthlyCost)}
             </span>
           </div>
         </div>
 
         {/* Formulario */}
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
-          <h2 className="font-semibold mb-4 text-sm flex items-center gap-2">
+        <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out mb-8">
+          <h2 className="font-semibold mb-4 text-sm text-text-light dark:text-text-dark flex items-center gap-2">
             <PlaySquare size={16} className="text-indigo-500" />
             Nueva Suscripción
           </h2>
@@ -211,7 +211,7 @@ export default function SuscripcionesPage() {
               placeholder="Servicio (ej. Netflix)"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
             />
             <input
               type="number"
@@ -220,24 +220,24 @@ export default function SuscripcionesPage() {
               placeholder="Costo"
               value={cost}
               onChange={(e) => setCost(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
             />
             <input
               type="date"
               value={renewalDate}
               onChange={(e) => setRenewalDate(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out [color-scheme:light] dark:[color-scheme:dark]"
             />
             <input
               type="text"
               placeholder="Banco/Tarjeta (opcional)"
               value={bank}
               onChange={(e) => setBank(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors flex items-center justify-center gap-1.5"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
             >
               <Plus size={16} />
               Agregar
@@ -247,7 +247,7 @@ export default function SuscripcionesPage() {
 
         {/* Lista */}
         {sortedSubs.length === 0 ? (
-          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-center">
+          <div className="p-12 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm text-center">
             <PlaySquare size={32} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No tienes suscripciones registradas.
@@ -261,18 +261,19 @@ export default function SuscripcionesPage() {
               const isOverdue = days < 0;
 
               return (
-                <div key={sub.id} className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md flex flex-col justify-between group">
+                <div key={sub.id} className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 transition-all duration-300 ease-soft-out flex flex-col justify-between group">
                   <div>
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg">{sub.name}</h3>
+                      <h3 className="text-sm font-semibold text-text-light dark:text-text-dark">{sub.name}</h3>
                       <button
                         onClick={() => handleDelete(sub.id)}
-                        className="p-1.5 rounded-md text-textMuted-light hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 opacity-0 group-hover:opacity-100 transition-all"
+                        className="p-2 -m-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 focus:outline-none focus:ring-2 focus:ring-rose-500/40 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200 ease-soft-out"
+                        aria-label={`Eliminar suscripción ${sub.name}`}
                       >
                         <Trash2 size={14} />
                       </button>
                     </div>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
+                    <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums mb-4">
                       {formatCurrency(sub.cost)}
                     </p>
                     
@@ -303,9 +304,10 @@ export default function SuscripcionesPage() {
                        days === 0 ? '¡Se renueva HOY!' :
                        `Se renueva en ${days} días`}
                     </span>
-                    <button 
+                    <button
                       onClick={() => updateNextRenewalDate(sub.id, sub.renewalDate)}
-                      className="text-xs px-2 py-1 bg-white dark:bg-black/20 rounded shadow-sm hover:shadow transition-shadow"
+                      className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-black/20 text-text-light dark:text-text-dark rounded-lg shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
+                      aria-label={`Marcar ${sub.name} como renovada`}
                     >
                       Renovado
                     </button>

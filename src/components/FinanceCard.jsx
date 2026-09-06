@@ -33,9 +33,9 @@ const NAV_ITEMS = [
 
 export default function FinanceCard() {
   return (
-    <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-all duration-300 hover:shadow-md group">
+    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out group">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-all duration-300">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-all duration-300 ease-soft-out">
           <Wallet size={20} className="text-white" />
         </div>
 
@@ -53,7 +53,7 @@ export default function FinanceCard() {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-col items-center gap-1.5 flex-1 py-2.5 px-2 rounded-xl border ${item.border} ${item.bg} ${item.hover} transition-all duration-200 active:scale-95`}
+              className={`flex flex-col items-center gap-1.5 flex-1 py-2.5 px-2 rounded-xl border ${item.border} ${item.bg} ${item.hover} transition-all duration-200 ease-soft-out hover:-translate-y-0.5 active:scale-[0.95]`}
             >
               <item.icon size={18} className={item.color} />
               <span className={`text-[11px] font-semibold tracking-wide uppercase ${item.color}`}>

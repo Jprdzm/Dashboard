@@ -490,7 +490,7 @@ export default function DeudasPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
           {/* Card 1: Deuda Total Acumulada */}
-          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+          <div className="relative p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-rose-500/5 rounded-bl-full" />
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
@@ -499,7 +499,7 @@ export default function DeudasPage() {
                 </span>
                 <PiggyBank size={18} className="text-rose-500" />
               </div>
-              <p className="text-3xl font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+              <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 tabular-nums">
                 {formatCurrency(totalDebt)}
               </p>
               <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
@@ -512,7 +512,7 @@ export default function DeudasPage() {
           </div>
 
           {/* Card 2: Tasa de Interés Promedio */}
-          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+          <div className="relative p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-bl-full" />
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
@@ -521,7 +521,7 @@ export default function DeudasPage() {
                 </span>
                 <Percent size={18} className="text-blue-500" />
               </div>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 tabular-nums">
                 {avgInterestRate > 0 ? `${avgInterestRate.toFixed(2)}%` : '—'}
               </p>
               <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
@@ -531,7 +531,7 @@ export default function DeudasPage() {
           </div>
 
           {/* Card 3: Simulador de Fecha de Libertad Financiera */}
-          <div className="relative p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden">
+          <div className="relative p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/5 rounded-bl-full" />
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
@@ -542,7 +542,7 @@ export default function DeudasPage() {
               </div>
               {simulationResult ? (
                 <>
-                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                  <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                     {formatMonths(simulationResult.totalMonths)}
                   </p>
                   <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1.5">
@@ -551,7 +551,7 @@ export default function DeudasPage() {
                 </>
               ) : (
                 <>
-                  <p className="text-3xl font-bold text-textMuted-light dark:text-textMuted-dark tabular-nums">
+                  <p className="text-2xl font-bold text-textMuted-light dark:text-textMuted-dark tabular-nums">
                     {totalMinPayments > 0 ? formatMonths(
                       Math.max(...debts.map((d) => calculatePayoffMonths(
                         d.totalAmount - (d.paidAmount || 0),
@@ -574,7 +574,7 @@ export default function DeudasPage() {
         {/* ══════════════════════════════════════════════
             SALUD FINANCIERA + INGRESOS
            ══════════════════════════════════════════════ */}
-        <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md mb-8">
+        <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out mb-8">
           <div className="flex items-center gap-2 mb-4">
             <BadgeInfo size={16} className="text-blue-500" />
             <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
@@ -592,7 +592,7 @@ export default function DeudasPage() {
                 placeholder="Tu ingreso mensual"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(safeParseFloat(e.target.value))}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
               />
             </div>
             <div className="text-center sm:text-left">
@@ -600,7 +600,7 @@ export default function DeudasPage() {
                 Ratio de Endeudamiento
               </span>
               <span
-                className={`text-2xl font-bold ${
+                className={`text-2xl font-bold tabular-nums ${
                   debtRatio > 50
                     ? 'text-rose-600 dark:text-rose-400'
                     : debtRatio > 30
@@ -639,14 +639,14 @@ export default function DeudasPage() {
         <div className="mb-8">
           <button
             onClick={() => setShowForm((p) => !p)}
-            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mb-3"
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-md transition-colors duration-200 ease-soft-out mb-3"
           >
             {showForm ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             {showForm ? 'Ocultar formulario' : 'Agregar nueva deuda'}
           </button>
 
           {showForm && (
-            <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
               <form onSubmit={handleAdd} className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                   <input
@@ -654,7 +654,7 @@ export default function DeudasPage() {
                     placeholder="Nombre"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -663,7 +663,7 @@ export default function DeudasPage() {
                     placeholder="Monto Total"
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -672,7 +672,7 @@ export default function DeudasPage() {
                     placeholder="Tasa Anual %"
                     value={interestRate}
                     onChange={(e) => setInterestRate(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -681,19 +681,19 @@ export default function DeudasPage() {
                     placeholder="Pago Mínimo"
                     value={minimumPayment}
                     onChange={(e) => setMinimumPayment(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                   <input
                     type="text"
                     placeholder="Acreedor"
                     value={creditor}
                     onChange={(e) => setCreditor(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   />
                   <select
                     value={paymentFrequency}
                     onChange={(e) => setPaymentFrequency(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                   >
                     <option value="monthly">Mensual</option>
                     <option value="yearly">Anual</option>
@@ -701,7 +701,7 @@ export default function DeudasPage() {
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1.5"
                 >
                   <Plus size={16} />
                   Agregar Deuda
@@ -715,7 +715,7 @@ export default function DeudasPage() {
             STRATEGY SELECTOR + EXTRA PAYMENT
            ══════════════════════════════════════════════ */}
         {debts.length > 0 && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
             <div className="flex items-center gap-3">
               <ArrowUpDown size={16} className="text-blue-500" />
               <span className="text-xs font-semibold uppercase tracking-wider text-textMuted-light dark:text-textMuted-dark">
@@ -724,7 +724,7 @@ export default function DeudasPage() {
               <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800">
                 <button
                   onClick={() => setStrategy('snowball')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out ${
                     strategy === 'snowball'
                       ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                       : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -735,7 +735,7 @@ export default function DeudasPage() {
                 </button>
                 <button
                   onClick={() => setStrategy('avalanche')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out ${
                     strategy === 'avalanche'
                       ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                       : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -758,7 +758,7 @@ export default function DeudasPage() {
                 placeholder="$0"
                 value={extraPerMonth}
                 onChange={(e) => setExtraPerMonth(safeParseFloat(e.target.value))}
-                className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
+                className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
               />
             </div>
           </div>
@@ -768,7 +768,7 @@ export default function DeudasPage() {
             SIMULATION RESULT BANNER
            ══════════════════════════════════════════════ */}
         {simulationResult && debts.length > 0 && (
-          <div className="flex flex-wrap items-center gap-3 mb-6 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
+          <div className="flex flex-wrap items-center gap-3 mb-6 p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800">
             <div className="flex items-center gap-2 text-sm">
               <Calculator size={15} className="text-blue-600 dark:text-blue-400" />
               <span className="text-textMuted-light dark:text-textMuted-dark">Proyección:</span>
@@ -785,7 +785,7 @@ export default function DeudasPage() {
             PER-DEBT CARDS
            ══════════════════════════════════════════════ */}
         {sortedDebts.length === 0 ? (
-          <div className="p-12 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md text-center">
+          <div className="p-12 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm text-center">
             <PiggyBank size={32} className="mx-auto mb-3 text-textMuted-light dark:text-textMuted-dark" />
             <p className="text-textMuted-light dark:text-textMuted-dark">
               No hay deudas registradas. Agrega tu primera deuda arriba.
@@ -806,7 +806,7 @@ export default function DeudasPage() {
               return (
                 <div
                   key={d.id}
-                  className="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md overflow-hidden transition-shadow hover:shadow-sm"
+                  className="rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 transition-all duration-300 ease-soft-out overflow-hidden"
                 >
                   {/* Card Header — click to expand */}
                   <div
@@ -855,7 +855,7 @@ export default function DeudasPage() {
                             e.stopPropagation();
                             handleDelete(d.id);
                           }}
-                          className="p-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all opacity-40 hover:opacity-100"
+                          className="p-2 -m-1 rounded-md text-textMuted-light dark:text-textMuted-dark hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 focus:outline-none focus:ring-2 focus:ring-rose-500/40 transition-all duration-200 ease-soft-out opacity-40 hover:opacity-100 focus:opacity-100"
                           aria-label="Eliminar deuda"
                         >
                           <Trash2 size={13} />
@@ -916,7 +916,7 @@ export default function DeudasPage() {
                             placeholder="0"
                             value={extraSimMap[d.id] || ''}
                             onChange={(e) => setExtraSimMap((prev) => ({ ...prev, [d.id]: e.target.value }))}
-                            className="w-20 px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors tabular-nums"
+                            className="w-20 px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
                           />
                           {simPayoffMonths !== null && (
                             <span className={`text-[10px] font-medium whitespace-nowrap ${
@@ -969,7 +969,7 @@ export default function DeudasPage() {
                                 type="date"
                                 value={abonoFecha}
                                 onChange={(e) => setAbonoFecha(e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                               />
                             </div>
                             <div>
@@ -984,7 +984,7 @@ export default function DeudasPage() {
                                 placeholder="0.00"
                                 value={abonoCantidad}
                                 onChange={(e) => setAbonoCantidad(e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                               />
                             </div>
                             <div className="sm:col-span-2">
@@ -998,12 +998,12 @@ export default function DeudasPage() {
                                   placeholder="Ej. Abono con dinero extra"
                                   value={abonoNota}
                                   onChange={(e) => setAbonoNota(e.target.value)}
-                                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors"
+                                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
                                 />
                                 <button
                                   onClick={() => handleAddAbono(d.id)}
                                   disabled={savingAbono || !abonoCantidad || parseFloat(abonoCantidad) <= 0}
-                                  className="px-3 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white transition-colors flex items-center gap-1"
+                                  className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1"
                                 >
                                   {savingAbono ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                   Guardar
@@ -1060,7 +1060,7 @@ export default function DeudasPage() {
            ══════════════════════════════════════════════ */}
         {simulationResult && simulationResult.schedule && simulationResult.schedule.length > 0 && (
           <details className="group mb-8">
-            <summary className="flex items-center gap-2 text-sm font-medium text-textMuted-light dark:text-textMuted-dark cursor-pointer hover:text-text-light dark:hover:text-text-dark transition-colors p-3 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md">
+            <summary className="flex items-center gap-2 text-sm font-medium text-textMuted-light dark:text-textMuted-dark cursor-pointer hover:text-text-light dark:hover:text-text-dark transition-colors duration-200 ease-soft-out p-3 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm">
               <Calculator size={15} className="text-blue-500" />
               Ver calendario de pagos mensual ({simulationResult.schedule.length} meses)
               <ChevronRight size={14} className="ml-auto group-open:rotate-90 transition-transform" />

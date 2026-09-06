@@ -36,7 +36,7 @@ function DonutChart({ value = 0, size = 88, stroke = 8 }) {
           strokeDashoffset={offset}
           strokeLinecap="round"
           stroke={strokeColor}
-          className="transition-all duration-500"
+          className="transition-all duration-500 ease-soft-out"
         />
       </svg>
       <span className={`absolute text-base font-bold tabular-nums leading-none ${text}`}>
@@ -72,12 +72,12 @@ export default function ProjectTracker() {
   };
 
   return (
-    <div className="p-5 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md transition-colors duration-300">
+    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Proyectos</h2>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="p-1.5 rounded-md border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
+          className="p-1.5 rounded-md border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark transition-all duration-200 ease-soft-out active:scale-[0.95]"
           aria-label="Agregar proyecto"
         >
           {showForm ? <X size={15} /> : <Plus size={15} />}
@@ -133,7 +133,7 @@ export default function ProjectTracker() {
             return (
               <div
                 key={project.id}
-                className="relative flex flex-col items-center gap-2 p-3 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-200 group"
+                className="relative flex flex-col items-center gap-2 p-3 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm hover:-translate-y-0.5 transition-all duration-200 ease-soft-out group"
               >
                 {/* Delete */}
                 <button
@@ -157,7 +157,7 @@ export default function ProjectTracker() {
                   <button
                     onClick={() => adjustProgress(project.id, -10)}
                     disabled={project.progress <= 0}
-                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-bold leading-none flex items-center justify-center"
+                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
                     aria-label="Disminuir"
                   >
                     −
@@ -168,7 +168,7 @@ export default function ProjectTracker() {
                   <button
                     onClick={() => adjustProgress(project.id, 10)}
                     disabled={project.progress >= MAX}
-                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-slate-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-bold leading-none flex items-center justify-center"
+                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
                     aria-label="Incrementar"
                   >
                     +
