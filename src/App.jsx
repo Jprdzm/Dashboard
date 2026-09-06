@@ -10,6 +10,8 @@ import DeudasPage from './pages/DeudasPage';
 import MetasPage from './pages/MetasPage';
 import HabitsPage from './pages/HabitsPage';
 import SuscripcionesPage from './pages/SuscripcionesPage';
+import CalendarioPage from './pages/CalendarioPage';
+import CalificacionesPage from './pages/CalificacionesPage';
 
 function AppShell() {
   const { session, loading } = useAuth();
@@ -35,6 +37,8 @@ function AppShell() {
           <Route path="/metas" element={<MetasPage />} />
           <Route path="/habits" element={<HabitsPage />} />
           <Route path="/suscripciones" element={<SuscripcionesPage />} />
+          <Route path="/calendario" element={<CalendarioPage />} />
+          <Route path="/calificaciones" element={<CalificacionesPage />} />
         </Routes>
       </main>
     </div>

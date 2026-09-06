@@ -8,6 +8,8 @@ import {
   Brain,
   LogOut,
   PlaySquare,
+  Calendar,
+  GraduationCap,
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import supabase from '../services/supabaseClient';
@@ -55,6 +57,20 @@ const NAV = [
     label: 'Hábitos',
     activeClass: 'bg-teal-500/12 text-teal-600 dark:text-teal-400 dark:bg-teal-500/15',
     dotClass: 'bg-teal-500',
+  },
+  {
+    to: '/calendario',
+    icon: Calendar,
+    label: 'Calendario',
+    activeClass: 'bg-cyan-500/12 text-cyan-600 dark:text-cyan-400 dark:bg-cyan-500/15',
+    dotClass: 'bg-cyan-500',
+  },
+  {
+    to: '/calificaciones',
+    icon: GraduationCap,
+    label: 'Calificaciones',
+    activeClass: 'bg-fuchsia-500/12 text-fuchsia-600 dark:text-fuchsia-400 dark:bg-fuchsia-500/15',
+    dotClass: 'bg-fuchsia-500',
   },
 ];
 
