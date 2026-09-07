@@ -57,7 +57,7 @@ function parseGradeOrUndefined(raw) {
 }
 
 const INPUT_CLASS =
-  'px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors';
+  'px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors';
 
 export default function CalificacionesPage() {
   const addToast = useToast();
@@ -265,7 +265,7 @@ export default function CalificacionesPage() {
               <button
                 type="button"
                 onClick={() => addSubNota(materia.id, topSlug)}
-                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-indigo-500 hover:bg-indigo-600 active:scale-[0.96] text-white transition-all duration-150 ease-soft-out"
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 active:scale-[0.96] text-white dark:text-neutral-900 transition-all duration-150 ease-soft-out"
               >
                 <Plus size={12} /> Nota
               </button>
@@ -328,7 +328,7 @@ export default function CalificacionesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-light dark:bg-bg-dark">
-        <Loader2 size={28} className="animate-spin text-indigo-500" />
+        <Loader2 size={28} className="animate-spin text-neutral-500" />
       </div>
     );
   }
@@ -345,7 +345,7 @@ export default function CalificacionesPage() {
         </Link>
 
         <div className="flex items-center gap-2 mb-1">
-          <GraduationCap size={24} className="text-indigo-500" />
+          <GraduationCap size={24} className="text-neutral-900 dark:text-neutral-100" />
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-text-light dark:text-text-dark">
             Calculadora de Calificaciones
           </h1>
@@ -357,7 +357,7 @@ export default function CalificacionesPage() {
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Promedio general del semestre
             </span>
-            <p className="text-4xl font-bold mt-1 text-fuchsia-600 dark:text-fuchsia-400 tabular-nums">
+            <p className="text-4xl font-bold mt-1 text-neutral-900 dark:text-neutral-100 tabular-nums">
               {resumen.promedioGeneral !== null ? resumen.promedioGeneral.toFixed(1) : 'N/D'}
             </p>
             <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-1">
@@ -463,7 +463,7 @@ export default function CalificacionesPage() {
                       <button
                         type="button"
                         onClick={() => handleCalcular(materia, pendientes)}
-                        className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white transition-all duration-150 ease-soft-out"
+                        className="px-3 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 active:scale-[0.98] text-white dark:text-neutral-900 transition-all duration-150 ease-soft-out"
                       >
                         Calcular
                       </button>

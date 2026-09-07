@@ -116,13 +116,13 @@ export default function PomodoroTimer() {
         flex flex-col items-center text-center
         transition-all duration-500 ease-soft-out
         ${isRunning
-          ? 'border-indigo-200/70 dark:border-indigo-400/20 shadow-soft-lg dark:shadow-soft-dark-lg shadow-[0_0_44px_-14px_rgba(99,102,241,0.5)] dark:shadow-[0_0_44px_-14px_rgba(129,140,248,0.4)]'
+          ? 'border-neutral-300/70 dark:border-neutral-500/20 shadow-soft-lg dark:shadow-soft-dark-lg shadow-[0_0_44px_-14px_rgba(115,115,115,0.5)] dark:shadow-[0_0_44px_-14px_rgba(163,163,163,0.4)]'
           : 'border-border-light dark:border-border-dark shadow-soft-sm dark:shadow-soft-dark-sm'}`}
     >
       {/* Ambient glow — only while actively running, respects reduced-motion globally */}
       {isRunning && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
-          <div className="w-64 h-64 rounded-full bg-indigo-500/10 dark:bg-indigo-400/10 blur-3xl animate-pulse" />
+          <div className="w-64 h-64 rounded-full bg-neutral-500/10 dark:bg-neutral-400/10 blur-3xl animate-pulse" />
         </div>
       )}
 
@@ -162,8 +162,8 @@ export default function PomodoroTimer() {
               strokeLinecap="round"
               className={`transition-all duration-500 ease-soft-out ${
                 isRunning
-                  ? 'stroke-indigo-500 dark:stroke-indigo-400'
-                  : 'stroke-indigo-400/60 dark:stroke-indigo-400/40'
+                  ? 'stroke-neutral-900 dark:stroke-neutral-100'
+                  : 'stroke-neutral-400/60 dark:stroke-neutral-500/40'
               }`}
             />
           </svg>
@@ -182,7 +182,7 @@ export default function PomodoroTimer() {
               border border-border-light dark:border-border-dark
               text-textMuted-light dark:text-textMuted-dark
               hover:text-text-light dark:hover:text-text-dark
-              hover:border-indigo-300 dark:hover:border-indigo-500/50
+              hover:border-neutral-400 dark:hover:border-neutral-500/50
               hover:bg-bg-light dark:hover:bg-white/[0.06]
               transition-all duration-200 ease-soft-out hover:scale-105 active:scale-[0.95]"
             aria-label="Reiniciar"
@@ -195,8 +195,8 @@ export default function PomodoroTimer() {
             <button
               onClick={pause}
               className="flex items-center justify-center w-14 h-14 rounded-full
-                bg-indigo-500 hover:bg-indigo-600 text-white
-                shadow-lg shadow-indigo-500/30 dark:shadow-indigo-500/20
+                bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900
+                shadow-lg shadow-neutral-900/30 dark:shadow-neutral-400/20
                 transition-all duration-200 ease-soft-out hover:scale-105 active:scale-[0.95]"
               aria-label="Pausar"
               title="Pausar"
@@ -252,7 +252,7 @@ export default function PomodoroTimer() {
                 bg-bg-light dark:bg-bg-dark
                 text-text-light dark:text-text-dark
                 placeholder-textMuted-light dark:placeholder-textMuted-dark
-                focus:outline-none focus:ring-2 focus:ring-indigo-500/40
+                focus:outline-none focus:ring-2 focus:ring-neutral-500/40
                 transition-all duration-200 ease-soft-out"
               autoFocus
             />

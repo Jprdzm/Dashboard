@@ -592,7 +592,7 @@ export default function DeudasPage() {
                 placeholder="Tu ingreso mensual"
                 value={monthlyIncome}
                 onChange={(e) => setMonthlyIncome(safeParseFloat(e.target.value))}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
               />
             </div>
             <div className="text-center sm:text-left">
@@ -639,7 +639,7 @@ export default function DeudasPage() {
         <div className="mb-8">
           <button
             onClick={() => setShowForm((p) => !p)}
-            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 rounded-md transition-colors duration-200 ease-soft-out mb-3"
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none focus:ring-2 focus:ring-neutral-500/50 rounded-md transition-colors duration-200 ease-soft-out mb-3"
           >
             {showForm ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             {showForm ? 'Ocultar formulario' : 'Agregar nueva deuda'}
@@ -654,7 +654,7 @@ export default function DeudasPage() {
                     placeholder="Nombre"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -663,7 +663,7 @@ export default function DeudasPage() {
                     placeholder="Monto Total"
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -672,7 +672,7 @@ export default function DeudasPage() {
                     placeholder="Tasa Anual %"
                     value={interestRate}
                     onChange={(e) => setInterestRate(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   />
                   <input
                     type="number"
@@ -681,19 +681,19 @@ export default function DeudasPage() {
                     placeholder="Pago Mínimo"
                     value={minimumPayment}
                     onChange={(e) => setMinimumPayment(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   />
                   <input
                     type="text"
                     placeholder="Acreedor"
                     value={creditor}
                     onChange={(e) => setCreditor(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   />
                   <select
                     value={paymentFrequency}
                     onChange={(e) => setPaymentFrequency(e.target.value)}
-                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                    className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                   >
                     <option value="monthly">Mensual</option>
                     <option value="yearly">Anual</option>
@@ -701,7 +701,7 @@ export default function DeudasPage() {
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1.5"
+                  className="px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1.5"
                 >
                   <Plus size={16} />
                   Agregar Deuda
@@ -724,7 +724,7 @@ export default function DeudasPage() {
               <div className="flex items-center gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800">
                 <button
                   onClick={() => setStrategy('snowball')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out ${
                     strategy === 'snowball'
                       ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                       : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -735,7 +735,7 @@ export default function DeudasPage() {
                 </button>
                 <button
                   onClick={() => setStrategy('avalanche')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out ${
                     strategy === 'avalanche'
                       ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                       : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -758,7 +758,7 @@ export default function DeudasPage() {
                 placeholder="$0"
                 value={extraPerMonth}
                 onChange={(e) => setExtraPerMonth(safeParseFloat(e.target.value))}
-                className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
+                className="w-28 px-2.5 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors tabular-nums"
               />
             </div>
           </div>
@@ -916,7 +916,7 @@ export default function DeudasPage() {
                             placeholder="0"
                             value={extraSimMap[d.id] || ''}
                             onChange={(e) => setExtraSimMap((prev) => ({ ...prev, [d.id]: e.target.value }))}
-                            className="w-20 px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors tabular-nums"
+                            className="w-20 px-2 py-1 text-xs rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors tabular-nums"
                           />
                           {simPayoffMonths !== null && (
                             <span className={`text-[10px] font-medium whitespace-nowrap ${
@@ -969,7 +969,7 @@ export default function DeudasPage() {
                                 type="date"
                                 value={abonoFecha}
                                 onChange={(e) => setAbonoFecha(e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                               />
                             </div>
                             <div>
@@ -984,7 +984,7 @@ export default function DeudasPage() {
                                 placeholder="0.00"
                                 value={abonoCantidad}
                                 onChange={(e) => setAbonoCantidad(e.target.value)}
-                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                                className="w-full px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                               />
                             </div>
                             <div className="sm:col-span-2">
@@ -998,12 +998,12 @@ export default function DeudasPage() {
                                   placeholder="Ej. Abono con dinero extra"
                                   value={abonoNota}
                                   onChange={(e) => setAbonoNota(e.target.value)}
-                                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                                  className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
                                 />
                                 <button
                                   onClick={() => handleAddAbono(d.id)}
                                   disabled={savingAbono || !abonoCantidad || parseFloat(abonoCantidad) <= 0}
-                                  className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1"
+                                  className="px-3 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:cursor-not-allowed text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out flex items-center gap-1"
                                 >
                                   {savingAbono ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                   Guardar

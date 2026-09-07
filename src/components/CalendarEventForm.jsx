@@ -10,7 +10,7 @@ import { Checkbox } from './ui/checkbox';
 const MATERIAS = Array.isArray(gradesConfig?.materias) ? gradesConfig.materias : [];
 
 const inputClass =
-  'px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors';
+  'px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors';
 
 const labelClass = 'block text-xs font-medium text-textMuted-light dark:text-textMuted-dark mb-1';
 
@@ -91,7 +91,7 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
         </div>
 
         {isEditing && event?.source === 'grades' && (
-          <div className="flex items-center gap-1.5 mb-4 px-3 py-2 rounded-lg bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-xs">
+          <div className="flex items-center gap-1.5 mb-4 px-3 py-2 rounded-lg bg-neutral-500/10 text-neutral-900 dark:text-neutral-300 text-xs">
             <Link2 size={12} className="shrink-0" />
             Sincronizado desde Calificaciones — puedes editarlo o eliminarlo libremente.
           </div>
@@ -214,7 +214,7 @@ export default function CalendarEventForm({ event, defaultDate, onSave, onDelete
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white transition-all duration-150 ease-soft-out"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 active:scale-[0.98] text-white dark:text-neutral-900 transition-all duration-150 ease-soft-out"
               >
                 <Save size={14} />
                 Guardar

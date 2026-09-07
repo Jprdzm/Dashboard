@@ -1,11 +1,13 @@
 import WelcomeBanner from '../components/WelcomeBanner';
 import NotionLink from '../components/NotionLink';
 import OneDriveLink from '../components/OneDriveLink';
-import CalendarEmbed from '../components/CalendarEmbed';
 import PomodoroTimer from '../components/PomodoroTimer';
 import FinanceCard from '../components/FinanceCard';
 import ProjectTracker from '../components/ProjectTracker';
 import HabitTracker from '../components/HabitTracker';
+import UpcomingEventsWidget from '../components/UpcomingEventsWidget';
+import PendingTasksWidget from '../components/PendingTasksWidget';
+import SemesterAverageWidget from '../components/SemesterAverageWidget';
 
 export default function Dashboard() {
   return (
@@ -16,14 +18,21 @@ export default function Dashboard() {
         </header>
 
         <main className="grid gap-6 md:gap-8">
-          {/* Top row: Focus timer gets the wider column — it's the visual anchor of the home */}
-          <div className="grid grid-cols-1 gap-4 md:gap-6 md:grid-cols-5">
-            <div className="md:col-span-2">
-              <FinanceCard />
-            </div>
-            <div className="md:col-span-3">
-              <PomodoroTimer />
-            </div>
+          {/* Summary widgets as a CSS-columns masonry, not a row-based grid:
+              a normal grid stretches every card in a row to the tallest
+              one's height, which is exactly what kept leaving blank gaps as
+              content changed (FinanceCard grew, Calificaciones went from one
+              number to a per-materia list, Pendientes got added). Columns
+              flow each card at its own natural height and pack the next one
+              right below it, so the layout self-balances regardless of how
+              tall any single card is. `break-inside-avoid` keeps each card
+              intact instead of splitting across columns. */}
+          <div className="columns-1 md:columns-2 xl:columns-3 gap-4 md:gap-6 [&>*]:mb-4 md:[&>*]:mb-6 [&>*]:break-inside-avoid">
+            <PomodoroTimer />
+            <FinanceCard />
+            <UpcomingEventsWidget />
+            <PendingTasksWidget />
+            <SemesterAverageWidget />
           </div>
 
           {/* Middle row: Projects full width */}
@@ -37,9 +46,6 @@ export default function Dashboard() {
             <OneDriveLink />
             <NotionLink />
           </div>
-
-          {/* Bottom row: Calendar full width */}
-          <CalendarEmbed />
         </main>
       </div>
     </div>

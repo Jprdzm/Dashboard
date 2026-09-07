@@ -18,7 +18,7 @@
 
 @layer base {
   body {
-    @apply bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark antialiased transition-colors duration-300 selection:bg-indigo-500/20;
+    @apply bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark antialiased transition-colors duration-300 selection:bg-neutral-500/20;
   }
 }
 
@@ -32,15 +32,15 @@
   }
 
   .btn-primary {
-    @apply bg-indigo-500 text-white px-4 py-2 rounded-xl font-semibold hover:bg-indigo-600 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-bg-light dark:focus:ring-offset-bg-dark transition-all duration-200 ease-soft-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    @apply bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-4 py-2 rounded-xl font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 focus:ring-offset-2 focus:ring-offset-bg-light dark:focus:ring-offset-bg-dark transition-all duration-200 ease-soft-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
   .btn-secondary {
-    @apply bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark px-4 py-2 rounded-xl font-medium hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-bg-light dark:focus:ring-offset-bg-dark transition-all duration-200 ease-soft-out;
+    @apply bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark px-4 py-2 rounded-xl font-medium hover:bg-slate-100 dark:hover:bg-white/[0.06] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 focus:ring-offset-2 focus:ring-offset-bg-light dark:focus:ring-offset-bg-dark transition-all duration-200 ease-soft-out;
   }
 
   .input {
-    @apply w-full px-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200;
+    @apply w-full px-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200;
   }
 
   .label {

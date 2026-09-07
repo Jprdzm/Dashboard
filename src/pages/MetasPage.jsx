@@ -30,7 +30,7 @@ function daysBetween(from, to) {
 
 function progressColor(pct) {
   if (pct >= 100) return 'bg-green-500';
-  if (pct >= 66) return 'bg-indigo-500';
+  if (pct >= 66) return 'bg-neutral-900 dark:bg-neutral-100';
   if (pct >= 33) return 'bg-yellow-500';
   return 'bg-red-500';
 }
@@ -240,7 +240,7 @@ export default function MetasPage() {
             <span className="text-xs font-medium text-textMuted-light dark:text-textMuted-dark uppercase tracking-wide">
               Por Ahorrar
             </span>
-            <p className="text-2xl font-bold mt-1 text-indigo-600 dark:text-indigo-400 tabular-nums">
+            <p className="text-2xl font-bold mt-1 text-neutral-900 dark:text-neutral-100 tabular-nums">
               {formatCurrency(stats.remaining)}
             </p>
           </div>
@@ -257,7 +257,7 @@ export default function MetasPage() {
                 placeholder="Nombre (Ej. Fondo de Emergencia)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
               />
               <input
                 type="number"
@@ -266,17 +266,17 @@ export default function MetasPage() {
                 placeholder="Monto Objetivo"
                 value={targetAmount}
                 onChange={(e) => setTargetAmount(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
               />
               <input
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
+                className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors [color-scheme:light] dark:[color-scheme:dark]"
               />
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
               >
                 <Plus size={16} />
                 Crear Meta
@@ -361,7 +361,7 @@ export default function MetasPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg-light dark:bg-bg-dark">
-                    <Wallet size={14} className="text-indigo-500 shrink-0" />
+                    <Wallet size={14} className="text-neutral-700 dark:text-neutral-300 shrink-0" />
                     <div>
                       <span className="text-xs text-textMuted-light dark:text-textMuted-dark">Restante</span>
                       <p className="text-sm font-semibold tabular-nums text-text-light dark:text-text-dark">
@@ -394,13 +394,13 @@ export default function MetasPage() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') { e.preventDefault(); handleQuickAdd(goal.id); }
                       }}
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200 ease-soft-out"
                     />
                     <button
                       onClick={() => handleQuickAdd(goal.id)}
                       disabled={isCompleted}
                       aria-label={`Aportar a ${goal.name}`}
-                      className="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
+                      className="px-3 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 disabled:cursor-not-allowed text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out"
                     >
                       <Plus size={16} />
                     </button>

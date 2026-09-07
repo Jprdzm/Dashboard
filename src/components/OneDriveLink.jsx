@@ -6,13 +6,13 @@ export default function OneDriveLink() {
       href="https://onedrive.live.com/?view=1"
       target="_blank"
       rel="noopener noreferrer"
-      className="p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md group transition-all duration-300 ease-soft-out shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 hover:border-indigo-400 dark:hover:border-indigo-500 active:scale-[0.99] flex flex-col items-center justify-center text-center space-y-3 cursor-pointer"
+      className="p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md group transition-all duration-300 ease-soft-out shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 hover:border-neutral-400 dark:hover:border-neutral-500 active:scale-[0.99] flex flex-col items-center justify-center text-center space-y-3 cursor-pointer"
     >
-      <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ease-soft-out">
-        <ExternalLink size={24} className="text-indigo-600 dark:text-indigo-400" />
+      <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800/40 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ease-soft-out">
+        <ExternalLink size={24} className="text-neutral-900 dark:text-neutral-100" />
       </div>
       <div>
-        <h2 className="font-semibold text-text-light dark:text-text-dark group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300 ease-soft-out">
+        <h2 className="font-semibold text-text-light dark:text-text-dark group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors duration-300 ease-soft-out">
           OneDrive
         </h2>
         <p className="text-sm text-textMuted-light dark:text-textMuted-dark mt-1">

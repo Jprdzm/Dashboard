@@ -7,7 +7,7 @@ const MAX = 100;
 
 function progressColor(pct) {
   if (pct >= 100) return { stroke: '#10b981', text: 'text-emerald-600 dark:text-emerald-400' };
-  if (pct >= 67)  return { stroke: '#6366f1', text: 'text-indigo-600 dark:text-indigo-400' };
+  if (pct >= 67)  return { stroke: '#171717', text: 'text-neutral-900 dark:text-neutral-100' };
   if (pct >= 34)  return { stroke: '#f59e0b', text: 'text-amber-600 dark:text-amber-400' };
   return           { stroke: '#f43f5e', text: 'text-rose-600 dark:text-rose-400' };
 }
@@ -96,7 +96,7 @@ export default function ProjectTracker() {
               value={newName}
               maxLength={80}
               onChange={(e) => setNewName(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors"
+              className="w-full px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors"
               autoFocus
             />
           </div>
@@ -108,77 +108,85 @@ export default function ProjectTracker() {
               placeholder="%"
               value={newProgress}
               onChange={(e) => setNewProgress(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors text-center"
+              className="w-full px-3 py-1.5 text-sm rounded-lg border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors text-center"
             />
           </div>
           <button
             type="submit"
-            className="p-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition-colors"
+            className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 transition-colors"
           >
             <Check size={15} />
           </button>
         </form>
       )}
 
-      {projects.length === 0 && !showForm ? (
-        <div className="text-center py-8">
-          <p className="text-xs text-textMuted-light dark:text-textMuted-dark">
-            No hay proyectos. Presiona + para agregar uno.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {projects.map((project) => {
-            const { text } = progressColor(project.progress);
-            return (
-              <div
-                key={project.id}
-                className="relative flex flex-col items-center gap-2 p-3 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm hover:-translate-y-0.5 transition-all duration-200 ease-soft-out group"
+      <div className="flex flex-wrap gap-3">
+        {/* Tarjeta "+ Nuevo proyecto" siempre visible: evita huecos con pocos proyectos
+            y da una segunda vía (además del botón de la esquina) para abrir el formulario. */}
+        {!showForm && (
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="flex-shrink-0 w-36 sm:w-40 flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:border-neutral-400 dark:hover:border-neutral-600 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100/50 dark:hover:bg-neutral-500/[0.06] transition-all duration-200 ease-soft-out active:scale-[0.98]"
+            aria-label="Agregar nuevo proyecto"
+          >
+            <div className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-dashed border-current/40">
+              <Plus size={18} />
+            </div>
+            <span className="text-xs font-semibold">Nuevo proyecto</span>
+          </button>
+        )}
+
+        {projects.map((project) => {
+          const { text } = progressColor(project.progress);
+          return (
+            <div
+              key={project.id}
+              className="relative flex-shrink-0 w-36 sm:w-40 flex flex-col items-center gap-2 p-3 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-neutral-300 dark:hover:border-neutral-700/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm hover:-translate-y-0.5 transition-all duration-200 ease-soft-out group"
+            >
+              {/* Delete */}
+              <button
+                onClick={() => handleDelete(project.id)}
+                className="absolute top-2 right-2 p-1 rounded text-textMuted-light/40 dark:text-textMuted-dark/40 hover:text-rose-500 dark:hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                aria-label={`Eliminar ${project.name}`}
               >
-                {/* Delete */}
+                <Trash2 size={12} />
+              </button>
+
+              {/* Name */}
+              <p className="text-xs font-semibold text-text-light dark:text-text-dark text-center leading-tight w-full truncate px-5">
+                {project.name}
+              </p>
+
+              {/* Donut */}
+              <DonutChart value={project.progress} />
+
+              {/* Controls */}
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleDelete(project.id)}
-                  className="absolute top-2 right-2 p-1 rounded text-textMuted-light/40 dark:text-textMuted-dark/40 hover:text-rose-500 dark:hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-all duration-200"
-                  aria-label={`Eliminar ${project.name}`}
+                  onClick={() => adjustProgress(project.id, -10)}
+                  disabled={project.progress <= 0}
+                  className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
+                  aria-label="Disminuir"
                 >
-                  <Trash2 size={12} />
+                  −
                 </button>
-
-                {/* Name */}
-                <p className="text-xs font-semibold text-text-light dark:text-text-dark text-center leading-tight w-full truncate px-5">
-                  {project.name}
-                </p>
-
-                {/* Donut */}
-                <DonutChart value={project.progress} />
-
-                {/* Controls */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => adjustProgress(project.id, -10)}
-                    disabled={project.progress <= 0}
-                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
-                    aria-label="Disminuir"
-                  >
-                    −
-                  </button>
-                  <span className={`text-[11px] font-semibold tabular-nums w-8 text-center ${text}`}>
-                    {project.progress}%
-                  </span>
-                  <button
-                    onClick={() => adjustProgress(project.id, 10)}
-                    disabled={project.progress >= MAX}
-                    className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
-                    aria-label="Incrementar"
-                  >
-                    +
-                  </button>
-                </div>
+                <span className={`text-[11px] font-semibold tabular-nums w-8 text-center ${text}`}>
+                  {project.progress}%
+                </span>
+                <button
+                  onClick={() => adjustProgress(project.id, 10)}
+                  disabled={project.progress >= MAX}
+                  className="w-6 h-6 rounded-full border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 ease-soft-out active:scale-[0.9] text-sm font-bold leading-none flex items-center justify-center"
+                  aria-label="Incrementar"
+                >
+                  +
+                </button>
               </div>
-            );
-          })}
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

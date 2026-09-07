@@ -99,7 +99,7 @@ export default function HabitTracker() {
           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Completados</p>
         </div>
         <div className="flex-1 text-center p-2 rounded-lg bg-bg-light dark:bg-bg-dark hover:-translate-y-0.5 transition-transform duration-200 ease-soft-out">
-          <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">{stats.bestStreak}</p>
+          <p className="text-lg font-bold text-neutral-900 dark:text-neutral-100 tabular-nums">{stats.bestStreak}</p>
           <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Mejor racha</p>
         </div>
       </div>

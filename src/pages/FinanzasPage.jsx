@@ -25,8 +25,8 @@ const CATEGORIAS = ALLOWED_CATEGORIES;
 const DEFAULT_BUDGET = Object.fromEntries(ALLOWED_CATEGORIES.map(c => [c, 0]));
 
 const CAT_COLORS = [
-  '#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#a855f7',
-  '#ef4444', '#ec4899', '#8b5cf6', '#14b8a6', '#94a3b8',
+  '#171717', '#10b981', '#f59e0b', '#3b82f6', '#737373',
+  '#ef4444', '#ec4899', '#404040', '#14b8a6', '#94a3b8',
 ];
 
 function fmt(value) {
@@ -173,7 +173,7 @@ function BudgetBarTooltip({ active, payload, label }) {
   return (
     <div className="px-3 py-2 rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] shadow-lg text-xs">
       <p className="font-semibold text-text-light dark:text-text-dark mb-1.5">{fullName}</p>
-      {presupuesto > 0 && <p className="text-indigo-500 font-medium">Presupuesto: {fmtFull(presupuesto)}</p>}
+      {presupuesto > 0 && <p className="text-neutral-700 dark:text-neutral-300 font-medium">Presupuesto: {fmtFull(presupuesto)}</p>}
       {gastado > 0 && <p className="text-rose-500 font-medium">Gastado: {fmtFull(gastado)}</p>}
       {presupuesto > 0 && (
         <p className={`mt-1 font-semibold ${gastado > presupuesto ? 'text-rose-500' : 'text-emerald-500'}`}>
@@ -644,7 +644,7 @@ export default function FinanzasPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={exportCSV}
-              className="p-2 rounded-xl border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
+              className="p-2 rounded-xl border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out"
               title="Exportar CSV"
               aria-label="Exportar CSV"
             >
@@ -652,7 +652,7 @@ export default function FinanzasPage() {
             </button>
             <button
               onClick={() => setShowForm((v) => !v)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-sm font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out"
             >
               <Plus size={15} />
               Nuevo
@@ -666,19 +666,19 @@ export default function FinanzasPage() {
             <h2 className="text-sm font-semibold text-text-light dark:text-text-dark mb-3">Nuevo Movimiento</h2>
             <form onSubmit={handleSubmit} className="flex flex-wrap gap-2 items-end">
               <input type="number" step="0.01" min="0" placeholder="Monto" value={monto} onChange={(e) => setMonto(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-32" />
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 w-32" />
               <select value={tipo} onChange={(e) => setTipo(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40">
                 <option value="gasto">Gasto</option>
                 <option value="ingreso">Ingreso</option>
               </select>
               <select value={categoria} onChange={(e) => setCategoria(e.target.value)}
-                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                className="px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40">
                 {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
               <input type="text" placeholder="Descripción..." value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
-                className="flex-1 min-w-[160px] px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40" />
-              <button type="submit" className="px-4 py-2 text-sm font-semibold rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out">
+                className="flex-1 min-w-[160px] px-3 py-2 text-sm rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-[#0B0F19] text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40" />
+              <button type="submit" className="px-4 py-2 text-sm font-semibold rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out">
                 Guardar
               </button>
             </form>
@@ -690,7 +690,7 @@ export default function FinanzasPage() {
           <KpiCard icon={Wallet}      iconColor="text-blue-600 dark:text-blue-400"    iconBg="bg-blue-50 dark:bg-blue-900/30"    label="Balance Total"     value={fmt(balance)}      pct={undefined} />
           <KpiCard icon={TrendingUp}  iconColor="text-emerald-600 dark:text-emerald-400" iconBg="bg-emerald-50 dark:bg-emerald-900/30" label="Ingresos del Mes"  value={fmt(ingresosMes)}  pct={pctIngresos}  pctPositiveIsGood={true} />
           <KpiCard icon={TrendingDown} iconColor="text-rose-600 dark:text-rose-400"   iconBg="bg-rose-50 dark:bg-rose-900/30"    label="Gastos del Mes"    value={fmt(gastosMes)}    pct={pctGastos}   pctPositiveIsGood={false} />
-          <KpiCard icon={PiggyBank}   iconColor="text-violet-600 dark:text-violet-400" iconBg="bg-violet-50 dark:bg-violet-900/30" label="Ahorro Total"      value={fmt(ahorroTotal)}  pct={undefined} />
+          <KpiCard icon={PiggyBank}   iconColor="text-neutral-900 dark:text-neutral-100" iconBg="bg-neutral-100 dark:bg-neutral-800/30" label="Ahorro Total"      value={fmt(ahorroTotal)}  pct={undefined} />
         </div>
 
         {/* ── Main Grid ── */}
@@ -735,16 +735,16 @@ export default function FinanzasPage() {
                   <div className="relative">
                     <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-textMuted-light dark:text-textMuted-dark pointer-events-none" />
                     <input type="text" placeholder="Buscar..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-                      className="pl-7 pr-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-28" />
+                      className="pl-7 pr-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 w-28" />
                   </div>
                   <Filter size={13} className="text-textMuted-light dark:text-textMuted-dark" />
                   <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}
-                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40">
                     <option value="Todos">Todas</option>
                     {CATEGORIAS.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                   <select value={orden} onChange={(e) => setOrden(e.target.value)}
-                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40">
+                    className="px-2 py-1.5 text-xs rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40">
                     <option value="newest">Más reciente</option>
                     <option value="oldest">Más antiguo</option>
                   </select>
@@ -907,8 +907,8 @@ export default function FinanzasPage() {
                       <Link key={s.id} to="/suscripciones" className="block p-2.5 rounded-xl bg-bg-light dark:bg-bg-dark hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:-translate-y-0.5 transition-all duration-200 ease-soft-out">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
-                              <PlaySquare size={10} className="text-violet-500" />
+                            <div className="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-800/40 flex items-center justify-center shrink-0">
+                              <PlaySquare size={10} className="text-neutral-700 dark:text-neutral-300" />
                             </div>
                             <p className="text-xs font-medium text-text-light dark:text-text-dark truncate">{s.name}</p>
                           </div>
@@ -948,13 +948,13 @@ export default function FinanzasPage() {
                 <>
                   <button
                     onClick={handleSaveBudget}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 text-xs font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out"
                   >
                     <Check size={13} /> Guardar
                   </button>
                   <button
                     onClick={() => setEditingBudget(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
                   >
                     <X size={13} /> Cancelar
                   </button>
@@ -962,7 +962,7 @@ export default function FinanzasPage() {
               ) : (
                 <button
                   onClick={() => { setBudgetDraft({ ...budgetCats }); setIngresoObjDraft(ingresoObjetivo > 0 ? String(ingresoObjetivo) : ''); setEditingBudget(true); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border-light dark:border-border-dark text-xs font-medium text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
                 >
                   <Edit3 size={13} /> Editar presupuesto
                 </button>
@@ -1098,7 +1098,7 @@ export default function FinanzasPage() {
           </div>
 
           {/* Budget main grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
             {/* LEFT: category list + chart */}
             <div className="lg:col-span-2 space-y-5">
@@ -1193,13 +1193,13 @@ export default function FinanzasPage() {
                       <XAxis dataKey="cat" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                       <YAxis tickFormatter={v => fmt(v)} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={68} />
                       <Tooltip content={<BudgetBarTooltip />} />
-                      <Bar dataKey="Presupuesto" fill="#6366f1" fillOpacity={0.55} radius={[3, 3, 0, 0]} maxBarSize={22} />
+                      <Bar dataKey="Presupuesto" fill="#171717" fillOpacity={0.55} radius={[3, 3, 0, 0]} maxBarSize={22} />
                       <Bar dataKey="Gastado" fill="#f43f5e" fillOpacity={0.85} radius={[3, 3, 0, 0]} maxBarSize={22} />
                     </BarChart>
                   </ResponsiveContainer>
                   <div className="flex items-center justify-center gap-5 mt-2">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-3 h-3 rounded-sm" style={{ background: '#6366f1', opacity: 0.55 }} />
+                      <div className="w-3 h-3 rounded-sm" style={{ background: '#171717', opacity: 0.55 }} />
                       <span className="text-xs text-textMuted-light dark:text-textMuted-dark">Presupuesto</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -1218,10 +1218,10 @@ export default function FinanzasPage() {
               <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-sm text-text-light dark:text-text-dark flex items-center gap-2">
-                    <DollarSign size={14} className="text-violet-500" />
+                    <DollarSign size={14} className="text-neutral-700 dark:text-neutral-300" />
                     Gastos Fijos
                   </h3>
-                  <span className="text-sm font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmt(totalGastosFijosPresupuesto)}</span>
+                  <span className="text-sm font-bold tabular-nums text-neutral-900 dark:text-neutral-100">{fmt(totalGastosFijosPresupuesto)}</span>
                 </div>
                 {gastosFijosPresupuesto.length === 0 ? (
                   <p className="text-xs text-textMuted-light dark:text-textMuted-dark text-center py-4 leading-relaxed">
@@ -1240,7 +1240,7 @@ export default function FinanzasPage() {
                     ))}
                     <div className="flex items-center justify-between pt-2 border-t border-border-light dark:border-border-dark">
                       <span className="text-[11px] text-textMuted-light dark:text-textMuted-dark font-medium">Total mensual fijo</span>
-                      <span className="text-[11px] font-bold tabular-nums text-violet-600 dark:text-violet-400">{fmt(totalGastosFijosPresupuesto)}</span>
+                      <span className="text-[11px] font-bold tabular-nums text-neutral-900 dark:text-neutral-100">{fmt(totalGastosFijosPresupuesto)}</span>
                     </div>
                     {regla5030.base > 0 && (
                       <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
@@ -1311,6 +1311,37 @@ export default function FinanzasPage() {
                   </div>
                 )}
               </div>
+
+              {/* Historial reciente (resumen numérico de areaData) */}
+              {areaData.length > 1 && (
+                <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out">
+                  <h3 className="font-semibold text-sm text-text-light dark:text-text-dark mb-0.5 flex items-center gap-2">
+                    <CalendarDays size={14} className="text-blue-500" />
+                    Historial Reciente
+                  </h3>
+                  <p className="text-[11px] text-textMuted-light dark:text-textMuted-dark mb-3">Balance de los últimos meses</p>
+                  <div className="space-y-1.5">
+                    {areaData.slice(-4).reverse().map(m => {
+                      const bal = m.ingreso - m.gasto;
+                      return (
+                        <div key={m.month} className="flex items-center justify-between p-2 rounded-xl bg-bg-light dark:bg-bg-dark gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-text-light dark:text-text-dark capitalize truncate">{m.label}</p>
+                            <p className="text-[10px] text-textMuted-light dark:text-textMuted-dark">
+                              <span className="text-emerald-600 dark:text-emerald-400">+{fmt(m.ingreso)}</span>
+                              {' · '}
+                              <span className="text-rose-600 dark:text-rose-400">-{fmt(m.gasto)}</span>
+                            </p>
+                          </div>
+                          <span className={`text-xs font-bold tabular-nums shrink-0 ${bal >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                            {fmt(bal)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

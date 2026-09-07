@@ -51,7 +51,7 @@ export default function WelcomeBanner() {
                 if (e.key === 'Enter') handleSave();
                 if (e.key === 'Escape') setIsEditing(false);
               }}
-              className="px-2 py-1 text-xl font-bold rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 w-48"
+              className="px-2 py-1 text-xl font-bold rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 w-48"
             />
             <button onClick={handleSave} className="p-1.5 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors duration-200 ease-soft-out active:scale-[0.95]" aria-label="Guardar nombre">
               <Check size={18} />

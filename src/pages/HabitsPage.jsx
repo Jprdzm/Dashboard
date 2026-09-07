@@ -180,13 +180,13 @@ export default function HabitsPage() {
           <div className="flex items-center gap-0.5 p-1 rounded-xl bg-slate-100/80 dark:bg-white/[0.04]">
             <button
               onClick={() => setView('week')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-soft-out ${view === 'week' ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-soft-out ${view === 'week' ? 'bg-white dark:bg-white/[0.1] text-neutral-900 dark:text-neutral-100 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
             >
               Semana
             </button>
             <button
               onClick={() => setView('month')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-soft-out ${view === 'month' ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-soft-out ${view === 'month' ? 'bg-white dark:bg-white/[0.1] text-neutral-900 dark:text-neutral-100 shadow-sm' : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark'}`}
             >
               Mes
             </button>
@@ -248,19 +248,19 @@ export default function HabitsPage() {
               const pct = total > 0 ? (doneCount / total) * 100 : 0;
               const isToday = day === today;
               return (
-                <div key={day} className="flex-1 flex flex-col items-center justify-end gap-2 group">
+                <div key={day} className="flex-1 h-full flex flex-col items-center justify-end gap-2 group">
                   <div className="w-full flex justify-center">
-                    <span className="text-[10px] font-bold text-primary-light/80 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-bold text-primary-light/80 dark:text-primary-dark/80 opacity-0 group-hover:opacity-100 transition-opacity">
                       {doneCount}/{total}
                     </span>
                   </div>
                   <div className="w-full max-w-[32px] h-full bg-muted/10 dark:bg-slate-800 rounded-t-md overflow-hidden relative flex items-end">
                     <div
-                      className={`w-full transition-all duration-700 ease-out rounded-t-md ${isToday ? 'bg-indigo-500' : 'bg-indigo-400 dark:bg-indigo-600'}`}
+                      className={`w-full transition-all duration-700 ease-out rounded-t-md ${isToday ? 'bg-neutral-900 dark:bg-neutral-100' : 'bg-neutral-400 dark:bg-neutral-600'}`}
                       style={{ height: `${pct}%` }}
                     />
                   </div>
-                  <span className={`text-[10px] font-medium ${isToday ? 'text-primary-light/80 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
+                  <span className={`text-[10px] font-medium ${isToday ? 'text-primary-light/80 dark:text-primary-dark/80' : 'text-textMuted-light dark:text-textMuted-dark'}`}>
                     {DAYS[i]}
                   </span>
                 </div>
@@ -280,11 +280,11 @@ export default function HabitsPage() {
               value={newName}
               maxLength={100}
               onChange={(e) => setNewName(e.target.value)}
-              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200"
+              className="flex-1 px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white transition-colors duration-200 ease-soft-out flex items-center gap-1.5"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 active:scale-[0.98] text-white dark:text-neutral-900 transition-colors duration-200 ease-soft-out flex items-center gap-1.5"
             >
               <Plus size={16} />
               Agregar
@@ -313,7 +313,7 @@ export default function HabitsPage() {
                       <th
                         key={day}
                         className={`py-3 px-1.5 text-center font-medium w-8 ${
-                          day === today ? 'text-primary-light/80 dark:text-indigo-400' : 'text-textMuted-light dark:text-textMuted-dark'
+                          day === today ? 'text-primary-light/80 dark:text-primary-dark/80' : 'text-textMuted-light dark:text-textMuted-dark'
                         }`}
                       >
                         {DAYS[i]}
@@ -350,7 +350,7 @@ export default function HabitsPage() {
                               maxLength={100}
                               onChange={(e) => setEditName(e.target.value)}
                               onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditingId(null); }}
-                              className="flex-1 px-2 py-1 text-xs rounded border border-indigo-400 dark:border-indigo-500 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                              className="flex-1 px-2 py-1 text-xs rounded border border-neutral-400 dark:border-neutral-500 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40"
                               autoFocus
                             />
                             <button onClick={commitEdit} aria-label="Guardar nombre" className="p-1 rounded text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 active:scale-90 transition-all duration-150 ease-soft-out">
@@ -387,7 +387,7 @@ export default function HabitsPage() {
                         })
                       ) : (
                         <td className="py-2.5 px-1.5 text-center">
-                          <span className="text-sm font-bold tabular-nums text-primary-light/80 dark:text-indigo-400">
+                          <span className="text-sm font-bold tabular-nums text-primary-light/80 dark:text-primary-dark/80">
                             {monthCompletions}
                           </span>
                           <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">/{monthTotal}</span>
@@ -414,7 +414,7 @@ export default function HabitsPage() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => startEdit(habit)}
-                            className="p-1.5 rounded text-primary-light dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 active:scale-90 transition-all duration-150 ease-soft-out"
+                            className="p-1.5 rounded text-primary-light dark:text-primary-dark hover:bg-neutral-100 dark:hover:bg-neutral-800/30 active:scale-90 transition-all duration-150 ease-soft-out"
                             title="Editar"
                           >
                             <Pencil size={14} />
@@ -487,15 +487,15 @@ export default function HabitsPage() {
                   <div
                     key={day}
                     className={`aspect-square rounded-md flex items-center justify-center text-[10px] font-medium transition-all duration-300 ease-soft-out ${
-                      isToday ? 'ring-2 ring-indigo-400 dark:ring-indigo-500' : ''
+                      isToday ? 'ring-2 ring-neutral-400 dark:ring-neutral-500' : ''
                     } ${
                       intensity === 0
                         ? 'bg-muted/10 dark:bg-slate-800 text-textMuted-light/50 dark:text-textMuted-dark/50'
                         : intensity <= 0.33
-                          ? 'bg-indigo-200 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300'
+                          ? 'bg-neutral-300 dark:bg-neutral-700/60 text-neutral-800 dark:text-neutral-300'
                           : intensity <= 0.66
-                            ? 'bg-indigo-400 dark:bg-indigo-700 text-white'
-                            : 'bg-indigo-600 dark:bg-indigo-500 text-white'
+                            ? 'bg-neutral-500 dark:bg-neutral-500 text-white'
+                            : 'bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-900'
                     }`}
                     title={`${day}: ${doneCount}/${total}`}
                   >
@@ -507,9 +507,9 @@ export default function HabitsPage() {
             <div className="flex items-center justify-end gap-2 mt-3">
               <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Menos</span>
               <div className="w-3 h-3 rounded bg-muted/10 dark:bg-slate-800" />
-              <div className="w-3 h-3 rounded bg-indigo-200 dark:bg-indigo-900/40" />
-              <div className="w-3 h-3 rounded bg-indigo-400 dark:bg-indigo-700" />
-              <div className="w-3 h-3 rounded bg-indigo-600 dark:bg-indigo-500" />
+              <div className="w-3 h-3 rounded bg-neutral-300 dark:bg-neutral-700/60" />
+              <div className="w-3 h-3 rounded bg-neutral-500 dark:bg-neutral-500" />
+              <div className="w-3 h-3 rounded bg-neutral-800 dark:bg-neutral-200" />
               <span className="text-[10px] text-textMuted-light dark:text-textMuted-dark">Más</span>
             </div>
           </div>

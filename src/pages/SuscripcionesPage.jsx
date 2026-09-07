@@ -26,6 +26,36 @@ function daysUntil(dateStr) {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+// Todo el manejo de fechas de renovación se hace con aritmética de enteros
+// (año/mes/día), nunca con new Date(isoString) + setMonth/toISOString: esa
+// combinación mezcla parsing en UTC con mutación en hora local y puede
+// desplazar el resultado un día según la zona horaria del navegador.
+
+function parseDateOnly(str) {
+  const [y, m, d] = str.split('-').map(Number);
+  return { y, m, d }; // m es 1-based (1-12)
+}
+
+function formatDateOnly({ y, m, d }) {
+  return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function compareDateOnly(a, b) {
+  if (a.y !== b.y) return a.y - b.y;
+  if (a.m !== b.m) return a.m - b.m;
+  return a.d - b.d;
+}
+
+// Suma `months` meses a la fecha {y,m,d}, recortando el día al último válido
+// del mes destino (ej. 31 ene + 1 mes -> 28/29 feb, nunca "3 mar").
+function addMonthsClamped({ y, m, d }, months) {
+  const totalMonths = y * 12 + (m - 1) + months;
+  const newY = Math.floor(totalMonths / 12);
+  const newM0 = ((totalMonths % 12) + 12) % 12; // 0-based, siempre positivo
+  const daysInNewMonth = new Date(newY, newM0 + 1, 0).getDate();
+  return { y: newY, m: newM0 + 1, d: Math.min(d, daysInNewMonth) };
+}
+
 export default function SuscripcionesPage() {
   const { user } = useAuth();
   const supabaseReady = isSupabaseConfigured;
@@ -135,9 +165,20 @@ export default function SuscripcionesPage() {
   };
 
   const updateNextRenewalDate = async (id, currentRenewal) => {
-    const current = new Date(currentRenewal);
-    current.setMonth(current.getMonth() + 1);
-    const nextRenewal = current.toISOString().split('T')[0];
+    const todayD = new Date();
+    const today = { y: todayD.getFullYear(), m: todayD.getMonth() + 1, d: todayD.getDate() };
+
+    // Avanza mes a mes (no solo +1 vez) hasta que la fecha quede
+    // estrictamente en el futuro, sin importar cuántos ciclos mensuales de
+    // atraso lleve la suscripción (ej. 83 días ≈ 2.7 meses sin marcarse).
+    // Esto evita el bug donde "Renovado" guardaba una fecha que seguía en
+    // el pasado, mostrando a la vez el check verde y el badge rojo de vencido.
+    let next = addMonthsClamped(parseDateOnly(currentRenewal), 1);
+    while (compareDateOnly(next, today) <= 0) {
+      next = addMonthsClamped(next, 1);
+    }
+
+    const nextRenewal = formatDateOnly(next);
     const now = new Date().toISOString();
 
     setSubs((prev) =>
@@ -189,7 +230,7 @@ export default function SuscripcionesPage() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
             Suscripciones
           </h1>
-          <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20">
+          <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-neutral-900 text-white shadow-lg shadow-blue-500/20">
             <span className="text-xs font-medium uppercase tracking-wider opacity-80 block">
               Gasto Mensual
             </span>
@@ -202,7 +243,7 @@ export default function SuscripcionesPage() {
         {/* Formulario */}
         <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-shadow duration-300 ease-soft-out mb-8">
           <h2 className="font-semibold mb-4 text-sm text-text-light dark:text-text-dark flex items-center gap-2">
-            <PlaySquare size={16} className="text-indigo-500" />
+            <PlaySquare size={16} className="text-neutral-900 dark:text-neutral-100" />
             Nueva Suscripción
           </h2>
           <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
@@ -211,7 +252,7 @@ export default function SuscripcionesPage() {
               placeholder="Servicio (ej. Netflix)"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200 ease-soft-out"
             />
             <input
               type="number"
@@ -220,24 +261,24 @@ export default function SuscripcionesPage() {
               placeholder="Costo"
               value={cost}
               onChange={(e) => setCost(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200 ease-soft-out"
             />
             <input
               type="date"
               value={renewalDate}
               onChange={(e) => setRenewalDate(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out [color-scheme:light] dark:[color-scheme:dark]"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200 ease-soft-out [color-scheme:light] dark:[color-scheme:dark]"
             />
             <input
               type="text"
               placeholder="Banco/Tarjeta (opcional)"
               value={bank}
               onChange={(e) => setBank(e.target.value)}
-              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-colors duration-200 ease-soft-out"
+              className="px-3 py-2 text-sm rounded-lg border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder-textMuted-light dark:placeholder-textMuted-dark focus:outline-none focus:ring-2 focus:ring-neutral-500/40 transition-colors duration-200 ease-soft-out"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
+              className="px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 text-white dark:text-neutral-900 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-neutral-500/50 transition-all duration-200 ease-soft-out flex items-center justify-center gap-1.5"
             >
               <Plus size={16} />
               Agregar
@@ -273,7 +314,7 @@ export default function SuscripcionesPage() {
                         <Trash2 size={14} />
                       </button>
                     </div>
-                    <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 tabular-nums mb-4">
+                    <p className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tabular-nums mb-4">
                       {formatCurrency(sub.cost)}
                     </p>
                     
@@ -306,7 +347,7 @@ export default function SuscripcionesPage() {
                     </span>
                     <button
                       onClick={() => updateNextRenewalDate(sub.id, sub.renewalDate)}
-                      className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-black/20 text-text-light dark:text-text-dark rounded-lg shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-indigo-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
+                      className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-black/20 text-text-light dark:text-text-dark rounded-lg shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-neutral-500/50 active:scale-[0.98] transition-all duration-200 ease-soft-out"
                       aria-label={`Marcar ${sub.name} como renovada`}
                     >
                       Renovado

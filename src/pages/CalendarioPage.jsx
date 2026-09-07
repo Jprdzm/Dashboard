@@ -149,7 +149,7 @@ export default function CalendarioPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+        <div className="w-5 h-5 rounded-full border-2 border-neutral-500 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -162,7 +162,7 @@ export default function CalendarioPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <CalendarDays size={22} className="text-indigo-500" />
+              <CalendarDays size={22} className="text-neutral-900 dark:text-neutral-100" />
               Calendario
             </h1>
             <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-0.5">
@@ -171,7 +171,7 @@ export default function CalendarioPage() {
           </div>
           <button
             onClick={() => openCreate(todayISO())}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white text-sm font-semibold transition-colors duration-200 ease-soft-out"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 active:scale-[0.98] text-white dark:text-neutral-900 text-sm font-semibold transition-colors duration-200 ease-soft-out"
           >
             <Plus size={15} />
             Nuevo evento
@@ -248,7 +248,7 @@ export default function CalendarioPage() {
               onClick={() => setViewMode('month')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 ease-soft-out ${
                 viewMode === 'month'
-                  ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  ? 'bg-white dark:bg-white/[0.1] text-neutral-900 dark:text-neutral-100 shadow-sm'
                   : 'text-textMuted-light dark:text-textMuted-dark'
               }`}
             >
@@ -258,7 +258,7 @@ export default function CalendarioPage() {
               onClick={() => setViewMode('week')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-200 ease-soft-out ${
                 viewMode === 'week'
-                  ? 'bg-white dark:bg-white/[0.1] text-indigo-600 dark:text-indigo-400 shadow-sm'
+                  ? 'bg-white dark:bg-white/[0.1] text-neutral-900 dark:text-neutral-100 shadow-sm'
                   : 'text-textMuted-light dark:text-textMuted-dark'
               }`}
             >
@@ -304,12 +304,12 @@ export default function CalendarioPage() {
                       viewMode === 'month' ? 'min-h-[6.5rem]' : 'min-h-[16rem]'
                     } ${
                       isToday
-                        ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20'
-                        : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm'
+                        ? 'border-neutral-400 dark:border-neutral-500 bg-neutral-100/60 dark:bg-neutral-800/30'
+                        : 'border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md hover:border-neutral-300 dark:hover:border-neutral-700/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm'
                     } ${!day.isCurrentMonth ? 'opacity-40' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`text-xs font-semibold ${isToday ? 'text-indigo-600 dark:text-indigo-400' : 'text-text-light dark:text-text-dark'}`}>
+                      <span className={`text-xs font-semibold ${isToday ? 'text-neutral-900 dark:text-neutral-100' : 'text-text-light dark:text-text-dark'}`}>
                         {day.date.getDate()}
                         {viewMode === 'week' && (
                           <span className="ml-1 font-normal text-textMuted-light dark:text-textMuted-dark">
@@ -319,7 +319,7 @@ export default function CalendarioPage() {
                       </span>
                       <button
                         onClick={(e) => { e.stopPropagation(); openCreate(day.iso); }}
-                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-textMuted-light dark:text-textMuted-dark hover:text-indigo-500 active:scale-90 transition-all duration-200 ease-soft-out"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-textMuted-light dark:text-textMuted-dark hover:text-neutral-700 dark:hover:text-neutral-300 active:scale-90 transition-all duration-200 ease-soft-out"
                         aria-label="Agregar evento"
                       >
                         <Plus size={12} />

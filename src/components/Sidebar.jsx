@@ -39,7 +39,7 @@ export default function Sidebar({ open, onClose }) {
       >
         <div className="flex items-center justify-between p-5 border-b border-border-light dark:border-border-dark shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neutral-800 to-neutral-950 flex items-center justify-center">
               <Brain size={18} className="text-white" />
             </div>
             <span className="font-semibold text-sm text-text-light dark:text-text-dark">Second Brain</span>
@@ -62,7 +62,7 @@ export default function Sidebar({ open, onClose }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300'
+                    ? 'bg-neutral-100 dark:bg-neutral-800/40 text-neutral-900 dark:text-neutral-100'
                     : 'text-textMuted-light dark:text-textMuted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-slate-50 dark:hover:bg-white/[0.04]'
                 }`
               }

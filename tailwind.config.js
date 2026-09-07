@@ -33,9 +33,11 @@ export default {
         },
         // Brand primary (already the de-facto accent throughout the app —
         // formalized here so it reads as a system, not a scattered choice).
+        // Neutral (near-black in light mode / near-white in dark mode) —
+        // replaces the previous indigo brand accent.
         primary: {
-          light: '#6366f1',
-          dark: '#818cf8',
+          light: '#171717',
+          dark: '#e5e5e5',
         },
       },
       fontFamily: {

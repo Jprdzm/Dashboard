@@ -44,8 +44,8 @@ const NAV = [
     to: '/metas',
     icon: Target,
     label: 'Metas',
-    activeClass: 'bg-violet-500/12 text-violet-600 dark:text-violet-400 dark:bg-violet-500/15',
-    dotClass: 'bg-violet-500',
+    activeClass: 'bg-neutral-800/12 text-neutral-800 dark:text-neutral-200 dark:bg-neutral-300/15',
+    dotClass: 'bg-neutral-800 dark:bg-neutral-300',
   },
   {
     to: '/suscripciones',
@@ -72,8 +72,8 @@ const NAV = [
     to: '/calificaciones',
     icon: GraduationCap,
     label: 'Calificaciones',
-    activeClass: 'bg-fuchsia-500/12 text-fuchsia-600 dark:text-fuchsia-400 dark:bg-fuchsia-500/15',
-    dotClass: 'bg-fuchsia-500',
+    activeClass: 'bg-neutral-500/12 text-neutral-500 dark:text-neutral-400 dark:bg-neutral-500/15',
+    dotClass: 'bg-neutral-500',
   },
 ];
 
