@@ -111,7 +111,7 @@ export default function PomodoroTimer() {
 
   return (
     <div
-      className={`relative overflow-hidden p-8 sm:p-10 rounded-2xl border
+      className={`relative overflow-hidden p-8 sm:p-10 rounded-[28px] border
         bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md
         flex flex-col items-center text-center
         transition-all duration-500 ease-soft-out
@@ -134,7 +134,7 @@ export default function PomodoroTimer() {
             <Coffee size={16} className="text-amber-500" />
           )}
           <span
-            className={`text-[11px] font-semibold uppercase tracking-[0.15em] ${
+            className={`font-heading text-[11px] font-semibold uppercase tracking-[0.15em] ${
               isWork
                 ? 'text-emerald-600 dark:text-emerald-400'
                 : 'text-amber-600 dark:text-amber-400'
@@ -162,13 +162,13 @@ export default function PomodoroTimer() {
               strokeLinecap="round"
               className={`transition-all duration-500 ease-soft-out ${
                 isRunning
-                  ? 'stroke-neutral-900 dark:stroke-neutral-100'
-                  : 'stroke-neutral-400/60 dark:stroke-neutral-500/40'
+                  ? 'stroke-accent-light dark:stroke-accent-dark'
+                  : 'stroke-accent-light/45 dark:stroke-accent-dark/40'
               }`}
             />
           </svg>
           <span
-            className="absolute font-extrabold tracking-tight text-5xl sm:text-6xl tabular-nums
+            className="absolute font-heading font-bold tracking-tight text-5xl sm:text-6xl tabular-nums
               text-text-light dark:text-text-dark leading-none select-none"
           >
             {formattedTime}

@@ -72,9 +72,9 @@ export default function HabitTracker() {
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
+    <div className="p-5 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
+        <h2 className="font-heading font-semibold text-text-light dark:text-text-dark text-sm flex items-center gap-2">
           <Target size={15} className="text-teal-500" />
           Hábitos de Hoy
         </h2>

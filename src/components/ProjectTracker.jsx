@@ -72,9 +72,9 @@ export default function ProjectTracker() {
   };
 
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
+    <div className="p-5 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Proyectos</h2>
+        <h2 className="font-heading font-semibold text-text-light dark:text-text-dark text-sm">Proyectos</h2>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="p-1.5 rounded-md border border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:bg-bg-light dark:hover:bg-white/[0.06] hover:text-text-light dark:hover:text-text-dark transition-all duration-200 ease-soft-out active:scale-[0.95]"
@@ -127,7 +127,7 @@ export default function ProjectTracker() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="flex-shrink-0 w-36 sm:w-40 flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-border-light dark:border-border-dark text-textMuted-light dark:text-textMuted-dark hover:border-neutral-400 dark:hover:border-neutral-600 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100/50 dark:hover:bg-neutral-500/[0.06] transition-all duration-200 ease-soft-out active:scale-[0.98]"
+            className="flex-shrink-0 w-36 sm:w-40 flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border-2 border-dashed border-accent-light/40 dark:border-accent-dark/40 text-accent-light dark:text-accent-dark hover:border-accent-light dark:hover:border-accent-dark hover:bg-accent-light/5 dark:hover:bg-accent-dark/10 transition-all duration-200 ease-soft-out active:scale-[0.98]"
             aria-label="Agregar nuevo proyecto"
           >
             <div className="w-11 h-11 flex items-center justify-center rounded-full border-2 border-dashed border-current/40">
@@ -142,7 +142,7 @@ export default function ProjectTracker() {
           return (
             <div
               key={project.id}
-              className="relative flex-shrink-0 w-36 sm:w-40 flex flex-col items-center gap-2 p-3 rounded-xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-neutral-300 dark:hover:border-neutral-700/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm hover:-translate-y-0.5 transition-all duration-200 ease-soft-out group"
+              className="relative flex-shrink-0 w-36 sm:w-40 flex flex-col items-center gap-2 p-3 rounded-2xl border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark hover:border-neutral-300 dark:hover:border-neutral-700/50 hover:shadow-soft-sm dark:hover:shadow-soft-dark-sm hover:-translate-y-0.5 transition-all duration-200 ease-soft-out group"
             >
               {/* Delete */}
               <button

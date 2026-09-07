@@ -31,12 +31,12 @@ export default function UpcomingEventsWidget() {
     .slice(0, 5);
 
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out flex flex-col">
+    <div className="p-5 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out flex flex-col">
       <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-neutral-800 to-neutral-950 flex items-center justify-center shadow-sm shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-accent-light dark:bg-accent-dark flex items-center justify-center shadow-sm shrink-0">
           <CalendarDays size={16} className="text-white" />
         </div>
-        <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Próximos eventos</h2>
+        <h2 className="font-heading font-semibold text-text-light dark:text-text-dark text-sm">Próximos eventos</h2>
       </div>
 
       {isLoading ? (
@@ -55,7 +55,7 @@ export default function UpcomingEventsWidget() {
             return (
               <li
                 key={ev.id}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-bg-light/60 dark:bg-bg-dark/40 border border-border-light dark:border-border-dark"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-bg-light/60 dark:bg-bg-dark/40 border border-border-light dark:border-border-dark"
               >
                 <span className={`w-2 h-2 rounded-full shrink-0 ${meta.dot}`} />
                 <div className="min-w-0 flex-1">

@@ -6,7 +6,7 @@ export default function NotionLink() {
       href="https://www.notion.so/Segundo-Cerebro-5d019a1a076345989474c3741930bd89"
       target="_blank"
       rel="noopener noreferrer"
-      className="p-6 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md group transition-all duration-300 ease-soft-out shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:-translate-y-0.5 hover:border-neutral-400 dark:hover:border-neutral-500 active:scale-[0.99] flex flex-col items-center justify-center text-center space-y-3 cursor-pointer"
+      className="p-6 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md group transition-all duration-300 ease-soft-out shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md hover:border-neutral-400 dark:hover:border-neutral-500 active:scale-[0.99] flex flex-col items-center justify-center text-center space-y-3 cursor-pointer"
     >
       <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800/40 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 ease-soft-out">
         <ExternalLink size={24} className="text-neutral-900 dark:text-neutral-100" />

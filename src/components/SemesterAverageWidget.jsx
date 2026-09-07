@@ -47,13 +47,13 @@ export default function SemesterAverageWidget() {
   const conDato = materiaStats.filter((m) => m.promedio !== null).length;
 
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out flex flex-col">
+    <div className="p-5 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out flex flex-col">
       <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center shadow-sm shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-light to-accent-light/80 dark:from-accent-dark dark:to-accent-dark/80 flex items-center justify-center shadow-sm shrink-0">
           <GraduationCap size={16} className="text-white" />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">Calificaciones</h2>
+          <h2 className="font-heading font-semibold text-text-light dark:text-text-dark text-sm">Calificaciones</h2>
         </div>
         <span className="text-[11px] font-medium text-textMuted-light dark:text-textMuted-dark shrink-0">
           {conDato}/{materias.length}
@@ -73,7 +73,7 @@ export default function SemesterAverageWidget() {
           {materiaStats.map((m) => (
             <li
               key={m.id}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-bg-light/60 dark:bg-bg-dark/40 border border-border-light dark:border-border-dark"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-bg-light/60 dark:bg-bg-dark/40 border border-border-light dark:border-border-dark"
             >
               <span className={`w-2 h-2 rounded-full shrink-0 ${m.promedio !== null ? (SEMAFORO_DOT[m.color] || 'bg-slate-400') : 'bg-slate-300 dark:bg-slate-600'}`} />
               <p className="text-xs font-medium text-text-light dark:text-text-dark truncate flex-1 min-w-0">

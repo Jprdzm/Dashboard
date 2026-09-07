@@ -42,14 +42,14 @@ function fmtMoney(value) {
   }).format(value);
 }
 
-function StatRow({ icon: Icon, label, value, valueColor }) {
+function StatRow({ icon: Icon, label, value, valueColor, iconColor, valueClassName }) {
   return (
     <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-bg-light/60 dark:bg-bg-dark/40 border border-border-light dark:border-border-dark">
       <div className="flex items-center gap-2 min-w-0">
-        <Icon size={14} className="text-textMuted-light dark:text-textMuted-dark shrink-0" />
+        <Icon size={14} className={`${iconColor || 'text-textMuted-light dark:text-textMuted-dark'} shrink-0`} />
         <span className="text-xs text-textMuted-light dark:text-textMuted-dark truncate">{label}</span>
       </div>
-      <span className={`text-sm font-bold tabular-nums shrink-0 ${valueColor}`}>{value}</span>
+      <span className={`text-sm font-bold tabular-nums shrink-0 ${valueColor} ${valueClassName || ''}`}>{value}</span>
     </div>
   );
 }
@@ -90,14 +90,14 @@ export default function FinanceCard() {
   const metasLabel = metasProgreso === null ? '—' : `${metasProgreso.toFixed(0)}%`;
 
   return (
-    <div className="p-5 rounded-2xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out group flex flex-col">
+    <div className="p-5 rounded-3xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark dark:backdrop-blur-md shadow-soft-sm dark:shadow-soft-dark-sm hover:scale-[1.015] hover:shadow-soft-md dark:hover:shadow-soft-dark-md transition-all duration-300 ease-soft-out group flex flex-col">
       <div className="flex flex-col items-center gap-4">
         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-all duration-300 ease-soft-out">
           <Wallet size={20} className="text-white" />
         </div>
 
         <div className="text-center">
-          <h2 className="font-semibold text-text-light dark:text-text-dark text-sm">
+          <h2 className="font-heading font-semibold text-text-light dark:text-text-dark text-sm">
             Centro Financiero
           </h2>
           <p className="text-xs text-textMuted-light dark:text-textMuted-dark mt-0.5">
@@ -117,6 +117,8 @@ export default function FinanceCard() {
             label="Remanente del mes"
             value={remanenteLabel}
             valueColor={remanenteColor}
+            valueClassName="font-heading"
+            iconColor="text-accent-light dark:text-accent-dark"
           />
           <StatRow
             icon={PiggyBank}

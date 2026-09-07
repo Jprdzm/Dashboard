@@ -39,9 +39,22 @@ export default {
           light: '#171717',
           dark: '#e5e5e5',
         },
+        // Signature accent for the bento redesign — used sparingly (one
+        // highlight per card: a key number, an active state, a hero ring),
+        // never as the structural chrome color. Keeps the neutral system as
+        // the base so this reads as one deliberate accent, not a return to
+        // the old scattered-color look.
+        accent: {
+          light: '#2563eb',
+          dark: '#60a5fa',
+        },
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        // Distinctive display/heading face for the bento redesign — section
+        // titles and hero numbers use this; body copy stays on `sans` for
+        // readability.
+        heading: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         // Soft, layered elevation — replaces ad-hoc one-off shadow strings.
